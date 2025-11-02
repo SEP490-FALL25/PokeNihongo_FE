@@ -1,11 +1,10 @@
 import { axiosPrivate } from "@configs/axios";
-import { QuestionType } from "@constants/questionBank";
-import { TestCreateRequest, TestListRequest } from "@models/test/request";
+import { TestCreateRequest, TestListRequest, TestTestSetLinkMultipleRequest } from "@models/test/request";
 import {
   TestCreateResponseType,
   TestListResponseType,
+  TestDetailResponseType,
 } from "@models/test/response";
-import { TestSetQuestionBankLinkMultipleRequest } from "@models/testSet/request";
 
 const testService = {
   getTests: async (params?: TestListRequest): Promise<TestListResponseType> => {
@@ -39,34 +38,36 @@ const testService = {
     const response = await axiosPrivate.put(`/test/${id}/with-meanings`, body);
     return response.data;
   },
-  linkQuestionBanksMultiple: async (
-    body: TestSetQuestionBankLinkMultipleRequest
+  linkTestSetMultiple: async (
+    testId: number,
+    body: TestTestSetLinkMultipleRequest
   ): Promise<{ message: string } & Record<string, unknown>> => {
     const response = await axiosPrivate.post(
-      "/test-questionbank/multiple",
+      `/test/${testId}/testSets`,
       body
     );
     return response.data;
   },
-  // Fetch questions already linked to a TestSet
-  getLinkedQuestionBanksByTest: async (
-    testId: number
-  ): Promise<
-    Array<{ id: number; questionJp: string; questionType: QuestionType }>
-  > => {
-    const response = await axiosPrivate.get(
-      `/test-questionbank/test/${testId}/full`
-    );
-    // API returns { statusCode, data, message }
-    return response.data?.data ?? [];
+  getTestById: async (testId: number): Promise<TestDetailResponseType> => {
+    const response = await axiosPrivate.get(`/test/${testId}`);
+    return response.data;
   },
+
   // Remove linked questions from a TestSet by link/question ids
-  deleteLinkedQuestionBanksMany: async (
-    ids: number[]
+  deleteLinkedTestSetsMany: async (
+    testId: number,
+    testSetIds: number[]
   ): Promise<{ message: string } & Record<string, unknown>> => {
     const response = await axiosPrivate.delete(
-      "/test-questionbank/delete-many",
-      { data: { ids } }
+      `/test/${testId}/testSets`,
+      { data: { testSetIds } }
+    );
+    return response.data;
+  },
+  
+  autoAddFreeTestSets: async (): Promise<{ message: string } & Record<string, unknown>> => {
+    const response = await axiosPrivate.post(
+      `/test/auto-add-free-testsets`
     );
     return response.data;
   },

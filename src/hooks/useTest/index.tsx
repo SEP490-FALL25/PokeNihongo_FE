@@ -2,8 +2,7 @@ import { useState, useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import testService from "@services/test";
-import { TestListRequest, TestCreateRequest } from "@models/test/request";
-import { TestSetQuestionBankLinkMultipleRequest } from "@models/testSet/request";
+import { TestListRequest, TestCreateRequest, TestTestSetLinkMultipleRequest } from "@models/test/request";
 import { selectCurrentLanguage } from "@redux/features/language/selector";
 import { useSelector } from "react-redux";
 import { AxiosError } from "axios";
@@ -76,6 +75,7 @@ export const useCreateTest = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["test-list"] });
       queryClient.invalidateQueries({ queryKey: ["testset-list"] });
+      toast.success("Tạo test thành công");
     },
     onError: (error: unknown) => {
       console.error("Error creating test:", error);
@@ -116,6 +116,7 @@ export const useUpdateTest = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["test-list"] });
       queryClient.invalidateQueries({ queryKey: ["testset-list"] });
+      toast.success("Cập nhật thành công");
     },
     onError: (error: unknown) => {
       console.error("Error updating test:", error);
@@ -138,80 +139,123 @@ export const useUpdateTest = () => {
   return updateTestMutation;
 };
 
-/**
- * Hook for linking question banks to a test
- * @returns mutation object with linkQuestionBanks function
- */
-export const useLinkQuestionBanks = () => {
-  const queryClient = useQueryClient();
-
-  const linkQuestionBanksMutation = useMutation({
-    mutationFn: (data: TestSetQuestionBankLinkMultipleRequest) =>
-      testService.linkQuestionBanksMultiple(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["question-bank-list"] });
-      queryClient.invalidateQueries({ queryKey: ["test-list"] });
-      queryClient.invalidateQueries({ queryKey: ["testset-list"] });
-    },
-    onError: (error: unknown) => {
-      console.error("Error linking question banks:", error);
-      toast.error(
-        getErrorMessage(error, "Có lỗi xảy ra khi liên kết câu hỏi")
-      );
-    },
-  });
-
-  return linkQuestionBanksMutation;
-};
 
 /**
- * Hook for fetching linked question banks by test ID
+ * Hook for fetching linked test sets by test ID
  * @param testId number
  * @param options { enabled?: boolean }
  * @returns { data, isLoading, error }
  */
-export const useGetLinkedQuestionBanks = (
+export const useGetLinkedTestSets = (
   testId: number | null,
   options?: { enabled?: boolean }
 ) => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["test-linked-question-banks", testId],
-    queryFn: () => testService.getLinkedQuestionBanksByTest(testId!),
+    queryKey: ["test-detail", testId],
+    queryFn: () => testService.getTestById(testId!),
     enabled: (options?.enabled ?? true) && testId !== null,
   });
 
   return {
-    data: data || [],
+    data: data?.data?.testSets || [],
     isLoading,
     error,
   };
 };
 
 /**
- * Hook for deleting linked question banks
- * @returns mutation object with deleteLinkedQuestionBanks function
+ * Hook for linking test sets to a test
+ * @returns mutation object with linkTestSets function
  */
-export const useDeleteLinkedQuestionBanks = () => {
+export const useLinkTestSets = () => {
   const queryClient = useQueryClient();
 
-  const deleteLinkedQuestionBanksMutation = useMutation({
-    mutationFn: (ids: number[]) =>
-      testService.deleteLinkedQuestionBanksMany(ids),
+  const linkTestSetsMutation = useMutation({
+    mutationFn: ({
+      testId,
+      data,
+    }: {
+      testId: number;
+      data: TestTestSetLinkMultipleRequest;
+    }) => testService.linkTestSetMultiple(testId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["test-linked-question-banks"] });
-      queryClient.invalidateQueries({ queryKey: ["question-bank-list"] });
+      queryClient.invalidateQueries({ queryKey: ["test-detail"] });
       queryClient.invalidateQueries({ queryKey: ["test-list"] });
       queryClient.invalidateQueries({ queryKey: ["testset-list"] });
+      toast.success("Đã thêm bộ đề vào Test");
     },
     onError: (error: unknown) => {
-      console.error("Error deleting linked question banks:", error);
+      console.error("Error linking test sets:", error);
       toast.error(
-        getErrorMessage(error, "Có lỗi xảy ra khi xóa câu hỏi")
+        getErrorMessage(error, "Có lỗi xảy ra khi liên kết bộ đề")
       );
     },
   });
 
-  return deleteLinkedQuestionBanksMutation;
+  return linkTestSetsMutation;
+};
+
+/**
+ * Hook for deleting linked test sets
+ * @returns mutation object with deleteLinkedTestSets function
+ */
+export const useDeleteLinkedTestSets = () => {
+  const queryClient = useQueryClient();
+
+  const deleteLinkedTestSetsMutation = useMutation({
+    mutationFn: ({
+      testId,
+      testSetIds,
+    }: {
+      testId: number;
+      testSetIds: number[];
+    }) => testService.deleteLinkedTestSetsMany(testId, testSetIds),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["test-detail"] });
+      queryClient.invalidateQueries({ queryKey: ["test-list"] });
+      queryClient.invalidateQueries({ queryKey: ["testset-list"] });
+      const count = variables.testSetIds.length;
+      toast.success(
+        count > 1
+          ? `Đã xóa ${count} bộ đề khỏi test`
+          : "Đã xóa bộ đề khỏi test"
+      );
+    },
+    onError: (error: unknown) => {
+      console.error("Error deleting linked test sets:", error);
+      toast.error(
+        getErrorMessage(error, "Có lỗi xảy ra khi xóa bộ đề")
+      );
+    },
+  });
+
+  return deleteLinkedTestSetsMutation;
+};
+
+/**
+ * Hook for auto adding free test sets to PLACEMENT_TEST_DONE test
+ * @returns mutation object with autoAddFreeTestSets function
+ */
+export const useAutoAddFreeTestSets = () => {
+  const queryClient = useQueryClient();
+
+  const autoAddFreeTestSetsMutation = useMutation({
+    mutationFn: () => testService.autoAddFreeTestSets(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["test-detail"] });
+      queryClient.invalidateQueries({ queryKey: ["test-list"] });
+      queryClient.invalidateQueries({ queryKey: ["testset-list"] });
+      toast.success("Đã tự động thêm tất cả TestSet miễn phí vào Test PLACEMENT_TEST_DONE");
+    },
+    onError: (error: unknown) => {
+      console.error("Error auto adding free test sets:", error);
+      toast.error(
+        getErrorMessage(error, "Có lỗi xảy ra khi tự động thêm TestSet miễn phí")
+      );
+    },
+  });
+
+  return autoAddFreeTestSetsMutation;
 };
 
 /**
