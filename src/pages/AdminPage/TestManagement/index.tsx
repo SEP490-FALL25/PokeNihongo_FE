@@ -116,7 +116,7 @@ const TestManagement: React.FC = () => {
       "N3 vocabulary test with 50 basic vocabulary questions in Japanese",
     content:
       "２月１４日は、日本ではバレンタインデーです。キリスト教の特別な日ですが、日本では、女の人が好きな人にチョコレートなどのプレゼントをする日になりました。世界にも同じような日があります。ブラジルでは、６月１２日が「恋人の日」と呼ばれる日です。その日は、男の人も女の人もプレゼントを用意して、恋人におくります。 ブラジルでは、日本のようにチョコレートではなく、写真立てに写真を入れて、プレゼントするそうです。",
-    price: 50000,
+    price: 0,
     levelN: 5 as number,
     testType: "PLACEMENT_TEST_DONE" as TestCreateRequest["testType"],
     status: "ACTIVE" as TestCreateRequest["status"],
@@ -229,7 +229,6 @@ const TestManagement: React.FC = () => {
   const handleSave = async () => {
     setSaving(true);
     const body = {
-      content: form.content,
       meanings: [
         {
           field: "name" as const,
@@ -383,7 +382,7 @@ const TestManagement: React.FC = () => {
     page: qbPage,
     limit: qbPageSize,
     search: qbSearch || undefined,
-    levelN: form.levelN as unknown as number,
+    levelN: form.levelN === 0 ? undefined : (form.levelN as unknown as number),
     questionType: form.testType as unknown as QuestionType,
     // extra flexible fields supported by backend through catchall
     testSetId: selectedId || undefined,
@@ -469,6 +468,7 @@ const TestManagement: React.FC = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ALL">Tất cả cấp</SelectItem>
+                  <SelectItem value="0">N0 (Tất cả cấp)</SelectItem>
                   <SelectItem value="1">N1</SelectItem>
                   <SelectItem value="2">N2</SelectItem>
                   <SelectItem value="3">N3</SelectItem>
@@ -687,13 +687,12 @@ const TestManagement: React.FC = () => {
               </div>
             
               <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                <div>
-                  <label className="text-sm font-medium">Price</label>
-                  <Input
-                    type="number"
-                    value={form.price}
-                    onChange={(e) =>
-                      setForm({ ...form, price: Number(e.target.value) })
+                <div className="flex items-end gap-2">
+                  <label className="text-sm font-medium">Có phí</label>
+                  <Switch
+                    checked={form.price === 1}
+                    onCheckedChange={(checked) =>
+                      setForm({ ...form, price: checked ? 1 : 0 })
                     }
                   />
                 </div>
@@ -709,6 +708,7 @@ const TestManagement: React.FC = () => {
                       <SelectValue placeholder="Chọn cấp độ" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="0">N0 (Tất cả cấp)</SelectItem>
                       <SelectItem value="1">N1</SelectItem>
                       <SelectItem value="2">N2</SelectItem>
                       <SelectItem value="3">N3</SelectItem>

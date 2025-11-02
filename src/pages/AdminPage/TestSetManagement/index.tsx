@@ -87,7 +87,7 @@ const TestSetManagement: React.FC = () => {
   const [isAddQuestionsOpen, setIsAddQuestionsOpen] = useState(false);
   // Linked questions of current test set
   const [linkedQuestions, setLinkedQuestions] = useState<
-    Array<{ id: number; questionJp: string; questionType: QuestionType }>
+    Array<{ id: number; questionJp: string; questionType: QuestionType; levelN: number }>
   >([]);
   const [loadingLinked, setLoadingLinked] = useState(false);
   const [selectedLinkedIds, setSelectedLinkedIds] = useState<number[]>([]);
@@ -102,7 +102,7 @@ const TestSetManagement: React.FC = () => {
       "２月１４日は、日本ではバレンタインデーです。キリスト教の特別な日ですが、日本では、女の人が好きな人にチョコレートなどのプレゼントをする日になりました。世界にも同じような日があります。ブラジルでは、６月１２日が「恋人の日」と呼ばれる日です。その日は、男の人も女の人もプレゼントを用意して、恋人におくります。 ブラジルでは、日本のようにチョコレートではなく、写真立てに写真を入れて、プレゼントするそうです。",
     audioUrl:
       "https://storage.googleapis.com/pokenihongo-audio/testset-n3-vocab-instruction.mp3",
-    price: 50000,
+    price: 0,
     levelN: 3,
     testType: "VOCABULARY" as TestSetCreateRequest["testType"],
     status: "DRAFT" as TestSetCreateRequest["status"],
@@ -117,10 +117,10 @@ const TestSetManagement: React.FC = () => {
       descriptionEn: "",
       content: "",
       audioUrl: "",
-      price: 0,
-      levelN: 3,
-      testType: "VOCABULARY",
-      status: "DRAFT",
+      price: 1,
+      levelN: 0,
+      testType: "GENERAL",
+      status: "ACTIVE",
     });
     setIsDialogOpen(true);
   };
@@ -183,7 +183,14 @@ const TestSetManagement: React.FC = () => {
         const list = await testSetService.getLinkedQuestionBanksByTestSet(
           selectedId
         );
-        setLinkedQuestions(Array.isArray(list) ? list : []);
+        setLinkedQuestions(
+          Array.isArray(list)
+            ? list.map((q) => ({
+                ...q,
+                levelN: (q as { levelN?: number }).levelN ?? 0,
+              }))
+            : []
+        );
         setSelectedLinkedIds([]);
       } catch (err) {
         console.error("Lỗi tải danh sách câu hỏi đã liên kết:", err);
@@ -367,8 +374,8 @@ const TestSetManagement: React.FC = () => {
     page: qbPage,
     limit: qbPageSize,
     search: qbSearch || undefined,
-    levelN: form.levelN as unknown as number,
-    questionType: form.testType as unknown as QuestionType,
+    levelN: form.levelN === 0 ? undefined : (form.levelN as unknown as number),
+    questionType: form.testType === "GENERAL" ? undefined : (form.testType as unknown as QuestionType),
     // extra flexible fields supported by backend through catchall
     testSetId: selectedId || undefined,
     noTestSet: qbNoTestSet,
@@ -409,7 +416,14 @@ const TestSetManagement: React.FC = () => {
         const list = await testSetService.getLinkedQuestionBanksByTestSet(
           selectedId
         );
-        setLinkedQuestions(Array.isArray(list) ? list : []);
+        setLinkedQuestions(
+          Array.isArray(list)
+            ? list.map((q) => ({
+                ...q,
+                levelN: (q as { levelN?: number }).levelN ?? 0,
+              }))
+            : []
+        );
         setSelectedLinkedIds([]);
       } catch (err) {
         console.error("Lỗi tải lại danh sách câu hỏi:", err);
@@ -461,6 +475,7 @@ const TestSetManagement: React.FC = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ALL">Tất cả cấp</SelectItem>
+                  <SelectItem value="0">Tất cả cấp</SelectItem>
                   <SelectItem value="1">N1</SelectItem>
                   <SelectItem value="2">N2</SelectItem>
                   <SelectItem value="3">N3</SelectItem>
@@ -687,13 +702,12 @@ const TestSetManagement: React.FC = () => {
                 onChange={(e) => setForm({ ...form, audioUrl: e.target.value })}
               />
               <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                <div>
-                  <label className="text-sm font-medium">Price</label>
-                  <Input
-                    type="number"
-                    value={form.price}
-                    onChange={(e) =>
-                      setForm({ ...form, price: Number(e.target.value) })
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium">Có phí</label>
+                  <Switch
+                    checked={form.price === 1}
+                    onCheckedChange={(checked) =>
+                      setForm({ ...form, price: checked ? 1 : 0 })
                     }
                   />
                 </div>
@@ -709,6 +723,7 @@ const TestSetManagement: React.FC = () => {
                       <SelectValue placeholder="Chọn cấp độ" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="0">Tất cả cấp</SelectItem>
                       <SelectItem value="1">N1</SelectItem>
                       <SelectItem value="2">N2</SelectItem>
                       <SelectItem value="3">N3</SelectItem>
@@ -718,7 +733,7 @@ const TestSetManagement: React.FC = () => {
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Test Type</label>
+                  <label className="text-sm font-medium">Loại đề</label>
                   <Select
                     value={form.testType}
                     onValueChange={(v) =>
@@ -732,13 +747,13 @@ const TestSetManagement: React.FC = () => {
                       <SelectValue placeholder="Chọn loại" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="VOCABULARY">VOCABULARY</SelectItem>
-                      <SelectItem value="GRAMMAR">GRAMMAR</SelectItem>
-                      <SelectItem value="KANJI">KANJI</SelectItem>
-                      <SelectItem value="LISTENING">LISTENING</SelectItem>
-                      <SelectItem value="READING">READING</SelectItem>
-                      <SelectItem value="SPEAKING">SPEAKING</SelectItem>
-                      <SelectItem value="GENERAL">GENERAL</SelectItem>
+                      <SelectItem value="VOCABULARY">Từ vựng</SelectItem>
+                      <SelectItem value="GRAMMAR">Ngữ pháp</SelectItem>
+                      <SelectItem value="KANJI">Hán tự</SelectItem>
+                      <SelectItem value="LISTENING">Nghe</SelectItem>
+                      <SelectItem value="READING">Đọc</SelectItem>
+                      <SelectItem value="SPEAKING">Nói</SelectItem>
+                      <SelectItem value="GENERAL">Tổng hợp</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -806,7 +821,7 @@ const TestSetManagement: React.FC = () => {
                             />
                             <div className="flex-1">
                               <div className="font-medium">
-                                {q.questionJp} - {q.questionType}
+                                {q.questionJp} - {q.questionType} - N{q.levelN || 0}
                               </div>
                             </div>
                             <button
@@ -868,7 +883,7 @@ const TestSetManagement: React.FC = () => {
                 />
                 <div className="flex items-center gap-2 ml-2">
                   <span className="text-sm text-muted-foreground">
-                    noTestSet
+             Lấy những câu hỏi không có trong test set
                   </span>
                   <Switch
                     checked={qbNoTestSet}
@@ -880,7 +895,7 @@ const TestSetManagement: React.FC = () => {
                   />
                 </div>
                 <div className="flex items-center gap-2 ml-2">
-                  <label className="text-sm font-medium">Test Type</label>
+                  <label className="text-sm font-medium">Loại câu hỏi</label>
                   <Select
                     value={form.testType}
                     onValueChange={(v) =>
@@ -894,13 +909,13 @@ const TestSetManagement: React.FC = () => {
                       <SelectValue placeholder="Chọn loại" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="VOCABULARY">VOCABULARY</SelectItem>
-                      <SelectItem value="GRAMMAR">GRAMMAR</SelectItem>
-                      <SelectItem value="KANJI">KANJI</SelectItem>
-                      <SelectItem value="LISTENING">LISTENING</SelectItem>
-                      <SelectItem value="READING">READING</SelectItem>
-                      <SelectItem value="SPEAKING">SPEAKING</SelectItem>
-                      <SelectItem value="GENERAL">GENERAL</SelectItem>
+                      <SelectItem value="VOCABULARY">Từ vựng</SelectItem>
+                      <SelectItem value="GRAMMAR">Ngữ pháp</SelectItem>
+                      <SelectItem value="KANJI">Hán tự</SelectItem>
+                      <SelectItem value="LISTENING">Nghe</SelectItem>
+                      <SelectItem value="READING">Đọc</SelectItem>
+                      <SelectItem value="SPEAKING">Nói</SelectItem>
+                      <SelectItem value="GENERAL">Tổng hợp</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
