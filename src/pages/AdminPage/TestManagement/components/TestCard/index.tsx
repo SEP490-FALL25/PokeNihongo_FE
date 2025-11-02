@@ -1,14 +1,15 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card";
 import { Badge } from "@ui/Badge";
+import { DollarSign } from "lucide-react";
 
-interface TestSetCardProps {
-  testSet: {
+interface TestCardProps {
+  test: {
     id: number;
-    levelN: number;
+    levelN: number | null;
     status: string;
     testType: string;
-    content: string;
+    price: number | null;
     name?: unknown;
     description?: unknown;
   };
@@ -16,8 +17,8 @@ interface TestSetCardProps {
   onClick: () => void;
 }
 
-const TestSetCard: React.FC<TestSetCardProps> = ({
-  testSet,
+const TestCard: React.FC<TestCardProps> = ({
+  test,
   extractText,
   onClick,
 }) => {
@@ -31,45 +32,54 @@ const TestSetCard: React.FC<TestSetCardProps> = ({
           <div className="flex-1">
             <CardTitle className="text-lg">
               {extractText(
-                (testSet as unknown as Record<string, unknown>).name,
+                (test as unknown as Record<string, unknown>).name,
                 "vi"
               )}
             </CardTitle>
             <p className="text-sm text-gray-600 line-clamp-2">
               {extractText(
-                (testSet as unknown as Record<string, unknown>).description,
+                (test as unknown as Record<string, unknown>).description,
                 "vi"
               )}
             </p>
           </div>
           <div className="flex gap-2">
-            <Badge variant="outline">N{testSet.levelN}</Badge>
+            <Badge variant="outline">N{test.levelN ?? 0}</Badge>
             <Badge
               className={
-                testSet.status === "ACTIVE"
+                test.status === "ACTIVE"
                   ? "bg-green-100 text-green-800"
-                  : testSet.status === "DRAFT"
+                  : test.status === "DRAFT"
                   ? "bg-yellow-100 text-yellow-800"
                   : "bg-gray-100 text-gray-800"
               }
             >
-              {testSet.status}
+              {test.status}
             </Badge>
           </div>
         </div>
       </CardHeader>
       <CardContent>
         <div className="text-sm text-gray-700 mb-3 line-clamp-3">
-          {testSet.content}
+          {extractText(
+            (test as unknown as Record<string, unknown>).description,
+            "vi"
+          )}
         </div>
         <div className="flex items-center justify-between text-sm text-gray-600">
-          <div>{testSet.testType}</div>
-          <div>#{testSet.id}</div>
+          <div className="flex items-center gap-1">
+            <DollarSign className="h-4 w-4" />
+            {test.price
+              ? `${test.price.toLocaleString()} ₫`
+              : "Miễn phí"}
+          </div>
+          <div>{test.testType.toUpperCase()}</div>
+          <div>#{test.id}</div>
         </div>
       </CardContent>
     </Card>
   );
 };
 
-export default TestSetCard;
+export default TestCard;
 
