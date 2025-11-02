@@ -22,7 +22,6 @@ import { IQueryQuestionRequest } from "@models/questionBank/request";
 import { QuestionEntityType } from "@models/questionBank/entity";
 import { QuestionType } from "@constants/questionBank";
 import { toast } from "react-toastify";
-import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { TestCreateRequest } from "@models/test/request";
 import {
@@ -262,7 +261,6 @@ const TestManagement: React.FC = () => {
                   {
                     onSuccess: () => {
                       setSelectedQuestionIds([]);
-                      queryClient.invalidateQueries({ queryKey: ["testset-list"] });
                       toast.success("Cập nhật thành công");
                       setIsDialogOpen(false);
                       setSelectedId(null);
@@ -270,7 +268,6 @@ const TestManagement: React.FC = () => {
                     },
                     onError: () => {
                       // Still close dialog even if linking fails
-                      queryClient.invalidateQueries({ queryKey: ["testset-list"] });
                       toast.success("Cập nhật thành công");
                       setIsDialogOpen(false);
                       setSelectedId(null);
@@ -279,7 +276,6 @@ const TestManagement: React.FC = () => {
                   }
                 );
               } else {
-                queryClient.invalidateQueries({ queryKey: ["testset-list"] });
                 toast.success("Cập nhật thành công");
                 setIsDialogOpen(false);
                 setSelectedId(null);
@@ -313,7 +309,6 @@ const TestManagement: React.FC = () => {
                 {
                   onSuccess: () => {
                     setSelectedQuestionIds([]);
-                    queryClient.invalidateQueries({ queryKey: ["testset-list"] });
                     toast.success("Tạo bộ đề thành công");
                     // keep dialog open and switch to edit mode for further actions
                     setSelectedId(newId);
@@ -325,7 +320,6 @@ const TestManagement: React.FC = () => {
                   },
                   onError: () => {
                     // Still proceed even if linking fails
-                    queryClient.invalidateQueries({ queryKey: ["testset-list"] });
                     toast.success("Tạo bộ đề thành công");
                     setSelectedId(newId);
                     setIsDialogOpen(true);
@@ -336,7 +330,6 @@ const TestManagement: React.FC = () => {
                 }
               );
             } else {
-              queryClient.invalidateQueries({ queryKey: ["testset-list"] });
               toast.success("Tạo bộ đề thành công");
               setSelectedId(newId);
               setIsDialogOpen(true);
@@ -358,8 +351,6 @@ const TestManagement: React.FC = () => {
       setSaving(false);
     }
   };
-
-  const queryClient = useQueryClient();
 
   // Add questions dialog state
   const [qbSearch, setQbSearch] = useState("");
