@@ -60,7 +60,7 @@ const TestManagement: React.FC = () => {
     price: 0,
     limit: undefined as number | undefined,
     levelN: 5 as number,
-    testType: "PLACEMENT_TEST_DONE" as TestCreateRequest["testType"],
+    testType: "READING_TEST" as TestCreateRequest["testType"],
     status: "ACTIVE" as TestCreateRequest["status"],
   });
 
@@ -74,7 +74,7 @@ const TestManagement: React.FC = () => {
       price: 0,
       limit: undefined,
       levelN: 5,
-      testType: "PLACEMENT_TEST_DONE",
+      testType: "READING_TEST",
       status: "ACTIVE",
     });
     setIsDialogOpen(true);
