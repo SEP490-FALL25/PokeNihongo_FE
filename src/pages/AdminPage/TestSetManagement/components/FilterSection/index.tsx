@@ -20,8 +20,8 @@ interface FilterSectionProps {
   };
   onSearchChange: (search: string) => void;
   onLevelChange: (level: number | undefined) => void;
-  onTestTypeChange: (testType: TestSetCreateRequest["testType"]) => void;
-  onStatusChange: (status: TestSetCreateRequest["status"]) => void;
+  onTestTypeChange: (testType: TestSetCreateRequest["testType"] | undefined) => void;
+  onStatusChange: (status: TestSetCreateRequest["status"] | undefined) => void;
 }
 
 const FilterSection: React.FC<FilterSectionProps> = ({
