@@ -1,6 +1,6 @@
 import { axiosPrivate } from "@configs/axios";
-import { CreateExerciseRequest } from "@models/exercise/request";
-import { CreateExerciseResponseType } from "@models/exercise/response";
+import { CreateExerciseRequest, UpdateExerciseRequest } from "@models/exercise/request";
+import { CreateExerciseResponseType, UpdateExerciseResponseType } from "@models/exercise/response";
 
 const exerciseService = {
   getExercisesByLessonId: async (lessonId: number) => {
@@ -13,6 +13,10 @@ const exerciseService = {
   },
   deleteExercise: async (id: number): Promise<{ message: string } & Record<string, unknown>> => {
     const response = await axiosPrivate.delete(`/exercises/${id}`);
+    return response.data;
+  },
+  updateExercise: async (id: number, data: UpdateExerciseRequest): Promise<UpdateExerciseResponseType> => {
+    const response = await axiosPrivate.put(`/exercises/${id}`, data);
     return response.data;
   },
 };

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import exerciseService from "@services/exercise";
-import { CreateExerciseRequest } from "@models/exercise/request";
+import { CreateExerciseRequest, UpdateExerciseRequest } from "@models/exercise/request";
 
 interface ApiError {
   response?: {
@@ -82,6 +82,38 @@ export const useDeleteExercise = (lessonId: number) => {
   return {
     deleteExercise: mutation.mutate,
     isDeleting: mutation.isPending,
+    error: mutation.error,
+  };
+};
+
+/**
+ * Hook for updating an exercise by id
+ */
+export const useUpdateExercise = (lessonId: number) => {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: UpdateExerciseRequest }) => 
+      exerciseService.updateExercise(id, data),
+    onSuccess: (response) => {
+      toast.success(response.message || "Cập nhật bài tập thành công");
+      queryClient.invalidateQueries({ queryKey: ["exercises", { lessonId }] });
+    },
+    onError: (error: ApiError) => {
+      const errorMessage = error.response?.data?.message;
+      if (Array.isArray(errorMessage)) {
+        toast.error(errorMessage.join(", "));
+      } else if (errorMessage) {
+        toast.error(errorMessage);
+      } else {
+        toast.error("Có lỗi xảy ra khi cập nhật bài tập");
+      }
+    },
+  });
+
+  return {
+    updateExercise: mutation.mutate,
+    isUpdating: mutation.isPending,
     error: mutation.error,
   };
 };

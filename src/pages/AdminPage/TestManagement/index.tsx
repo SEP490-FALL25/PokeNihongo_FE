@@ -60,7 +60,7 @@ const TestManagement: React.FC = () => {
     price: 0,
     limit: undefined as number | undefined,
     levelN: 5 as number,
-    testType: "PLACEMENT_TEST_DONE" as TestCreateRequest["testType"],
+    testType: "READING_TEST" as TestCreateRequest["testType"],
     status: "ACTIVE" as TestCreateRequest["status"],
   });
 
@@ -74,7 +74,7 @@ const TestManagement: React.FC = () => {
       price: 0,
       limit: undefined,
       levelN: 5,
-      testType: "PLACEMENT_TEST_DONE",
+      testType: "READING_TEST",
       status: "ACTIVE",
     });
     setIsDialogOpen(true);
@@ -214,13 +214,17 @@ const TestManagement: React.FC = () => {
   const [tsPage, setTsPage] = useState(1);
   const [tsPageSize, setTsPageSize] = useState(15);
   const [tsForceKey, setTsForceKey] = useState(0);
+  const [tsLevelN, setTsLevelN] = useState<number | undefined>(undefined);
+  const [tsTestType, setTsTestType] = useState<TestSetListRequest["testType"]>(undefined);
+  const [tsNoPrice, setTsNoPrice] = useState<boolean | undefined>(undefined);
 
   const testSetFilters: TestSetListRequest = {
     currentPage: tsPage,
     pageSize: tsPageSize,
     search: tsSearch || undefined,
-    levelN: form.levelN === 0 ? undefined : form.levelN,
-    testType: undefined, // Allow all test types for now
+    levelN: tsLevelN,
+    testType: tsTestType,
+    noPrice: tsNoPrice,
   };
 
   const {
@@ -240,6 +244,9 @@ const TestManagement: React.FC = () => {
     setSelectedTestSetIds([]);
     setTsSearch("");
     setTsPage(1);
+    setTsLevelN(undefined);
+    setTsTestType(undefined);
+    setTsNoPrice(undefined);
     setTsForceKey((k) => k + 1);
     setIsAddTestSetsOpen(true);
   };
@@ -382,17 +389,35 @@ const TestManagement: React.FC = () => {
           tsPage={tsPage}
           tsPageSize={tsPageSize}
           tsSearch={tsSearch}
+          tsLevelN={tsLevelN}
+          tsTestType={tsTestType}
+          tsNoPrice={tsNoPrice}
           selectedTestSetIds={selectedTestSetIds}
           extractText={extractText}
           onSearchChange={(search) => {
             setTsSearch(search);
-                    setTsPage(1);
-                  }}
+            setTsPage(1);
+          }}
+          onLevelChange={(level) => {
+            setTsLevelN(level);
+            setTsPage(1);
+            setTsForceKey((k) => k + 1);
+          }}
+          onTestTypeChange={(testType) => {
+            setTsTestType(testType);
+            setTsPage(1);
+            setTsForceKey((k) => k + 1);
+          }}
+          onNoPriceChange={(noPrice) => {
+            setTsNoPrice(noPrice);
+            setTsPage(1);
+            setTsForceKey((k) => k + 1);
+          }}
           onPageChange={setTsPage}
           onPageSizeChange={(size) => {
             setTsPageSize(size);
-                      setTsPage(1);
-                    }}
+            setTsPage(1);
+          }}
           onToggleSelect={toggleSelectTestSet}
           onLinkSelected={handleLinkSelected}
           isLinking={linkTestSetsMutation.isPending}

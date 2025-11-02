@@ -12,3 +12,11 @@ export const CreateExerciseResponseSchema = z.object({
 });
 
 export type CreateExerciseResponseType = z.infer<typeof CreateExerciseResponseSchema>;
+
+export const UpdateExerciseResponseSchema = z.object({
+  statusCode: z.number(),
+  data: ExerciseResponseSchema,
+  message: z.string(),
+});
+
+export type UpdateExerciseResponseType = z.infer<typeof UpdateExerciseResponseSchema>;

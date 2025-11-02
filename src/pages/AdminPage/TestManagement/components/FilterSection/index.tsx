@@ -20,7 +20,9 @@ interface FilterSectionProps {
   };
   onSearchChange: (search: string) => void;
   onLevelChange: (level: number | undefined) => void;
-  onTestTypeChange: (testType: TestCreateRequest["testType"] | undefined) => void;
+  onTestTypeChange: (
+    testType: TestCreateRequest["testType"] | undefined
+  ) => void;
   onStatusChange: (status: TestCreateRequest["status"] | undefined) => void;
 }
 
@@ -49,7 +51,9 @@ const FilterSection: React.FC<FilterSectionProps> = ({
           </div>
           <Select
             value={filters.levelN ? String(filters.levelN) : "ALL"}
-            onValueChange={(v) => onLevelChange(v === "ALL" ? undefined : Number(v))}
+            onValueChange={(v) =>
+              onLevelChange(v === "ALL" ? undefined : Number(v))
+            }
           >
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="Cấp độ" />
@@ -77,11 +81,16 @@ const FilterSection: React.FC<FilterSectionProps> = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">Tất cả loại</SelectItem>
-              <SelectItem value="PLACEMENT_TEST_DONE">PLACEMENT_TEST_DONE</SelectItem>
-              <SelectItem value="MATCH_TEST">MATCH_TEST</SelectItem>
-              <SelectItem value="QUIZ_TEST">QUIZ_TEST</SelectItem>
-              <SelectItem value="REVIEW_TEST">REVIEW_TEST</SelectItem>
-              <SelectItem value="PRACTICE_TEST">PRACTICE_TEST</SelectItem>
+              <SelectItem value="READING_TEST">Reading test</SelectItem>
+              <SelectItem value="LISTENING_TEST">Listening test</SelectItem>
+              <SelectItem value="SPEAKING_TEST">Speaking test</SelectItem>
+              <SelectItem value="MATCH_TEST">Match test</SelectItem>
+              <SelectItem value="QUIZ_TEST">Quiz test</SelectItem>
+              <SelectItem value="REVIEW_TEST">Review test</SelectItem>
+              <SelectItem value="PRACTICE_TEST">Practice test</SelectItem>
+              <SelectItem value="PLACEMENT_TEST_DONE">
+                Placement test
+              </SelectItem>
             </SelectContent>
           </Select>
           <Select
@@ -109,4 +118,3 @@ const FilterSection: React.FC<FilterSectionProps> = ({
 };
 
 export default FilterSection;
-

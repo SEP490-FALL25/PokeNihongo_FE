@@ -120,7 +120,7 @@ const TestDialog: React.FC<TestDialogProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-            <div className="flex items-end gap-2">
+            <div className="flex items-center gap-2">
               <label className="text-sm font-medium">Có phí</label>
               <Switch
                 checked={form.price === 1}
@@ -165,13 +165,16 @@ const TestDialog: React.FC<TestDialogProps> = ({
                   <SelectValue placeholder="Chọn loại" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="PLACEMENT_TEST_DONE">
-                    Placement test
-                  </SelectItem>
+                  <SelectItem value="READING_TEST">Reading test</SelectItem>
+                  <SelectItem value="LISTENING_TEST">Listening test</SelectItem>
+                  <SelectItem value="SPEAKING_TEST">Speaking test</SelectItem>
                   <SelectItem value="MATCH_TEST">Match test</SelectItem>
                   <SelectItem value="QUIZ_TEST">Quiz test</SelectItem>
                   <SelectItem value="REVIEW_TEST">Review test</SelectItem>
                   <SelectItem value="PRACTICE_TEST">Practice test</SelectItem>
+                  <SelectItem value="PLACEMENT_TEST_DONE">
+                    Placement test
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -253,4 +256,3 @@ const TestDialog: React.FC<TestDialogProps> = ({
 };
 
 export default TestDialog;
-
