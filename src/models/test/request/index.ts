@@ -13,6 +13,7 @@ export type TestListRequest = z.infer<typeof TestListRequestSchema>;
 
 export const TestCreateRequestSchema = z.object({
   price: z.number().optional(),
+  limit: z.number().optional(),
   testType: z.enum(['PLACEMENT_TEST_DONE', 'MATCH_TEST', 'QUIZ_TEST', 'REVIEW_TEST', 'PRACTICE_TEST']),
   status: z.enum(['DRAFT', 'ACTIVE', 'INACTIVE'])
 });
@@ -20,9 +21,8 @@ export const TestCreateRequestSchema = z.object({
 export type TestCreateRequest = z.infer<typeof TestCreateRequestSchema>;
 
 // Link multiple QuestionBanks to a Test
-export const TestQuestionBankLinkMultipleSchema = z.object({
-  testId: z.number(),
-  questionBankIds: z.array(z.number()).min(1),
+export const TestTestSetLinkMultipleSchema = z.object({
+  testSetIds: z.array(z.number()).min(1),
 });
 
-export type TestQuestionBankLinkMultipleRequest = z.infer<typeof TestQuestionBankLinkMultipleSchema>;
+export type TestTestSetLinkMultipleRequest = z.infer<typeof TestTestSetLinkMultipleSchema>;

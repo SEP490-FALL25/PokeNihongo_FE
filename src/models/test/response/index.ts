@@ -1,6 +1,6 @@
 import { PaginationMetaSchema } from "@models/common/response";
 import z from "zod";
-import { TestEntitySchema } from "../entity";
+import { TestDetailDataSchema, TestEntitySchema } from "../entity";
 
 export const TestResponseSchema = TestEntitySchema;
 
@@ -24,3 +24,14 @@ export const TestCreateResponseSchema = z.object({
 });
 
 export type TestCreateResponseType = z.infer<typeof TestCreateResponseSchema>;
+
+
+
+export const TestDetailResponseSchema = z.object({
+  statusCode: z.number(),
+  data: TestDetailDataSchema,
+  message: z.string(),
+});
+
+export type TestDetailResponseType = z.infer<typeof TestDetailResponseSchema>;
+

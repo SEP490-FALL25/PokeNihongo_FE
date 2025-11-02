@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@ui/Button";
 import { Input } from "@ui/Input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@ui/Dialog";
@@ -17,62 +17,23 @@ import HeaderAdmin from "@organisms/Header/Admin";
 import PaginationControls from "@ui/PaginationControls";
 import { Checkbox } from "@ui/Checkbox";
 import { Switch } from "@ui/Switch";
-import { useQuestionBankList } from "@hooks/useQuestionBank";
-import { IQueryQuestionRequest } from "@models/questionBank/request";
-import { QuestionEntityType } from "@models/questionBank/entity";
-import { QuestionType } from "@constants/questionBank";
 import { toast } from "react-toastify";
-import { AxiosError } from "axios";
 import { TestCreateRequest } from "@models/test/request";
 import {
   useCreateTest,
   useUpdateTest,
-  useLinkQuestionBanks,
-  useGetLinkedQuestionBanks,
-  useDeleteLinkedQuestionBanks,
   useTest,
+  useGetLinkedTestSets,
+  useLinkTestSets,
+  useDeleteLinkedTestSets,
+  useAutoAddFreeTestSets,
 } from "@hooks/useTest";
+import { useTestSetList } from "@hooks/useTestSet";
+import { TestSetListRequest } from "@models/testSet/request";
+import { TestSetEntity } from "@models/testSet/entity";
+import { extractText, getTranslation } from "./utils/helpers";
 
 const TestManagement: React.FC = () => {
-  // Helper function to extract error message from axios error response
-  const getErrorMessage = (error: unknown, defaultMessage: string): string => {
-    if (error instanceof AxiosError) {
-      const message = error.response?.data?.message;
-      if (message) {
-        return Array.isArray(message) ? message.join(", ") : message;
-      }
-    }
-    if (error instanceof Error) {
-      return error.message;
-    }
-    return defaultMessage;
-  };
-
-  type TranslationEntry = { language: string; value: string };
-  const isTranslationArray = (field: unknown): field is TranslationEntry[] =>
-    Array.isArray(field);
-
-  const extractText = (field: unknown, lang: string = "vi"): string => {
-    if (isTranslationArray(field)) {
-      const byLang = field.find((f) => f?.language === lang)?.value?.trim();
-      if (byLang) return byLang;
-      const vi = field.find((f) => f?.language === "vi")?.value?.trim();
-      if (vi) return vi;
-      const en = field.find((f) => f?.language === "en")?.value?.trim();
-      if (en) return en;
-      const first = field.find((f) => f?.value)?.value?.trim();
-      return first || "";
-    }
-    if (typeof field === "string") return field;
-    return "";
-  };
-
-  const getTranslation = (field: unknown, language: string): string => {
-    if (isTranslationArray(field)) {
-      return field.find((f) => f?.language === language)?.value || "";
-    }
-    return typeof field === "string" ? field : "";
-  };
   const {
     tests,
     isLoading,
@@ -85,27 +46,22 @@ const TestManagement: React.FC = () => {
     handlePageChange,
     handlePageSizeChange,
   } = useTest();
-  const [saving, setSaving] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isAddQuestionsOpen, setIsAddQuestionsOpen] = useState(false);
-  // Linked questions of current test set
+  const [isAddTestSetsOpen, setIsAddTestSetsOpen] = useState(false);
   const [selectedLinkedIds, setSelectedLinkedIds] = useState<number[]>([]);
+  const [selectedTestSetIds, setSelectedTestSetIds] = useState<number[]>([]);
   
   // Test service hooks
   const createTestMutation = useCreateTest();
   const updateTestMutation = useUpdateTest();
-  const linkQuestionBanksMutation = useLinkQuestionBanks();
-  const deleteLinkedQuestionBanksMutation = useDeleteLinkedQuestionBanks();
+  const linkTestSetsMutation = useLinkTestSets();
+  const deleteLinkedTestSetsMutation = useDeleteLinkedTestSets();
+  const autoAddFreeTestSetsMutation = useAutoAddFreeTestSets();
   const {
-    data: linkedQuestionsData,
+    data: linkedTestSets,
     isLoading: loadingLinked,
-  } = useGetLinkedQuestionBanks(selectedId, { enabled: isDialogOpen && selectedId !== null });
-  
-  const linkedQuestions = (linkedQuestionsData || []).map((q) => ({
-    ...q,
-    questionType: (q.questionType as QuestionType) || "VOCABULARY" as QuestionType,
-  }));
+  } = useGetLinkedTestSets(selectedId, { enabled: isDialogOpen && selectedId !== null });
   const [form, setForm] = useState({
     nameVi: "Đề thi từ vựng N3 - Phần 1",
     nameEn: "N3 Vocabulary Test - Part 1",
@@ -116,6 +72,7 @@ const TestManagement: React.FC = () => {
     content:
       "２月１４日は、日本ではバレンタインデーです。キリスト教の特別な日ですが、日本では、女の人が好きな人にチョコレートなどのプレゼントをする日になりました。世界にも同じような日があります。ブラジルでは、６月１２日が「恋人の日」と呼ばれる日です。その日は、男の人も女の人もプレゼントを用意して、恋人におくります。 ブラジルでは、日本のようにチョコレートではなく、写真立てに写真を入れて、プレゼントするそうです。",
     price: 0,
+    limit: undefined as number | undefined,
     levelN: 5 as number,
     testType: "PLACEMENT_TEST_DONE" as TestCreateRequest["testType"],
     status: "ACTIVE" as TestCreateRequest["status"],
@@ -130,6 +87,7 @@ const TestManagement: React.FC = () => {
       descriptionEn: "",
       content: "",
       price: 0,
+      limit: undefined,
       levelN: 5,
       testType: "PLACEMENT_TEST_DONE",
       status: "ACTIVE",
@@ -173,6 +131,7 @@ const TestManagement: React.FC = () => {
         ),
       content: (item as unknown as Record<string, unknown>).content as string,
       price: item.price || 0,
+      limit: (item as { limit?: number | null }).limit ?? undefined,
       levelN: item.levelN as number,
       testType: item.testType as TestCreateRequest["testType"],
       status: item.status,
@@ -188,18 +147,16 @@ const TestManagement: React.FC = () => {
     }
   }, [isDialogOpen]);
 
-  const handleRemoveLinked = async (id: number) => {
-    if (!id) return;
-    deleteLinkedQuestionBanksMutation.mutate([id], {
-      onSuccess: () => {
-        setSelectedLinkedIds((prev) => prev.filter((qId) => qId !== id));
-        toast.success("Đã xóa câu hỏi khỏi test");
-      },
-      onError: (e) => {
-        console.error("Lỗi xóa câu hỏi khỏi test:", e);
-        toast.error(getErrorMessage(e, "Không thể xóa câu hỏi khỏi test"));
-      },
-    });
+  const handleRemoveLinked = (id: number) => {
+    if (!id || !selectedId) return;
+    deleteLinkedTestSetsMutation.mutate(
+      { testId: selectedId, testSetIds: [id] },
+      {
+        onSuccess: () => {
+          setSelectedLinkedIds((prev) => prev.filter((qId) => qId !== id));
+        },
+      }
+    );
   };
 
   const toggleSelectLinked = (id: number) => {
@@ -208,25 +165,23 @@ const TestManagement: React.FC = () => {
     );
   };
 
-  const handleRemoveSelectedLinked = async () => {
-    if (selectedLinkedIds.length === 0) {
-      toast.error("Hãy chọn ít nhất một câu hỏi để xóa");
+  const handleRemoveSelectedLinked = () => {
+    if (selectedLinkedIds.length === 0 || !selectedId) {
+      toast.error("Hãy chọn ít nhất một bộ đề để xóa");
       return;
     }
-    deleteLinkedQuestionBanksMutation.mutate(selectedLinkedIds, {
-      onSuccess: () => {
-        toast.success(`Đã xóa ${selectedLinkedIds.length} câu hỏi khỏi test`);
-        setSelectedLinkedIds([]);
-      },
-      onError: (e) => {
-        console.error("Lỗi xóa câu hỏi khỏi test:", e);
-        toast.error(getErrorMessage(e, "Không thể xóa câu hỏi khỏi test"));
-      },
-    });
+    deleteLinkedTestSetsMutation.mutate(
+      { testId: selectedId, testSetIds: selectedLinkedIds },
+      {
+        onSuccess: () => {
+          setSelectedLinkedIds([]);
+        },
+      }
+    );
   };
 
-  const handleSave = async () => {
-    setSaving(true);
+
+  const handleSave = () => {
     const body = {
       meanings: [
         {
@@ -239,182 +194,82 @@ const TestManagement: React.FC = () => {
         },
       ],
       price: form.price,
+      limit: form.limit,
       levelN: form.levelN,
       testType: form.testType,
       status: form.status,
     } as TestCreateRequest;
 
-    try {
-      if (selectedId) {
-        // Update test
-        updateTestMutation.mutate(
-          { id: selectedId, data: body },
-          {
-            onSuccess: () => {
-              // Link selected questions if any on update flow
-              if (selectedQuestionIds.length > 0) {
-                linkQuestionBanksMutation.mutate(
-                  {
-                    testSetId: selectedId,
-                    questionBankIds: selectedQuestionIds,
-                  },
-                  {
-                    onSuccess: () => {
-                      setSelectedQuestionIds([]);
-                      toast.success("Cập nhật thành công");
-                      setIsDialogOpen(false);
-                      setSelectedId(null);
-                      setSaving(false);
-                    },
-                    onError: () => {
-                      // Still close dialog even if linking fails
-                      toast.success("Cập nhật thành công");
-                      setIsDialogOpen(false);
-                      setSelectedId(null);
-                      setSaving(false);
-                    },
-                  }
-                );
-              } else {
-                toast.success("Cập nhật thành công");
-                setIsDialogOpen(false);
-                setSelectedId(null);
-                setSaving(false);
-              }
-            },
-            onError: () => {
-              // Error handled by hook
-              setSaving(false);
-            },
-          }
-        );
-      } else {
-        // Create test
-        createTestMutation.mutate(body, {
-          onSuccess: (response) => {
-            const newId = response?.data?.id;
-            if (!newId) {
-              toast.error("Không nhận được ID từ server sau khi tạo");
-              setSaving(false);
-              return;
-            }
-
-            // If admin has pre-selected questions, link them now using new id
-            if (selectedQuestionIds.length > 0) {
-              linkQuestionBanksMutation.mutate(
-                {
-                  testSetId: newId,
-                  questionBankIds: selectedQuestionIds,
-                },
-                {
-                  onSuccess: () => {
-                    setSelectedQuestionIds([]);
-                    toast.success("Tạo bộ đề thành công");
-                    // keep dialog open and switch to edit mode for further actions
-                    setSelectedId(newId);
-                    setIsDialogOpen(true);
-                    // open add-questions dialog so admin can tiếp tục thêm
-                    setQbForceKey((k) => k + 1);
-                    setIsAddQuestionsOpen(true);
-                    setSaving(false);
-                  },
-                  onError: () => {
-                    // Still proceed even if linking fails
-                    toast.success("Tạo bộ đề thành công");
-                    setSelectedId(newId);
-                    setIsDialogOpen(true);
-                    setQbForceKey((k) => k + 1);
-                    setIsAddQuestionsOpen(true);
-                    setSaving(false);
-                  },
-                }
-              );
-            } else {
-              toast.success("Tạo bộ đề thành công");
-              setSelectedId(newId);
-              setIsDialogOpen(true);
-              setQbForceKey((k) => k + 1);
-              setIsAddQuestionsOpen(true);
-              setSaving(false);
-            }
+    if (selectedId) {
+      updateTestMutation.mutate(
+        { id: selectedId, data: body },
+        {
+          onSuccess: () => {
+            setIsDialogOpen(false);
+            setSelectedId(null);
           },
-          onError: () => {
-            // Error handled by hook
-            setSaving(false);
-          },
-        });
-        return; // Early return since mutation handles the flow
-      }
-    } catch (e) {
-      console.error("Lỗi không xác định:", e);
-      toast.error(getErrorMessage(e, "Đã xảy ra lỗi không mong muốn"));
-      setSaving(false);
+        }
+      );
+    } else {
+      createTestMutation.mutate(body, {
+        onSuccess: () => {
+          setIsDialogOpen(false);
+          setSelectedId(null);
+        },
+      });
     }
   };
 
-  // Add questions dialog state
-  const [qbSearch, setQbSearch] = useState("");
-  const [qbPage, setQbPage] = useState(1);
-  const [qbPageSize, setQbPageSize] = useState(15);
-  const [qbNoTestSet, setQbNoTestSet] = useState<boolean>(false);
-  const [selectedQuestionIds, setSelectedQuestionIds] = useState<number[]>([]);
-  const [qbForceKey, setQbForceKey] = useState(0);
+  // Add testSets dialog state
+  const [tsSearch, setTsSearch] = useState("");
+  const [tsPage, setTsPage] = useState(1);
+  const [tsPageSize, setTsPageSize] = useState(15);
+  const [tsForceKey, setTsForceKey] = useState(0);
 
-  type QuestionListFilters = IQueryQuestionRequest & {
-    testSetId?: number;
-    noTestSet?: boolean;
+  const testSetFilters: TestSetListRequest = {
+    currentPage: tsPage,
+    pageSize: tsPageSize,
+    search: tsSearch || undefined,
+    levelN: form.levelN === 0 ? undefined : form.levelN,
+    testType: undefined, // Allow all test types for now
   };
 
   const {
-    data: qbItems,
-    pagination: qbPagination,
-    isLoading: qbLoading,
-  } = useQuestionBankList({
-    page: qbPage,
-    limit: qbPageSize,
-    search: qbSearch || undefined,
-    levelN: form.levelN === 0 ? undefined : (form.levelN as unknown as number),
-    questionType: form.testType as unknown as QuestionType,
-    // extra flexible fields supported by backend through catchall
-    testSetId: selectedId || undefined,
-    noTestSet: qbNoTestSet,
-    forceKey: qbForceKey,
-  } as QuestionListFilters);
+    data: tsItems,
+    pagination: tsPagination,
+    isLoading: tsLoading,
+  } = useTestSetList(testSetFilters, { forceKey: tsForceKey });
 
-  const toggleSelectQuestion = (id: number) => {
-    setSelectedQuestionIds((prev) =>
+  const toggleSelectTestSet = (id: number) => {
+    setSelectedTestSetIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
 
-  const handleOpenAddQuestions = () => {
+  const handleOpenAddTestSets = () => {
     if (!selectedId) return;
-    setSelectedQuestionIds([]);
-    setQbSearch("");
-    setQbPage(1);
-    setQbForceKey((k) => k + 1);
-    setIsAddQuestionsOpen(true);
+    setSelectedTestSetIds([]);
+    setTsSearch("");
+    setTsPage(1);
+    setTsForceKey((k) => k + 1);
+    setIsAddTestSetsOpen(true);
   };
 
   const handleLinkSelected = () => {
-    if (!selectedId || selectedQuestionIds.length === 0) {
-      toast.error("Hãy chọn ít nhất một câu hỏi");
+    if (!selectedId || selectedTestSetIds.length === 0) {
+      toast.error("Hãy chọn ít nhất một bộ đề");
       return;
     }
-    linkQuestionBanksMutation.mutate(
+    linkTestSetsMutation.mutate(
       {
-        testSetId: selectedId,
-        questionBankIds: selectedQuestionIds,
+        testId: selectedId,
+        data: { testSetIds: selectedTestSetIds },
       },
       {
         onSuccess: () => {
-          toast.success("Đã thêm câu hỏi vào Test");
-          setSelectedQuestionIds([]);
-          setQbForceKey((k) => k + 1);
-          setIsAddQuestionsOpen(false);
-        },
-        onError: () => {
-          // Error handled by hook
+          setSelectedTestSetIds([]);
+          setTsForceKey((k) => k + 1);
+          setIsAddTestSetsOpen(false);
         },
       }
     );
@@ -430,7 +285,19 @@ const TestManagement: React.FC = () => {
       <div className="p-8 mt-24">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Quản lý Test</h2>
-          <Button onClick={openCreate}>Thêm mới</Button>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => autoAddFreeTestSetsMutation.mutate()}
+              disabled={autoAddFreeTestSetsMutation.isPending}
+            >
+              {autoAddFreeTestSetsMutation.isPending
+                ? "Đang thêm..."
+                : "Tự động thêm TestSet miễn phí"}
+            </Button>
+            <Button onClick={openCreate}>Thêm mới</Button>
+          </div>
         </div>
 
         <Card className="bg-white border mt-4">
@@ -459,7 +326,7 @@ const TestManagement: React.FC = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ALL">Tất cả cấp</SelectItem>
-                  <SelectItem value="0">N0 (Tất cả cấp)</SelectItem>
+                  <SelectItem value="0">Tất cả cấp</SelectItem>
                   <SelectItem value="1">N1</SelectItem>
                   <SelectItem value="2">N2</SelectItem>
                   <SelectItem value="3">N3</SelectItem>
@@ -753,11 +620,32 @@ const TestManagement: React.FC = () => {
                   </Select>
                 </div>
               </div>
+              <div>
+                <label className="text-sm font-medium">
+                  Giới hạn số lần làm (Limit)
+                </label>
+                <Input
+                  type="number"
+                  placeholder="Để trống nếu không giới hạn"
+                  value={form.limit ?? ""}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setForm({
+                      ...form,
+                      limit: value === "" ? undefined : Number(value),
+                    });
+                  }}
+                  min="0"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Số lần tối đa người dùng có thể làm test này. Để trống nếu không giới hạn.
+                </p>
+              </div>
               {selectedId && (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-medium">
-                      Câu hỏi đã thêm
+                      Bộ đề đã thêm
                     </label>
                     {selectedLinkedIds.length > 0 && (
                       <Button
@@ -776,33 +664,39 @@ const TestManagement: React.FC = () => {
                       <div className="p-4 text-sm text-gray-500">
                         Đang tải...
                       </div>
-                    ) : linkedQuestions.length === 0 ? (
+                    ) : linkedTestSets.length === 0 ? (
                       <div className="p-4 text-sm text-gray-500">
-                        Chưa có câu hỏi
+                        Chưa có bộ đề
                       </div>
                     ) : (
                       <div className="max-h-[30vh] overflow-auto">
-                        {linkedQuestions.map((q) => (
+                        {linkedTestSets.map((ts) => (
                           <div
-                            key={q.id}
+                            key={ts.id}
                             role="button"
-                            onClick={() => toggleSelectLinked(q.id)}
+                            onClick={() => toggleSelectLinked(ts.id)}
                             className="flex items-start gap-3 p-3 border-b hover:bg-gray-50"
                           >
                             <Checkbox
-                              checked={selectedLinkedIds.includes(q.id)}
-                              onCheckedChange={() => toggleSelectLinked(q.id)}
+                              checked={selectedLinkedIds.includes(ts.id)}
+                              onCheckedChange={() => toggleSelectLinked(ts.id)}
                             />
                             <div className="flex-1">
                               <div className="font-medium">
-                                {q.questionJp} - {q.questionType}
+                                {extractText(
+                                  (ts as unknown as Record<string, unknown>).name,
+                                  "vi"
+                                )} - {ts.testType} - N{ts.levelN}
                               </div>
                             </div>
                             <button
                               type="button"
                               aria-label="Remove"
                               className="text-gray-500 hover:text-red-600 shrink-0"
-                              onClick={() => handleRemoveLinked(q.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemoveLinked(ts.id);
+                              }}
                             >
                               <X className="h-4 w-4" />
                             </button>
@@ -817,9 +711,10 @@ const TestManagement: React.FC = () => {
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={handleOpenAddQuestions}
+                  onClick={handleOpenAddTestSets}
+                  disabled={!selectedId}
                 >
-                  Thêm câu hỏi
+                  Thêm bộ đề
                 </Button>
                 <Button
                   variant="ghost"
@@ -832,9 +727,9 @@ const TestManagement: React.FC = () => {
                 </Button>
                 <Button
                   onClick={handleSave}
-                  disabled={saving || createTestMutation.isPending || updateTestMutation.isPending}
+                  disabled={createTestMutation.isPending || updateTestMutation.isPending}
                 >
-                  {saving || createTestMutation.isPending || updateTestMutation.isPending
+                  {createTestMutation.isPending || updateTestMutation.isPending
                     ? "Đang lưu..."
                     : "Lưu"}
                 </Button>
@@ -843,86 +738,55 @@ const TestManagement: React.FC = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Add Questions Dialog */}
-        <Dialog open={isAddQuestionsOpen} onOpenChange={setIsAddQuestionsOpen}>
+        {/* Add TestSets Dialog */}
+        <Dialog open={isAddTestSetsOpen} onOpenChange={setIsAddTestSetsOpen}>
           <DialogContent className="max-w-3xl bg-white">
             <DialogHeader>
-              <DialogTitle>Thêm câu hỏi vào TestSet #{selectedId}</DialogTitle>
+              <DialogTitle>Thêm bộ đề vào Test #{selectedId}</DialogTitle>
             </DialogHeader>
 
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <Input
-                  placeholder="Tìm kiếm câu hỏi..."
-                  value={qbSearch}
+                  placeholder="Tìm kiếm bộ đề..."
+                  value={tsSearch}
                   onChange={(e) => {
-                    setQbSearch(e.target.value);
-                    setQbPage(1);
+                    setTsSearch(e.target.value);
+                    setTsPage(1);
                   }}
                 />
-                <div className="flex items-center gap-2 ml-2">
-                  <span className="text-sm text-muted-foreground">
-                    noTestSet
-                  </span>
-                  <Switch
-                    checked={qbNoTestSet}
-                    onCheckedChange={(val) => {
-                      setQbNoTestSet(Boolean(val));
-                      setQbPage(1);
-                      setQbForceKey((k) => k + 1);
-                    }}
-                  />
-                </div>
-                <div className="flex items-center gap-2 ml-2">
-                  <label className="text-sm font-medium">Test Type</label>
-                  <Select
-                    value={form.testType}
-                    onValueChange={(v) =>
-                      setForm({
-                        ...form,
-                        testType: v as TestCreateRequest["testType"],
-                      })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Chọn loại" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="PLACEMENT_TEST_DONE">Placement test</SelectItem>
-                      <SelectItem value="MATCH_TEST">Match test</SelectItem>
-                      <SelectItem value="QUIZ_TEST">Quiz test</SelectItem>
-                      <SelectItem value="REVIEW_TEST">Review test</SelectItem>
-                      <SelectItem value="PRACTICE_TEST">Practice test</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
 
               <div className="border rounded">
-                {qbLoading ? (
+                {tsLoading ? (
                   <div className="p-4 text-sm text-gray-500">Đang tải...</div>
-                ) : qbItems.length === 0 ? (
+                ) : (tsItems || []).length === 0 ? (
                   <div className="p-4 text-sm text-gray-500">
-                    Không có câu hỏi phù hợp
+                    Không có bộ đề phù hợp
                   </div>
                 ) : (
                   <div className="max-h-[50vh] overflow-auto">
-                    {(qbItems as unknown as QuestionEntityType[]).map((q) => (
+                    {(tsItems as unknown as TestSetEntity[]).map((ts) => (
                       <div
-                        key={q.id}
+                        key={ts.id}
                         className="flex items-start gap-3 p-3 border-b cursor-pointer hover:bg-gray-50"
                         role="button"
-                        onClick={() => toggleSelectQuestion(q.id)}
+                        onClick={() => toggleSelectTestSet(ts.id)}
                       >
                         <Checkbox
-                          checked={selectedQuestionIds.includes(q.id)}
-                          onCheckedChange={() => toggleSelectQuestion(q.id)}
+                          checked={selectedTestSetIds.includes(ts.id)}
+                          onCheckedChange={() => toggleSelectTestSet(ts.id)}
                           onClick={(e) => e.stopPropagation()}
                         />
                         <div className="flex-1">
-                          <div className="font-medium">{q.questionJp}</div>
+                          <div className="font-medium">
+                            {extractText(
+                              (ts as unknown as Record<string, unknown>).name,
+                              "vi"
+                            )}
+                          </div>
                           <div className="text-xs text-gray-600">
-                            #{q.id} • N{q.levelN} • {q.questionType}
+                            #{ts.id} • N{ts.levelN} • {ts.testType}
                           </div>
                         </div>
                       </div>
@@ -931,19 +795,19 @@ const TestManagement: React.FC = () => {
                 )}
               </div>
 
-              {qbPagination && (
+              {tsPagination && (
                 <div className="flex justify-end">
                   <PaginationControls
-                    currentPage={qbPagination.current || 1}
-                    totalPages={qbPagination.totalPage || 0}
-                    totalItems={qbPagination.totalItem || 0}
-                    itemsPerPage={qbPagination.pageSize || qbPageSize}
-                    onPageChange={(p: number) => setQbPage(p)}
+                    currentPage={tsPagination.current || 1}
+                    totalPages={tsPagination.totalPage || 0}
+                    totalItems={tsPagination.totalItem || 0}
+                    itemsPerPage={tsPagination.pageSize || tsPageSize}
+                    onPageChange={(p: number) => setTsPage(p)}
                     onItemsPerPageChange={(s: number) => {
-                      setQbPageSize(s);
-                      setQbPage(1);
+                      setTsPageSize(s);
+                      setTsPage(1);
                     }}
-                    isLoading={qbLoading}
+                    isLoading={tsLoading}
                   />
                 </div>
               )}
@@ -951,15 +815,15 @@ const TestManagement: React.FC = () => {
               <div className="flex justify-end gap-2">
                 <Button
                   variant="ghost"
-                  onClick={() => setIsAddQuestionsOpen(false)}
+                  onClick={() => setIsAddTestSetsOpen(false)}
                 >
                   Đóng
                 </Button>
                 <Button
                   onClick={handleLinkSelected}
-                  disabled={selectedQuestionIds.length === 0 || linkQuestionBanksMutation.isPending}
+                  disabled={selectedTestSetIds.length === 0 || linkTestSetsMutation.isPending}
                 >
-                  {linkQuestionBanksMutation.isPending ? "Đang thêm..." : "Thêm vào Test"}
+                  {linkTestSetsMutation.isPending ? "Đang thêm..." : "Thêm vào Test"}
                 </Button>
               </div>
             </div>
