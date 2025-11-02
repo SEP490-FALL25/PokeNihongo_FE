@@ -16,6 +16,7 @@ const testSetService = {
     if (params?.creatorId) queryParams.append('creatorId', params.creatorId.toString());
     if (params?.language) queryParams.append('language', params.language);
     if (params?.noExercies) queryParams.append('noExercies', params.noExercies.toString());
+    if (params?.noPrice !== undefined) queryParams.append('noPrice', params.noPrice.toString());
     
     const queryString = queryParams.toString();
     const url = queryString ? `/testset?${queryString}` : '/testset';

@@ -120,7 +120,7 @@ const TestDialog: React.FC<TestDialogProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-            <div className="flex items-end gap-2">
+            <div className="flex items-center gap-2">
               <label className="text-sm font-medium">Có phí</label>
               <Switch
                 checked={form.price === 1}
