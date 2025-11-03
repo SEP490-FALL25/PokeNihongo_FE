@@ -9,7 +9,7 @@ export const createCreateGeminiConfigModelsSchema = (t: (key: string, opts?: any
     maxTokens: z.number().min(1024, t('validation.maxTokensMin', { min: 1024 })).max(3072, t('validation.maxTokensMax', { max: 3072 })),
     jsonMode: z.boolean(),
     systemInstruction: z.string().min(1, t('validation.systemInstructionRequired')),
-    safetySettings: z.object(),
+    safetySettings: z.record(z.string(), z.string()),
     extraParams: z.object({
         responseMimeType: z.string().min(1, t('validation.responseMimeTypeRequired')),
     }),

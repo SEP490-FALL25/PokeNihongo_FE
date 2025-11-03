@@ -35,6 +35,28 @@ export const GeminiModelsEntitySchema = z.object({
     updatedAt: z.string(),
 });
 
-export type GeminiModelsEntity = z.infer<typeof GeminiModelsEntitySchema>;
+export type IGeminiModelsEntity = z.infer<typeof GeminiModelsEntitySchema>;
+//-----------------------End--------------------//
+//--------------------------------------End--------------------------------------//
+
+
+//----------------------Config Presets Entity----------------------//
+/**
+ * Config Presets Entity Schema
+ */
+export const ConfigPresetsEntitySchema = z.object({
+    id: z.number(),
+    key: z.string(),
+    name: z.string(),
+    description: z.string().nullable(),
+    temperature: z.number(),
+    topP: z.number(),
+    topK: z.number().nullable(),
+    isEnabled: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+});
+
+export type IConfigPresetsEntity = z.infer<typeof ConfigPresetsEntitySchema>;
 //-----------------------End--------------------//
 //--------------------------------------End--------------------------------------//

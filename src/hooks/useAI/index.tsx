@@ -53,3 +53,18 @@ export const useGetAIGeminiModels = () => {
     return { data: data?.data?.data, isLoading, error };
 }
 //-----------------------End-----------------------//
+
+
+
+/**
+ * Handle Get Config Presets
+ * @returns 
+ */
+export const useGetAIGeminiConfigPresets = () => {
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['gemini-config-presets'],
+        queryFn: () => geminiService.getConfigPresets(),
+    });
+    return { data: data?.data?.data, isLoading, error };
+}
+//-----------------------End-----------------------//
