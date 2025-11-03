@@ -4,11 +4,13 @@ import { Button } from "@ui/Button";
 import { Input } from "@ui/Input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select";
 import { Plus, Search, Sparkles } from "lucide-react";
+import CreateConfigModel from "@hooks/useAI/components/CreateConfigModel";
 import { useState } from "react";
 
 export default function CustomAIManagement() {
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState<string>("all");
+    const [showCreateDialog, setShowCreateDialog] = useState<boolean>(false);
 
     return (
         <>
@@ -39,7 +41,7 @@ export default function CustomAIManagement() {
                                         <SelectItem value="inactive">Tắt</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+                                <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => setShowCreateDialog(true)}>
                                     <Plus className="h-4 w-4 mr-2" />
                                     Tạo cấu hình
                                 </Button>
@@ -60,6 +62,10 @@ export default function CustomAIManagement() {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Create Config Model Dialog */}
+            <CreateConfigModel showCreateDialog={showCreateDialog} setShowCreateDialog={setShowCreateDialog} onSuccess={() => setShowCreateDialog(false)} />
+
         </>
     );
 }
