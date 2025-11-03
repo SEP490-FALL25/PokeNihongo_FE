@@ -1,5 +1,5 @@
 import { Outlet, useLocation, NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, BookOpen, Languages, BarChart3, Settings, LogOut, Menu, Trophy, Package, Brain, Calendar, Gift, LucideIcon, FileText, Layers, Store, ShieldCheck, Book } from "lucide-react";
+import { LayoutDashboard, Users, BarChart3, Settings, LogOut, Menu, Trophy, Package, Brain, Calendar, Gift, LucideIcon, Store, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@ui/Button";
 import { cn } from "@utils/CN";
@@ -35,31 +35,6 @@ const AdminLayout = () => {
       name: t("navigation.pokemon"),
       href: ROUTES.ADMIN.POKEMON_MANAGEMENT,
       icon: Trophy,
-    },
-    {
-      name: t("navigation.lessons"),
-      href: ROUTES.ADMIN.LESSONS,
-      icon: BookOpen,
-    },
-    {
-      name: t("navigation.questionBank"),
-      href: ROUTES.ADMIN.QUESTION_BANK,
-      icon: FileText,
-    },
-    {
-      name: t("navigation.testSets"),
-      href: ROUTES.ADMIN.TESTSET_MANAGEMENT,
-      icon: Layers,
-    },
-    {
-      name: t("navigation.test"),
-      href: ROUTES.ADMIN.TEST_MANAGEMENT,
-      icon: Book,
-    },
-    {
-      name: t("navigation.vocabulary"),
-      href: ROUTES.ADMIN.VOCABULARY,
-      icon: Languages,
     },
     {
       name: t("navigation.tournaments"),

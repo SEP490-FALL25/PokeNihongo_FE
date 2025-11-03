@@ -6,6 +6,7 @@ import { ROUTES } from "@constants/route"
 import LoginPage from "@pages/AuthPage/LoginPage"
 import AuthLayout from "@layouts/Auth"
 import AdminLayout from "@layouts/Admin"
+import ManagerLayout from "@layouts/Manager"
 import { lazy } from "react"
 import ConfigShop from "@pages/AdminPage/ConfigShop"
 import ShopBannerDetail from "@pages/AdminPage/ConfigShop/components/ShopBannerDetail"
@@ -49,8 +50,6 @@ const RouterComponent = () => {
                             children: [
                                 { path: ROUTES.ADMIN.ROOT, element: <AdminDashboard /> },
                                 { path: ROUTES.ADMIN.USERS, element: <UsersManagement /> },
-                                { path: ROUTES.LESSONS.MANAGEMENT, element: <LessonsManagement /> },
-                                { path: ROUTES.ADMIN.VOCABULARY, element: <VocabularyManagement /> },
                                 { path: ROUTES.ADMIN.ANALYTICS, element: <AnalyticsDashboard /> },
                                 { path: ROUTES.ADMIN.PACKAGE_MANAGEMENT, element: <PackageManagement /> },
                                 { path: ROUTES.ADMIN.POKEMON_MANAGEMENT, element: <PokemonManagement /> },
@@ -62,10 +61,17 @@ const RouterComponent = () => {
                                 { path: ROUTES.ADMIN.CONFIG_SHOP_BANNER_DETAIL, element: <ShopBannerDetail /> },
                                 { path: ROUTES.ADMIN.CONFIG_GACHA, element: <ConfigGacha /> },
                                 { path: ROUTES.ADMIN.CONFIG_GACHA_BANNER_DETAIL, element: <GachaBannerDetail /> },
-                                { path: ROUTES.ADMIN.QUESTION_BANK, element: <QuestionBankManagement /> },
-                                { path: ROUTES.ADMIN.TESTSET_MANAGEMENT, element: <TestSetManagement /> },
                                 { path: ROUTES.ADMIN.PERMISSION_MANAGEMENT, element: <PermissionManagement /> },
-                                { path: ROUTES.ADMIN.TEST_MANAGEMENT, element: <TestManagement /> },
+                            ],
+                        },
+                        {
+                            element: <ManagerLayout />,
+                            children: [
+                                { path: ROUTES.MANAGER.LESSONS, element: <LessonsManagement /> },
+                                { path: ROUTES.MANAGER.VOCABULARY, element: <VocabularyManagement /> },
+                                { path: ROUTES.MANAGER.QUESTION_BANK, element: <QuestionBankManagement /> },
+                                { path: ROUTES.MANAGER.TESTSET_MANAGEMENT, element: <TestSetManagement /> },
+                                { path: ROUTES.MANAGER.TEST_MANAGEMENT, element: <TestManagement /> },
                             ],
                         },
                     ],
