@@ -61,7 +61,8 @@
         "lessonContent": "Nội dung bài học",
         "configShop": "Cấu hình Shop",
         "configGacha": "Cấu hình Gacha",
-        "testSets": "Bộ đề"
+        "testSets": "Bộ đề",
+        "permissionManagement": "Quản lý quyền"
     },
     "dailyQuest": {
         "title": "Quản lý Nhiệm vụ hàng ngày",

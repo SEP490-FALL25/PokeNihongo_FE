@@ -34,15 +34,21 @@ const PermissionManagement = () => {
      */
     const [permParams, setPermParams] = useState<IQueryRequest>({ page: 1, limit: 100, sortBy: 'module' });
     const [moduleSearch, setModuleSearch] = useState<string>("");
+    const [pathSearch, setPathSearch] = useState<string>("");
     const debouncedModule = useDebounce(moduleSearch, 400);
+    const debouncedPath = useDebounce(pathSearch, 400);
 
     const permQueryParams = useMemo(() => {
         const params: IQueryRequest = { ...permParams, sortBy: 'module' };
         if (debouncedModule) {
             params.moduleLike = debouncedModule;
         }
+        if (debouncedPath) {
+            const normalizedPath = debouncedPath.replace(/^\/+/, ''); // allow inputs like "/wallet"
+            params.pathLike = normalizedPath;
+        }
         return params;
-    }, [permParams, debouncedModule]);
+    }, [permParams, debouncedModule, debouncedPath]);
 
     const { data: permData, isLoading: permLoading } = usePermissionList(safeRoleId || 0, permQueryParams);
     //----------------------End----------------------//
@@ -149,7 +155,7 @@ const PermissionManagement = () => {
                 title="Permission Management"
                 description="Manage role-based access control"
             />
-            <div className="mt-20 min-h-screen bg-gray-50">
+            <div className="mt-24 min-h-screen bg-gray-50">
                 <div className="max-w-[1600px] mx-auto p-3 md:p-4 lg:p-6 space-y-4">
 
                     {/* Filters Card */}
@@ -166,7 +172,7 @@ const PermissionManagement = () => {
                             </div>
                         </CardHeader>
                         <CardContent className="pt-4 pb-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
                                         <span className="text-sm">👤</span>
@@ -191,13 +197,26 @@ const PermissionManagement = () => {
 
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
-                                        <span className="text-sm">🔍</span>
+                                        <span className="text-sm">📦</span>
                                         Filter by Module
                                     </label>
                                     <Input
-                                        placeholder="Search modules..."
+                                        placeholder="e.g. User, Lesson..."
                                         value={moduleSearch}
                                         onChange={(e) => setModuleSearch(e.target.value)}
+                                        className="h-9 border border-gray-200 hover:border-blue-400 transition-all duration-200 shadow-sm hover:shadow focus-visible:border-blue-500 bg-white text-sm"
+                                    />
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
+                                        <span className="text-sm">🔗</span>
+                                        Filter by Path
+                                    </label>
+                                    <Input
+                                        placeholder="e.g. /wallet, /api/users..."
+                                        value={pathSearch}
+                                        onChange={(e) => setPathSearch(e.target.value)}
                                         className="h-9 border border-gray-200 hover:border-blue-400 transition-all duration-200 shadow-sm hover:shadow focus-visible:border-blue-500 bg-white text-sm"
                                     />
                                 </div>

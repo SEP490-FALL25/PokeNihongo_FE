@@ -61,7 +61,8 @@
         "lessonContent": "レッスン内容",
         "configShop": "ショップ設定",
         "configGacha": "ガチャ設定",
-        "testSets": "テストセット"
+        "testSets": "テストセット",
+        "permissionManagement": "権限管理"
     },
     "dailyQuest": {
         "title": "デイリークエスト管理",
