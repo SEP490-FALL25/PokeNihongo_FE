@@ -83,6 +83,7 @@
         "configGacha": "Gacha Configuration",
         "testSets": "Test Sets",
         "permissionManagement": "Permission Management"
+        "test": "Test Management"
     },
     "dailyQuest": {
         "title": "Daily Quest Management",

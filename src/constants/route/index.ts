@@ -28,6 +28,7 @@ const ADMIN = {
     QUESTION_BANK: '/admin/question-bank',
     TESTSET_MANAGEMENT: '/admin/testset-management',
     PERMISSION_MANAGEMENT: '/admin/permission-management',
+    TEST_MANAGEMENT: '/admin/test-management',
     CONFIG_SHOP: '/admin/config-shop',
     CONFIG_SHOP_BANNER_DETAIL: '/admin/config-shop/:bannerId',
     CONFIG_GACHA: '/admin/config-gacha',

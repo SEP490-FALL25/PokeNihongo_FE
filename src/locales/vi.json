@@ -63,6 +63,7 @@
         "configGacha": "Cấu hình Gacha",
         "testSets": "Bộ đề",
         "permissionManagement": "Quản lý quyền"
+        "test": "Quản lý bài kiểm tra"
     },
     "dailyQuest": {
         "title": "Quản lý Nhiệm vụ hàng ngày",

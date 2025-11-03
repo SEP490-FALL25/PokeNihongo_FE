@@ -123,9 +123,9 @@ const CreateContentDialog = ({
 
   // Fetch data based on content type - only when shouldFetch is true
   const { data: vocabularies, isLoading: vocabLoading } = useVocabularyList({
-    page: page,
-    limit: itemsPerPage,
-    search: searchQuery,
+    currentPage: page,
+    pageSize: itemsPerPage,
+    search: searchQuery || undefined,
     levelN: selectedLevel === "all" ? undefined : parseInt(selectedLevel),
     sortBy: "createdAt",
     sort: "desc",
@@ -135,10 +135,10 @@ const CreateContentDialog = ({
   });
 
   const { data: grammars, isLoading: grammarLoading } = useGrammarList({
-    page: page,
-    limit: itemsPerPage,
-    search: searchQuery,
-    levelN: selectedLevel === "all" ? undefined : parseInt(selectedLevel),
+    currentPage: page,
+    pageSize: itemsPerPage,
+    search: searchQuery || undefined,
+    level: selectedLevel === "all" ? undefined : parseInt(selectedLevel),
     sortBy: "createdAt",
     sort: "desc",
     enabled: shouldFetch && contentType === QUESTION_TYPE.GRAMMAR,
@@ -147,10 +147,10 @@ const CreateContentDialog = ({
   });
 
   const { data: kanjis, isLoading: kanjiLoading } = useKanjiList({
-    page: page,
-    limit: itemsPerPage,
-    search: searchQuery,
-    levelN: selectedLevel === "all" ? undefined : parseInt(selectedLevel),
+    currentPage: page,
+    pageSize: itemsPerPage,
+    search: searchQuery || undefined,
+    jlptLevel: selectedLevel === "all" ? undefined : parseInt(selectedLevel),
     sortBy: "character",
     sort: "asc",
     enabled: shouldFetch && contentType === QUESTION_TYPE.KANJI,

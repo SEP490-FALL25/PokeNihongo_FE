@@ -7,6 +7,7 @@ import AudioDropzone from "@ui/AudioDropzone";
 import mediaService from "@services/media";
 import { toast } from "react-toastify";
 import { QuestionType } from "@constants/questionBank";
+import { X } from "lucide-react";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
@@ -80,45 +81,53 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                 value={formData.questionType}
                 onValueChange={(value) => {
                   const newQuestionType = value as QuestionType;
+                  const isEditMode = isEditDialogOpen;
+                  
                   setFormData((prev: any) => {
                     const newFormData: any = { ...prev, questionType: newQuestionType };
+                    // Only reset pronunciation and audioUrl if not applicable to new type
                     if (newQuestionType !== "SPEAKING" && newQuestionType !== "VOCABULARY") {
                       newFormData.pronunciation = "";
                     }
                     if (newQuestionType !== "LISTENING" && newQuestionType !== "VOCABULARY") {
                       newFormData.audioUrl = "";
                     }
-                    if (newQuestionType === "MATCHING") {
-                      newFormData.answers = [
-                        {
+                    
+                    // Only reset answers structure when creating new question, keep answers when editing
+                    if (!isEditMode) {
+                      if (newQuestionType === "MATCHING") {
+                        newFormData.answers = [
+                          {
+                            answerJp: "",
+                            isCorrect: true,
+                            translations: {
+                              meaning: [
+                                { language_code: "vi", value: "" },
+                                { language_code: "en", value: "" },
+                              ],
+                            },
+                          },
+                        ];
+                      } else {
+                        const blankAnswer = () => ({
                           answerJp: "",
-                          isCorrect: true,
+                          isCorrect: false,
                           translations: {
                             meaning: [
                               { language_code: "vi", value: "" },
                               { language_code: "en", value: "" },
                             ],
                           },
-                        },
-                      ];
-                    } else {
-                      const blankAnswer = () => ({
-                        answerJp: "",
-                        isCorrect: false,
-                        translations: {
-                          meaning: [
-                            { language_code: "vi", value: "" },
-                            { language_code: "en", value: "" },
-                          ],
-                        },
-                      });
-                      newFormData.answers = [
-                        { ...blankAnswer(), isCorrect: true },
-                        blankAnswer(),
-                        blankAnswer(),
-                        blankAnswer(),
-                      ];
+                        });
+                        newFormData.answers = [
+                          { ...blankAnswer(), isCorrect: true },
+                          blankAnswer(),
+                          blankAnswer(),
+                          blankAnswer(),
+                        ];
+                      }
                     }
+                    // When editing, keep existing answers as is (don't reset)
                     return newFormData;
                   });
                 }}
@@ -361,22 +370,61 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                           )}
                         </div>
                       </div>
-                      {formData.answers && formData.answers.length > 1 && (
+                      <div className="flex items-center gap-2">
                         <Button
                           type="button"
                           variant="outline"
                           size="sm"
-                              onClick={(e) => {
+                          onClick={(e) => {
                             e.stopPropagation();
+                            // Clear answerExtras for this index
+                            setAnswerExtras((prev) => {
+                              const newExtras = { ...prev };
+                              delete newExtras[index];
+                              return newExtras;
+                            });
+                            // Clear all answer fields
                             setFormData((prev: any) => ({
                               ...prev,
-                              answers: prev.answers?.filter((_: any, i: number) => i !== index),
+                              answers: prev.answers?.map((a: any, i: number) =>
+                                i === index
+                                  ? {
+                                      ...a,
+                                      answerJp: "",
+                                      translations: {
+                                        meaning: [
+                                          { language_code: "vi", value: "" },
+                                          { language_code: "en", value: "" },
+                                        ],
+                                      },
+                                    }
+                                  : a
+                              ),
                             }));
                           }}
+                          className="text-gray-600 hover:text-red-600"
+                          title="Clear all fields for this option"
                         >
-                          Remove Answer
+                          <X className="h-4 w-4 mr-1" />
+                          Clear
                         </Button>
-                      )}
+                        {formData.answers && formData.answers.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFormData((prev: any) => ({
+                                ...prev,
+                                answers: prev.answers?.filter((_: any, i: number) => i !== index),
+                              }));
+                            }}
+                          >
+                            Remove Answer
+                          </Button>
+                        )}
+                      </div>
                     </div>
                     <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
                       {(() => {
@@ -588,6 +636,42 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                 </div>
               )}
               <div className="border rounded-lg p-4 bg-gray-50">
+                <div className="flex items-center justify-end mb-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Clear all fields for MATCHING answer
+                      setAnswerExtras((prev) => {
+                        const newExtras = { ...prev };
+                        delete newExtras[0];
+                        return newExtras;
+                      });
+                      setFormData((prev: any) => ({
+                        ...prev,
+                        answers: [
+                          {
+                            answerJp: "",
+                            isCorrect: true,
+                            translations: {
+                              meaning: [
+                                { language_code: "vi", value: "" },
+                                { language_code: "en", value: "" },
+                              ],
+                            },
+                          },
+                        ],
+                      }));
+                    }}
+                    className="text-gray-600 hover:text-red-600"
+                    title="Clear all fields for this option"
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    Clear
+                  </Button>
+                </div>
                 <div className="space-y-3">
                   <Input
                     label="Japanese Answer"

@@ -1,4 +1,5 @@
 import { axiosPrivate } from "@configs/axios";
+import { QuestionType } from "@constants/questionBank";
 import { TestSetListRequest, TestSetCreateRequest, TestSetQuestionBankLinkMultipleRequest } from "@models/testSet/request";
 import { TestSetListResponseType, TestSetCreateResponseType } from "@models/testSet/response";
 
@@ -15,6 +16,7 @@ const testSetService = {
     if (params?.creatorId) queryParams.append('creatorId', params.creatorId.toString());
     if (params?.language) queryParams.append('language', params.language);
     if (params?.noExercies) queryParams.append('noExercies', params.noExercies.toString());
+    if (params?.noPrice !== undefined) queryParams.append('noPrice', params.noPrice.toString());
     
     const queryString = queryParams.toString();
     const url = queryString ? `/testset?${queryString}` : '/testset';
@@ -44,7 +46,7 @@ const testSetService = {
   // Fetch questions already linked to a TestSet
   getLinkedQuestionBanksByTestSet: async (
     testSetId: number
-  ): Promise<Array<{ id: number; questionJp: string }>> => {
+  ): Promise<Array<{ id: number; questionJp: string; questionType: QuestionType }>> => {
     const response = await axiosPrivate.get(
       `/testset-questionbank/testset/${testSetId}/full`
     );

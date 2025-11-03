@@ -13,6 +13,10 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
+      - name: Create env file
+        run: |
+          echo "${{ secrets.ENV_PROD }}" > .env.production
+
       - name: Build FE
         run: |
           npm ci
@@ -35,8 +39,8 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "dist/*"
-          target: "/home/root/FE/dist"
+          source: "dist"
+          target: "/home/root/FE"
 
       - name: Restart nginx container
         uses: appleboy/ssh-action@v0.1.8

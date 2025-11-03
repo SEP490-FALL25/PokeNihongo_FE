@@ -12,21 +12,11 @@ import {
 } from "lucide-react";
 import SelectTestSetDialog from "../../Dialogs/SelectTestSetDialog";
 import { useLessonExercises } from "@hooks/useLessonExercises";
-import { useCreateExercise, useDeleteExercise } from "@hooks/useExercise";
+import { useCreateExercise, useUpdateExercise } from "@hooks/useExercise";
 import { useTranslation } from "react-i18next";
 import { ExerciseResponseType } from "@models/exercise/response";
 import { TestSetEntity } from "@models/testSet/entity";
 import { QUESTION_TYPE } from "@constants/questionBank";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@ui/AlertDialog";
 
 interface LessonItem {
   id: number;
@@ -56,28 +46,33 @@ const LessonExercisesStep = ({
   const { exercises, isLoading, error } = useLessonExercises(lesson.id);
 
   const { createExercise, isLoading: isCreatingExercise } = useCreateExercise();
-  const { deleteExercise, isDeleting } = useDeleteExercise(lesson.id);
-  const [deleteTarget, setDeleteTarget] = useState<ExerciseResponseType | null>(
+  const { updateExercise, isUpdating } = useUpdateExercise(lesson.id);
+  const [updateTarget, setUpdateTarget] = useState<ExerciseResponseType | null>(
     null
   );
 
-  const handleDeleteExercise = () => {
-    if (deleteTarget) {
-      deleteExercise(deleteTarget.id);
-      setDeleteTarget(null);
-    }
-  };
-
   const handleSelectTestSet = (testSet: TestSetEntity) => {
-    createExercise({
-      exerciseType: pendingSectionType as unknown as
-        | "VOCABULARY"
-        | "GRAMMAR"
-        | "KANJI",
-      isBlocked: false,
-      lessonId: lesson.id,
-      testSetId: testSet.id,
-    });
+    if (updateTarget) {
+      // Update existing exercise
+      updateExercise({
+        id: updateTarget.id,
+        data: {
+          testSetId: testSet.id,
+        },
+      });
+      setUpdateTarget(null);
+    } else {
+      // Create new exercise
+      createExercise({
+        exerciseType: pendingSectionType as unknown as
+          | "VOCABULARY"
+          | "GRAMMAR"
+          | "KANJI",
+        isBlocked: false,
+        lessonId: lesson.id,
+        testSetId: testSet.id,
+      });
+    }
     setIsSelectTestSetOpen(false);
   };
 
@@ -85,6 +80,13 @@ const LessonExercisesStep = ({
     sectionType: (typeof QUESTION_TYPE)[keyof typeof QUESTION_TYPE]
   ) => {
     setPendingSectionType(sectionType);
+    setUpdateTarget(null);
+    setIsSelectTestSetOpen(true);
+  };
+
+  const handleUpdateExercise = (exercise: ExerciseResponseType) => {
+    setUpdateTarget(exercise);
+    setPendingSectionType(exercise.exerciseType as unknown as (typeof QUESTION_TYPE)[keyof typeof QUESTION_TYPE]);
     setIsSelectTestSetOpen(true);
   };
 
@@ -179,19 +181,28 @@ const LessonExercisesStep = ({
                         </p>
                       </div>
                     </div>
-                    <Button
-                      size="sm"
-                      className="bg-primary text-white hover:bg-primary/90 shadow"
-                      onClick={() => handleAddExercise(section.type)}
-                      disabled={Boolean(existing) || isCreatingExercise}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      {existing
-                        ? t("workflow.exercises.addExercise") + " (disabled)"
-                        : isCreatingExercise
-                        ? "Đang tạo..."
-                        : t("workflow.exercises.addExercise")}
-                    </Button>
+                    {existing ? (
+                      <Button
+                        size="sm"
+                        className="bg-blue-600 text-white hover:bg-blue-700 shadow"
+                        onClick={() => handleUpdateExercise(existing)}
+                        disabled={isUpdating || isCreatingExercise}
+                      >
+                        {isUpdating ? "Đang cập nhật..." : "Cập nhật TestSet"}
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        className="bg-primary text-white hover:bg-primary/90 shadow"
+                        onClick={() => handleAddExercise(section.type)}
+                        disabled={isCreatingExercise}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        {isCreatingExercise
+                          ? "Đang tạo..."
+                          : t("workflow.exercises.addExercise")}
+                      </Button>
+                    )}
                   </div>
 
                   {isLoading ? (
@@ -211,18 +222,8 @@ const LessonExercisesStep = ({
                           TestSet: {existing.testSetId}
                         </span>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <div className="text-sm text-muted-foreground">
-                          {new Date(existing.createdAt).toLocaleDateString()}
-                        </div>
-                        <Button
-                          size="sm"
-                          className="bg-red-600 text-white hover:bg-red-700 shadow"
-                          disabled={isDeleting}
-                          onClick={() => setDeleteTarget(existing)}
-                        >
-                          {isDeleting ? "Đang xóa..." : "Xóa khỏi bài học"}
-                        </Button>
+                      <div className="text-sm text-muted-foreground">
+                        {new Date(existing.createdAt).toLocaleDateString()}
                       </div>
                     </div>
                   ) : (
@@ -262,7 +263,10 @@ const LessonExercisesStep = ({
 
       <SelectTestSetDialog
         isOpen={isSelectTestSetOpen}
-        onClose={() => setIsSelectTestSetOpen(false)}
+        onClose={() => {
+          setIsSelectTestSetOpen(false);
+          setUpdateTarget(null);
+        }}
         onSelectTestSet={handleSelectTestSet}
         lessonId={lesson.id}
         lessonLevel={lesson.levelJlpt}
@@ -270,34 +274,6 @@ const LessonExercisesStep = ({
           pendingSectionType as unknown as "VOCABULARY" | "GRAMMAR" | "KANJI"
         }
       />
-
-      <AlertDialog
-        open={Boolean(deleteTarget)}
-        onOpenChange={(o) => {
-          if (!o) setDeleteTarget(null);
-        }}
-      >
-        <AlertDialogContent className="bg-white">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Xóa bài tập?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Hành động này sẽ gỡ Test Set khỏi bài tập của bài học. Bạn không
-              thể hoàn tác.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="hover:bg-gray-200 cursor-pointer">
-              Hủy
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-red-600 text-white hover:bg-red-700 cursor-pointer"
-              onClick={handleDeleteExercise}
-            >
-              {isDeleting ? "Đang xóa..." : "Xóa"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 };

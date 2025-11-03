@@ -311,24 +311,7 @@ export const useQuestionBank = (
       fieldErrors.questionJp = [error];
     }
 
-    // Validate meanings (required for all types)
-    if (!data.meanings || data.meanings.length === 0) {
-      const error = "Bản dịch là bắt buộc";
-      errors.push(error);
-      fieldErrors.meanings = [error];
-    } else {
-      const hasValidMeaning = data.meanings.some(
-        (meaning) =>
-          meaning.translations.vi?.trim() !== "" ||
-          meaning.translations.en?.trim() !== ""
-      );
-      if (!hasValidMeaning) {
-        const error =
-          "Ít nhất một bản dịch (tiếng Việt hoặc tiếng Anh) phải được điền";
-        errors.push(error);
-        fieldErrors.meanings = [error];
-      }
-    }
+    // Meanings (translations) are optional - no validation needed
 
     // Validate answers (required for all types except MATCHING)
     if (data.questionType !== "MATCHING") {

@@ -52,6 +52,11 @@ const AdminLayout = () => {
       icon: Layers,
     },
     {
+      name: t("navigation.test"),
+      href: ROUTES.ADMIN.TEST_MANAGEMENT,
+      icon: Book,
+    },
+    {
       name: t("navigation.vocabulary"),
       href: ROUTES.ADMIN.VOCABULARY,
       icon: Languages,

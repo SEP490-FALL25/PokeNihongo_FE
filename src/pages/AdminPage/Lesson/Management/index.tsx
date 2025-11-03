@@ -173,10 +173,11 @@ const LessonsManagement = () => {
             <div className="flex items-center justify-center mb-8">
               <div className="flex items-center space-x-4">
                 <div
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                  onClick={() => setActiveStep("content")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all hover:opacity-90 ${
                     activeStep === "content"
                       ? "bg-primary text-white"
-                      : "bg-muted text-muted-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
                   }`}
                 >
                   <FileText className="h-4 w-4" />
@@ -186,10 +187,11 @@ const LessonsManagement = () => {
                 </div>
                 <ArrowRight className="h-4 w-4 text-muted-foreground" />
                 <div
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                  onClick={() => setActiveStep("exercises")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all hover:opacity-90 ${
                     activeStep === "exercises"
                       ? "bg-primary text-white"
-                      : "bg-muted text-muted-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
                   }`}
                 >
                   <Target className="h-4 w-4" />

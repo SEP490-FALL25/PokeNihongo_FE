@@ -63,6 +63,7 @@
         "configGacha": "ガチャ設定",
         "testSets": "テストセット",
         "permissionManagement": "権限管理"
+        "test": "テスト管理"
     },
     "dailyQuest": {
         "title": "デイリークエスト管理",
