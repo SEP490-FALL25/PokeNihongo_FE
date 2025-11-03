@@ -42,6 +42,12 @@
         "retry": "Thử lại",
         "clearAll": "Xóa hết"
     },
+    "notFoundPage": {
+        "title": "Trang không tồn tại",
+        "description": "Xin lỗi, trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.",
+        "goBack": "← Quay lại",
+        "goToLogin": "Về trang đăng nhập"
+    },
     "navigation": {
         "dashboard": "Tổng quan",
         "users": "Quản lý người dùng",

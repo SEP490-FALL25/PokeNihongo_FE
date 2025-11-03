@@ -1,6 +1,6 @@
-  import { Outlet, useLocation, NavLink, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, NavLink, useNavigate } from "react-router-dom";
 import { LayoutDashboard, Users, BarChart3, Settings, LogOut, Menu, Trophy, Package, Brain, Calendar, Gift, LucideIcon, Store, ShieldCheck } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@ui/Button";
 import { cn } from "@utils/CN";
 import { ROUTES } from "@constants/route";
@@ -11,8 +11,9 @@ import { ChevronDown } from "lucide-react";
 import React from 'react';
 import SparklesFillIcon from "@atoms/SparklesFill";
 import { CookiesService } from "@utils/cookies";
-import { COOKIES } from "@constants/common";
-
+import { COOKIES, ROLE_ID } from "@constants/common";
+import { decodeJWT } from "@utils/token";
+import NotFoundPage from "@pages/NotFoundPage";
 
 interface NavigationItem {
   name: string;
@@ -92,6 +93,17 @@ const AdminLayout = () => {
   const handleLogout = () => {
     CookiesService.remove(COOKIES.ACCESS_TOKEN);
     navigate(ROUTES.AUTH.LOGIN, { replace: true });
+  }
+  //-----------------------End--------------------//
+
+
+  /**
+   * Handle check role
+   */
+  const isAdmin = useMemo(() => decodeJWT()?.roleId === ROLE_ID.ADMIN, []);
+  if (!isAdmin) {
+    CookiesService.remove(COOKIES.ACCESS_TOKEN);
+    return <NotFoundPage />;
   }
   //-----------------------End--------------------//
 

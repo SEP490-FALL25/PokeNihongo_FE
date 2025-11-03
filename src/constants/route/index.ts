@@ -32,8 +32,7 @@ const ADMIN = {
 };
 
 const MANAGER = {
-    ROOT: '/manager/overview',
-    LESSONS: '/manager/lessons/management',
+    ROOT: '/manager/lessons/management',
     VOCABULARY: '/manager/vocabulary',
     QUESTION_BANK: '/manager/question-bank',
     TESTSET_MANAGEMENT: '/manager/testset-management',

@@ -1,13 +1,15 @@
 import { Outlet, useLocation, NavLink, useNavigate } from "react-router-dom";
 import { BookOpen, Languages, LogOut, Menu, FileText, Layers, Book, Settings } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@ui/Button";
 import { cn } from "@utils/CN";
 import { ROUTES } from "@constants/route";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../../components/Atoms/LanguageSwitcher";
 import { CookiesService } from "@utils/cookies";
-import { COOKIES } from "@constants/common";
+import { COOKIES, ROLE_ID } from "@constants/common";
+import { decodeJWT } from "@utils/token";
+import NotFoundPage from "@pages/NotFoundPage";
 
 interface NavigationItem {
     name: string;
@@ -24,7 +26,7 @@ const ManagerLayout = () => {
     const navigation: NavigationItem[] = [
         {
             name: t("navigation.lessons"),
-            href: ROUTES.MANAGER.LESSONS,
+            href: ROUTES.MANAGER.ROOT,
             icon: BookOpen,
         },
         {
@@ -55,6 +57,17 @@ const ManagerLayout = () => {
     const handleLogout = () => {
         CookiesService.remove(COOKIES.ACCESS_TOKEN);
         navigate(ROUTES.AUTH.LOGIN, { replace: true });
+    }
+    //-----------------------End--------------------//
+
+
+    /**
+     * Handle check role
+     */
+    const isManager = useMemo(() => decodeJWT()?.roleId === ROLE_ID.MANAGER, []);
+    if (!isManager) {
+        CookiesService.remove(COOKIES.ACCESS_TOKEN);
+        return <NotFoundPage />;
     }
     //-----------------------End--------------------//
 

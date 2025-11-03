@@ -69,7 +69,7 @@ const RouterComponent = () => {
                         {
                             element: <ManagerLayout />,
                             children: [
-                                { path: ROUTES.MANAGER.LESSONS, element: <LessonsManagement /> },
+                                { path: ROUTES.MANAGER.ROOT, element: <LessonsManagement /> },
                                 { path: ROUTES.MANAGER.VOCABULARY, element: <VocabularyManagement /> },
                                 { path: ROUTES.MANAGER.QUESTION_BANK, element: <QuestionBankManagement /> },
                                 { path: ROUTES.MANAGER.TESTSET_MANAGEMENT, element: <TestSetManagement /> },

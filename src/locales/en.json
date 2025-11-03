@@ -62,6 +62,12 @@
         "startByAdding": "Start by adding {{type}} to this lesson.",
         "addFirst": "Add First {{type}}"
     },
+    "notFoundPage": {
+        "title": "Page Not Found",
+        "description": "Sorry, the page you are looking for does not exist or has been moved.",
+        "goBack": "← Go Back",
+        "goToLogin": "Go to Login"
+    },
     "navigation": {
         "dashboard": "Dashboard",
         "users": "User Management",
