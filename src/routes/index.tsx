@@ -25,7 +25,7 @@ const PackageManagement = lazy(() => import("@pages/AdminPage/PackageManagement"
 const PokemonManagement = lazy(() => import("@pages/AdminPage/Pokemon"))
 const TournamentManagement = lazy(() => import("@pages/AdminPage/Tournaments"))
 const AIPromptManagement = lazy(() => import("@pages/AdminPage/AIPrompts"))
-const CustomAIManagement = lazy(() => import("@pages/AdminPage/CustomAI"))
+const CustomAIManagement = lazy(() => import("@pages/AdminPage/AICustom"))
 const DailyQuestManagement = lazy(() => import("@pages/AdminPage/DailyQuest"))
 const RewardManagement = lazy(() => import("@pages/AdminPage/Reward"))
 const QuestionBankManagement = lazy(() => import("@pages/AdminPage/QuestionBank"))

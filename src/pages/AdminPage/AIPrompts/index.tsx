@@ -181,7 +181,7 @@ export default function AIPromptManagement() {
                 </div>
 
                 {/* Filters Bar */}
-                <Card className="bg-card border-border">
+                <Card className="bg-card border-border mb-4">
                     <CardContent className="py-4">
                         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
                             <div className="flex-1 w-full sm:max-w-md relative">
