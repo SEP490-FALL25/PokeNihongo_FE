@@ -266,15 +266,6 @@ const CustomAIDetail = () => {
             toast.error(errorMsg)
             return
         }
-        if (!initialPolicy) {
-            const errorMsg = t('aiCustom.errors.missingPolicy', { defaultValue: 'Không tìm thấy policy trong cấu hình. Vui lòng kiểm tra lại dữ liệu.' })
-            console.error('❌ Save failed: Missing initialPolicy', {
-                configData: configData,
-                extraParams: configData.extraParams
-            })
-            toast.error(errorMsg)
-            return
-        }
 
         const current = history[historyIndex]
         console.log('💾 Saving changes...', { modelId: configIdNumber, current })
@@ -295,11 +286,15 @@ const CustomAIDetail = () => {
             }
         })
 
+        // Use initialPolicy values if exists, otherwise use defaults
+        const purpose = initialPolicy?.purpose || PURPOSE_POLICY_AI.PERSONALIZED_RECOMMENDATIONS
+        const maskingRules = initialPolicy?.maskingRules || {}
+
         const payload = {
             policy: {
-                purpose: (initialPolicy.purpose || PURPOSE_POLICY_AI.PERSONALIZED_RECOMMENDATIONS) as any,
+                purpose: purpose as any,
                 entities: entitiesArray,
-                maskingRules: initialPolicy.maskingRules || {},
+                maskingRules: maskingRules,
             }
         }
 

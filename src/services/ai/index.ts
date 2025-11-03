@@ -102,9 +102,7 @@ const geminiService = {
     },
 
     updateModelConfigsPolicySchema: async (modelId: number, data: IUpdateModelConfigsPolicySchemaRequest) => {
-        console.log('🔵 Service: Update Policy Schema API call', { modelId, data })
-        const response = await axiosPrivate.put(`/gemini-config/admin/schema/${modelId}`, data);
-        console.log('🔵 Service: Update Policy Schema response', response)
+        const response = await axiosPrivate.patch(`/gemini-config/config-models/${modelId}/policy`, data);
         return response
     },
 
