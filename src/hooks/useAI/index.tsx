@@ -42,6 +42,21 @@ export const useGetAIConfigModels = (params: IQueryRequest) => {
 
 
 /**
+ * Handle Get Config Model By Id
+ * @param id 
+ * @returns 
+ */
+export const useGetAIConfigModelById = (id: number) => {
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['gemini-config-model-by-id', id],
+        queryFn: () => geminiService.getConfigModelById(id),
+    });
+    return { data: data?.data?.data, isLoading, error };
+}
+//-----------------------End-----------------------//
+
+
+/**
  * Handle Create Gemini Config Models
  */
 export const useCreateAIGeminiConfigModels = () => {

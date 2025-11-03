@@ -1,3 +1,4 @@
+import { AI_POLICY_SCOPE } from "@constants/ai";
 import { at, byUser } from "@models/common/response";
 import z from "zod";
 
@@ -84,6 +85,13 @@ export const GeminiConfigModelsEntitySchema = z.object({
     systemInstruction: z.string(),
     safetySettings: z.record(z.string(), z.string()),
     extraParams: z.object({
+        purpose: z.string().optional(),
+        entities: z.array(z.object({
+            scope: z.enum(AI_POLICY_SCOPE),
+            entity: z.string(),
+            fields: z.array(z.string()),
+            limit: z.number().optional(),
+        })).optional(),
         responseMimeType: z.string(),
     }),
     presetId: z.number(),

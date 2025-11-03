@@ -34,6 +34,7 @@ export const updateModelConfigsPolicySchemaSchema = () => z.object({
             entity: z.string(),
             scope: z.enum(AI_POLICY_SCOPE),
             fields: z.array(z.string()),
+            limit: z.number().optional(),
         })),
         maskingRules: z.record(z.string(), z.string()),
     }),
