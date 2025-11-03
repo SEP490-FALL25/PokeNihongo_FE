@@ -169,7 +169,8 @@
             "purpose": "Purpose:",
             "purposePersonalizedRecommendations": "Personalized Recommendations",
             "purposeSpeakingEvaluation": "Speaking Evaluation",
-            "purposeAiKaiwa": "AI Kaiwa"
+            "purposeAiKaiwa": "AI Kaiwa",
+            "removeEntity": "Remove entity"
         },
         "errors": {
             "missingConfigData": "Configuration data not found. Please refresh the page.",

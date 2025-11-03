@@ -149,7 +149,8 @@
             "purpose": "Mục đích:",
             "purposePersonalizedRecommendations": "Gợi ý cá nhân hóa",
             "purposeSpeakingEvaluation": "Đánh giá phát âm",
-            "purposeAiKaiwa": "Chat với AI"
+            "purposeAiKaiwa": "Chat với AI",
+            "removeEntity": "Xóa entity"
         },
         "errors": {
             "missingConfigData": "Không tìm thấy dữ liệu cấu hình. Vui lòng tải lại trang.",

@@ -12,7 +12,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@u
 import { Skeleton } from '@ui/Skeleton'
 import { useGetAIConfigModelById, useGetAIModelConfigPolicySchemaFields, useUpdateModelConfigsPolicySchema } from '@hooks/useAI'
 import ModalEntityCustomAI from '@pages/AdminPage/AICustom/components/ModalEntity'
-import { ChevronLeft, Database, Settings, Brain, Sparkles, Hash, Calendar, Code, CheckCircle2, XCircle, Loader2, Undo, Redo, Save } from 'lucide-react'
+import { ChevronLeft, Database, Settings, Brain, Sparkles, Hash, Calendar, Code, CheckCircle2, XCircle, Loader2, Undo, Redo, Save, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import { AI_POLICY_SCOPE, PURPOSE_POLICY_AI } from '@constants/ai'
@@ -247,6 +247,21 @@ const CustomAIDetail = () => {
         const numValue = value === '' ? undefined : parseInt(value, 10)
         if (isNaN(numValue as number) && value !== '') return
         nextDraft.selectedLimits[entityName] = numValue
+        pushHistory(nextDraft)
+    }
+
+    const handleRemoveEntity = (entityName: string) => {
+        const nextDraft: DraftState = {
+            selectedSchemas: new Set(selectedSchemas),
+            selectedFields: { ...selectedFields },
+            selectedLimits: { ...selectedLimits },
+            selectedPurpose: selectedPurpose
+        }
+        // Remove entity from selectedSchemas
+        nextDraft.selectedSchemas.delete(entityName)
+        // Remove fields and limits for this entity
+        delete nextDraft.selectedFields[entityName]
+        delete nextDraft.selectedLimits[entityName]
         pushHistory(nextDraft)
     }
 
@@ -516,7 +531,7 @@ const CustomAIDetail = () => {
                                     <Database className="h-4 w-4 mr-2" />
                                     {t('aiCustom.selectEntities', { defaultValue: 'Chọn Entities' })}
                                     {selectedSchemas.size > 0 && (
-                                        <Badge className="ml-2 bg-primary text-primary-foreground">{selectedSchemas.size}</Badge>
+                                        <Badge className="ml-2 bg-primary text-white">{selectedSchemas.size}</Badge>
                                     )}
                                 </Button>
                             </div>
@@ -710,6 +725,16 @@ const CustomAIDetail = () => {
                                                                 onClick={(e) => e.stopPropagation()}
                                                             />
                                                         </div>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                handleRemoveEntity(entityName)
+                                                            }}
+                                                            className="p-1.5 rounded-lg border border-red-200 hover:border-red-400 hover:bg-red-50 transition-all duration-200 text-red-600 hover:text-white cursor-pointer"
+                                                            title={t('aiCustom.schemaEntities.removeEntity', { defaultValue: 'Remove entity' })}
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </button>
                                                     </div>
                                                 </AccordionTrigger>
                                                 <AccordionContent className="px-4 py-3 border-t border-gray-200 bg-gray-50">
