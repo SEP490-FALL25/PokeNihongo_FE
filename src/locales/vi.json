@@ -61,6 +61,8 @@
         "questionBank": "Quản lý Ngân hàng Câu hỏi",
         "packageManagement": "Gói dịch vụ",
         "aiPrompts": "AI Prompts",
+        "configAI": "Cấu hình AI",
+        "customAI": "Custom AI",
         "rewards": "Phần thưởng",
         "lessonManagement": "Danh sách bài học",
         "lessonTypes": "Loại bài học",
@@ -609,7 +611,14 @@
         "endDateRequired": "Ngày kết thúc là bắt buộc",
         "minRequired": "Số lượng tối thiểu là bắt buộc",
         "maxRequired": "Số lượng tối đa là bắt buộc",
-        "precreateBeforeEndDaysRequired": "Số ngày trước kết thúc là bắt buộc"
+        "precreateBeforeEndDaysRequired": "Số ngày trước kết thúc là bắt buộc",
+        "nameRequired": "Tên là bắt buộc",
+        "geminiModelIdRequired": "Gemini model ID là bắt buộc",
+        "maxTokensMin": "Số token tối đa phải ít nhất {{min}}",
+        "maxTokensMax": "Số token tối đa không được vượt quá {{max}}",
+        "systemInstructionRequired": "System instruction là bắt buộc",
+        "responseMimeTypeRequired": "Response MIME type là bắt buộc",
+        "presetIdRequired": "Preset là bắt buộc"
     },
     "conditionTypes": {
         "DAILY_LOGIN": "Đăng nhập",
