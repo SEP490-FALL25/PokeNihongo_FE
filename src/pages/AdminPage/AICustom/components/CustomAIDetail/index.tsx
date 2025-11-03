@@ -13,6 +13,7 @@ import { useGetAIConfigModelById, useGetAIModelConfigPolicySchemaFields, useUpda
 import ModalEntityCustomAI from '@pages/AdminPage/AICustom/components/ModalEntity'
 import { ChevronLeft, Database, Settings, Brain, Sparkles, Hash, Calendar, Code, CheckCircle2, XCircle, Loader2, Undo, Redo, Save } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'react-toastify'
 import { AI_POLICY_SCOPE, PURPOSE_POLICY_AI } from '@constants/ai'
 
 const CustomAIDetail = () => {
@@ -43,6 +44,7 @@ const CustomAIDetail = () => {
     type DraftState = {
         selectedSchemas: Set<string>
         selectedFields: Record<string, Set<string>>
+        selectedLimits: Record<string, number | undefined>
     }
     const [history, setHistory] = useState<DraftState[]>([])
     const [historyIndex, setHistoryIndex] = useState<number>(-1)
@@ -73,22 +75,33 @@ const CustomAIDetail = () => {
         return fieldsMap
     }, [entities])
 
+    const selectedLimitsFromEntities = useMemo(() => {
+        const limitsMap: Record<string, number | undefined> = {}
+        entities.forEach((entity: any) => {
+            if (entity.entity) {
+                limitsMap[entity.entity] = entity.limit
+            }
+        })
+        return limitsMap
+    }, [entities])
+
     // Initialize draft from configData
     useEffect(() => {
         if (entities.length > 0) {
             const initialDraft: DraftState = {
                 selectedSchemas: selectedSchemasFromEntities,
-                selectedFields: selectedFieldsFromEntities
+                selectedFields: selectedFieldsFromEntities,
+                selectedLimits: selectedLimitsFromEntities
             }
             setHistory([initialDraft])
             setHistoryIndex(0)
         } else if (configData && entities.length === 0) {
             // Config exists but no entities - initialize empty
-            const emptyDraft: DraftState = { selectedSchemas: new Set(), selectedFields: {} }
+            const emptyDraft: DraftState = { selectedSchemas: new Set(), selectedFields: {}, selectedLimits: {} }
             setHistory([emptyDraft])
             setHistoryIndex(0)
         }
-    }, [entities, configData, selectedSchemasFromEntities, selectedFieldsFromEntities])
+    }, [entities, configData, selectedSchemasFromEntities, selectedFieldsFromEntities, selectedLimitsFromEntities])
 
     // Get current draft from history
     const currentDraft = useMemo(() => {
@@ -96,11 +109,16 @@ const CustomAIDetail = () => {
             return history[historyIndex]
         }
         // Return entities state if history not initialized yet
-        return { selectedSchemas: selectedSchemasFromEntities, selectedFields: selectedFieldsFromEntities }
-    }, [history, historyIndex, selectedSchemasFromEntities, selectedFieldsFromEntities])
+        return {
+            selectedSchemas: selectedSchemasFromEntities,
+            selectedFields: selectedFieldsFromEntities,
+            selectedLimits: selectedLimitsFromEntities
+        }
+    }, [history, historyIndex, selectedSchemasFromEntities, selectedFieldsFromEntities, selectedLimitsFromEntities])
 
     const selectedSchemas = currentDraft.selectedSchemas
     const selectedFields = currentDraft.selectedFields
+    const selectedLimits = currentDraft.selectedLimits
 
     // Push new state to history
     const pushHistory = (nextDraft: DraftState) => {
@@ -163,7 +181,8 @@ const CustomAIDetail = () => {
     const toggleSelectEntityAllFields = (entityName: string, checked: boolean) => {
         const nextDraft: DraftState = {
             selectedSchemas: new Set(selectedSchemas),
-            selectedFields: { ...selectedFields }
+            selectedFields: { ...selectedFields },
+            selectedLimits: { ...selectedLimits }
         }
         const fields = (filteredSchemaFields[entityName] || []) as string[]
         if (checked) {
@@ -177,7 +196,8 @@ const CustomAIDetail = () => {
     const toggleSelectField = (entityName: string, fieldName: string, checked: boolean) => {
         const nextDraft: DraftState = {
             selectedSchemas: new Set(selectedSchemas),
-            selectedFields: { ...selectedFields }
+            selectedFields: { ...selectedFields },
+            selectedLimits: { ...selectedLimits }
         }
         if (!nextDraft.selectedFields[entityName]) nextDraft.selectedFields[entityName] = new Set()
         if (checked) {
@@ -191,11 +211,24 @@ const CustomAIDetail = () => {
         pushHistory(nextDraft)
     }
 
+    const handleLimitChange = (entityName: string, value: string) => {
+        const nextDraft: DraftState = {
+            selectedSchemas: new Set(selectedSchemas),
+            selectedFields: { ...selectedFields },
+            selectedLimits: { ...selectedLimits }
+        }
+        const numValue = value === '' ? undefined : parseInt(value, 10)
+        if (isNaN(numValue as number) && value !== '') return
+        nextDraft.selectedLimits[entityName] = numValue
+        pushHistory(nextDraft)
+    }
+
     // Check if draft has changes
     const isDirty = useMemo(() => {
+        if (history.length === 0) return false
         if (historyIndex !== history.length - 1) return true
-        const initialDraft = history[0] || { selectedSchemas: new Set(), selectedFields: {} }
-        const current = history[historyIndex] || { selectedSchemas: new Set(), selectedFields: {} }
+        const initialDraft = history[0] || { selectedSchemas: new Set(), selectedFields: {}, selectedLimits: {} }
+        const current = history[historyIndex] || { selectedSchemas: new Set(), selectedFields: {}, selectedLimits: {} }
 
         // Compare schemas
         if (initialDraft.selectedSchemas.size !== current.selectedSchemas.size) return true
@@ -227,9 +260,24 @@ const CustomAIDetail = () => {
     const { mutateAsync: updatePolicySchema, isPending: isSaving } = useUpdateModelConfigsPolicySchema()
 
     const handleSave = async () => {
-        if (!configData || !initialPolicy) return
+        if (!configData) {
+            const errorMsg = 'Không tìm thấy dữ liệu cấu hình. Vui lòng tải lại trang.'
+            console.error('❌ Save failed: Missing configData')
+            toast.error(errorMsg)
+            return
+        }
+        if (!initialPolicy) {
+            const errorMsg = 'Không tìm thấy policy trong cấu hình. Vui lòng kiểm tra lại dữ liệu.'
+            console.error('❌ Save failed: Missing initialPolicy', {
+                configData: configData,
+                extraParams: configData.extraParams
+            })
+            toast.error(errorMsg)
+            return
+        }
 
         const current = history[historyIndex]
+        console.log('💾 Saving changes...', { modelId: configIdNumber, current })
 
         // Build entities array from draft
         const entitiesArray = Array.from(current.selectedSchemas).map(entityName => {
@@ -237,11 +285,13 @@ const CustomAIDetail = () => {
             // Get scope from original entity or default to SELF_ONLY
             const originalEntity = entities.find((e: any) => e.entity === entityName)
             const scope = originalEntity?.scope || AI_POLICY_SCOPE.SELF_ONLY
+            const limit = current.selectedLimits[entityName]
 
             return {
                 entity: entityName,
                 scope: scope as any,
                 fields: fields,
+                ...(limit !== undefined && { limit })
             }
         })
 
@@ -253,15 +303,23 @@ const CustomAIDetail = () => {
             }
         }
 
-        await updatePolicySchema({ modelId: configIdNumber, data: payload })
+        console.log('📤 API call payload:', payload)
+        try {
+            await updatePolicySchema({ modelId: configIdNumber, data: payload })
+            console.log('✅ Save successful')
 
-        // Reset history after save
-        const savedDraft: DraftState = {
-            selectedSchemas: new Set(current.selectedSchemas),
-            selectedFields: { ...current.selectedFields }
+            // Reset history after save
+            const savedDraft: DraftState = {
+                selectedSchemas: new Set(current.selectedSchemas),
+                selectedFields: { ...current.selectedFields },
+                selectedLimits: { ...current.selectedLimits }
+            }
+            setHistory([savedDraft])
+            setHistoryIndex(0)
+        } catch (error) {
+            console.error('❌ Save error:', error)
+            throw error
         }
-        setHistory([savedDraft])
-        setHistoryIndex(0)
     }
 
     const isAllFieldsSelectedInEntity = (entityName: string) => {
@@ -439,7 +497,7 @@ const CustomAIDetail = () => {
                             </div>
 
                             {/* Quick Actions */}
-                            <div className="flex flex-wrap items-center gap-3 mt-3 pt-3 border-t border-gray-200">
+                            <div className="flex flex-wrap items-center justify-between gap-3 mt-3 pt-3 border-t border-gray-200">
                                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-gray-200 hover:border-green-300 transition-all duration-200 shadow-sm">
                                     <Switch
                                         id="expand-all"
@@ -453,45 +511,47 @@ const CustomAIDetail = () => {
 
                                 {/* Undo/Redo */}
                                 <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={handleUndo}
-                                        disabled={historyIndex <= 0}
-                                        className={`p-2 rounded-lg border border-gray-200 hover:border-green-300 transition-all ${historyIndex <= 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                                        title="Undo"
-                                    >
-                                        <Undo className="h-4 w-4" />
-                                    </button>
-                                    <button
-                                        onClick={handleRedo}
-                                        disabled={historyIndex >= history.length - 1}
-                                        className={`p-2 rounded-lg border border-gray-200 hover:border-green-300 transition-all ${historyIndex >= history.length - 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                                        title="Redo"
-                                    >
-                                        <Redo className="h-4 w-4" />
-                                    </button>
-                                </div>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={handleUndo}
+                                            disabled={historyIndex <= 0}
+                                            className={`p-2 rounded-lg border border-gray-200 hover:border-green-300 transition-all ${historyIndex <= 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                                            title="Undo"
+                                        >
+                                            <Undo className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            onClick={handleRedo}
+                                            disabled={historyIndex >= history.length - 1}
+                                            className={`p-2 rounded-lg border border-gray-200 hover:border-green-300 transition-all ${historyIndex >= history.length - 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                                            title="Redo"
+                                        >
+                                            <Redo className="h-4 w-4" />
+                                        </button>
+                                    </div>
 
-                                {/* Save Button */}
-                                {isDirty && (
-                                    <Button
-                                        onClick={handleSave}
-                                        disabled={isSaving}
-                                        size="sm"
-                                        className="bg-gradient-to-r from-green-600 to-green-600 hover:from-green-700 hover:to-green-700 text-white shadow-md hover:shadow-lg transition-all duration-200 font-bold h-9 px-6 text-sm"
-                                    >
-                                        {isSaving ? (
-                                            <>
-                                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                                Saving...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Save className="h-4 w-4 mr-2" />
-                                                Save Changes
-                                            </>
-                                        )}
-                                    </Button>
-                                )}
+                                    {/* Save Button */}
+                                    {isDirty && (
+                                        <Button
+                                            onClick={handleSave}
+                                            disabled={isSaving}
+                                            size="sm"
+                                            className="bg-gradient-to-r from-green-600 to-green-600 hover:from-green-700 hover:to-green-700 text-white shadow-md hover:shadow-lg transition-all duration-200 font-bold h-9 px-6 text-sm"
+                                        >
+                                            {isSaving ? (
+                                                <>
+                                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                                    Saving...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Save className="h-4 w-4 mr-2" />
+                                                    Save Changes
+                                                </>
+                                            )}
+                                        </Button>
+                                    )}
+                                </div>
                             </div>
                         </CardHeader>
                         <CardContent className="p-4 bg-gray-50">
@@ -572,16 +632,36 @@ const CustomAIDetail = () => {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className="ml-auto flex items-center gap-2 pr-1">
-                                                        <label htmlFor={`select-entity-all-${entityName}`} className="text-xs font-bold text-gray-600 cursor-pointer hover:text-green-600 transition-colors select-none">
-                                                            Select All
-                                                        </label>
-                                                        <Switch
-                                                            id={`select-entity-all-${entityName}`}
-                                                            checked={isAllSelected}
-                                                            onCheckedChange={(val) => toggleSelectEntityAllFields(entityName, val)}
-                                                            onClick={(e) => e.stopPropagation()}
-                                                        />
+                                                    <div className="ml-auto flex items-center gap-3 pr-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <label htmlFor={`limit-${entityName}`} className="text-[10px] font-medium text-gray-600 whitespace-nowrap">
+                                                                Limit:
+                                                            </label>
+                                                            <Input
+                                                                id={`limit-${entityName}`}
+                                                                type="number"
+                                                                min="0"
+                                                                value={selectedLimits[entityName] ?? ''}
+                                                                onChange={(e) => {
+                                                                    e.stopPropagation()
+                                                                    handleLimitChange(entityName, e.target.value)
+                                                                }}
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                placeholder="0"
+                                                                className="w-20 h-7 text-xs border-gray-300 focus:border-green-500 focus:ring-green-500"
+                                                            />
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <label htmlFor={`select-entity-all-${entityName}`} className="text-xs font-bold text-gray-600 cursor-pointer hover:text-green-600 transition-colors select-none">
+                                                                Select All
+                                                            </label>
+                                                            <Switch
+                                                                id={`select-entity-all-${entityName}`}
+                                                                checked={isAllSelected}
+                                                                onCheckedChange={(val) => toggleSelectEntityAllFields(entityName, val)}
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            />
+                                                        </div>
                                                     </div>
                                                 </AccordionTrigger>
                                                 <AccordionContent className="px-4 py-3 border-t border-gray-200 bg-gray-50">
@@ -644,12 +724,18 @@ const CustomAIDetail = () => {
                 onConfirm={(selected) => {
                     const nextDraft: DraftState = {
                         selectedSchemas: new Set(selected),
-                        selectedFields: { ...selectedFields }
+                        selectedFields: { ...selectedFields },
+                        selectedLimits: { ...selectedLimits }
                     }
-                    // Remove fields for entities that are no longer selected
+                    // Remove fields and limits for entities that are no longer selected
                     Object.keys(nextDraft.selectedFields).forEach(entityName => {
                         if (!nextDraft.selectedSchemas.has(entityName)) {
                             delete nextDraft.selectedFields[entityName]
+                        }
+                    })
+                    Object.keys(nextDraft.selectedLimits).forEach(entityName => {
+                        if (!nextDraft.selectedSchemas.has(entityName)) {
+                            delete nextDraft.selectedLimits[entityName]
                         }
                     })
                     pushHistory(nextDraft)

@@ -151,18 +151,11 @@ export const useGetAIModelConfigPolicySchemaFields = (entities: string[]) => {
     const { data, isLoading, error } = useQuery({
         queryKey: ['gemini-model-configs-policy-schema-fields', entities],
         queryFn: async () => {
-            console.log('🔍 Hook: Calling API with entities:', entities)
             const response = await geminiService.getModelConfigsPolicySchemaFields(entities)
-            console.log('🔍 Hook: Raw response:', response)
-            console.log('🔍 Hook: response.data:', response?.data)
-            console.log('🔍 Hook: response.data.data:', response?.data?.data)
-            console.log('🔍 Hook: response.data?.data?.data:', response?.data?.data?.data)
             return response
         },
         enabled: entities.length > 0,
     });
-    console.log('🔍 Hook: Query data:', data)
-    console.log('🔍 Hook: Final data (data?.data?.data):', data?.data?.data)
     return { data: data?.data?.data, isLoading, error };
 }
 //-----------------------End-----------------------//
