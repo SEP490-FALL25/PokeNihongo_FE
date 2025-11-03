@@ -27,6 +27,7 @@ const ADMIN = {
     REWARD_MANAGEMENT: '/admin/reward-management',
     QUESTION_BANK: '/admin/question-bank',
     TESTSET_MANAGEMENT: '/admin/testset-management',
+    PERMISSION_MANAGEMENT: '/admin/permission-management',
     CONFIG_SHOP: '/admin/config-shop',
     CONFIG_SHOP_BANNER_DETAIL: '/admin/config-shop/:bannerId',
     CONFIG_GACHA: '/admin/config-gacha',

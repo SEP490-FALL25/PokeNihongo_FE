@@ -1,8 +1,10 @@
 import { IQueryRequest } from "@models/common/request";
 import permissionService from "@services/permission";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { selectCurrentLanguage } from "@redux/features/language/selector";
+import { IUpdateRoleRequest } from "@models/permission/request";
+import { toast } from "react-toastify";
 
 /**
  * Handle Role List
@@ -32,6 +34,27 @@ export const usePermissionList = (roleId: number, params: IQueryRequest) => {
         queryKey: ['permission-list', roleId, params, currentLanguage],
         queryFn: () => permissionService.getPermissionByRoleId(roleId, params),
     });
-    return { data: data?.data?.data, isLoading, error };
+    return { data: data?.data?.data.permissions, isLoading, error };
+};
+//----------------------End----------------------//
+
+
+/**
+ * Handle Update Permission By Role ID
+ * @param roleId 
+ * @returns 
+ */
+export const useUpdatePermissionByRoleId = (roleId: number) => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: IUpdateRoleRequest) => permissionService.updateForRole(roleId, data),
+        onSuccess: (data: any) => {
+            queryClient.invalidateQueries({ queryKey: ['permission-list', roleId] });
+            toast.success(data?.message || "Permissions updated successfully!");
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.message || "An error occurred while updating permissions.");
+        },
+    });
 };
 //----------------------End----------------------//

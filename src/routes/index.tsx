@@ -13,6 +13,7 @@ import ConfigGacha from "@pages/AdminPage/ConfigGacha"
 import GachaBannerDetail from "@pages/AdminPage/ConfigGacha/components/GachaBannerDetail"
 
 const AdminDashboard = lazy(() => import("@pages/AdminPage/Dashboard"))
+const PermissionManagement = lazy(() => import("@pages/AdminPage/Permission"))
 const UsersManagement = lazy(() => import("@pages/AdminPage/Users"))
 const LessonsManagement = lazy(() => import("@pages/AdminPage/Lesson/Management"))
 const VocabularyManagement = lazy(() => import("@pages/AdminPage/Vocabulary"))
@@ -62,6 +63,7 @@ const RouterComponent = () => {
                                 { path: ROUTES.ADMIN.CONFIG_GACHA_BANNER_DETAIL, element: <GachaBannerDetail /> },
                                 { path: ROUTES.ADMIN.QUESTION_BANK, element: <QuestionBankManagement /> },
                                 { path: ROUTES.ADMIN.TESTSET_MANAGEMENT, element: <TestSetManagement /> },
+                                { path: ROUTES.ADMIN.PERMISSION_MANAGEMENT, element: <PermissionManagement /> },
                             ],
                         },
                     ],

@@ -1,5 +1,6 @@
 import { axiosPrivate } from "@configs/axios";
 import { IQueryRequest } from "@models/common/request";
+import { IUpdateRoleRequest } from "@models/permission/request";
 
 const permissionService = {
     getRoleList: async (params: IQueryRequest) => {
@@ -52,6 +53,9 @@ const permissionService = {
         if (qsParts.length) queryParams.set('qs', qsParts.join(','));
 
         return axiosPrivate.get(`/roles/${roleId}`, { params: queryParams });
+    },
+    updateForRole: async (roleId: number, data: IUpdateRoleRequest) => {
+        return axiosPrivate.put(`/roles/${roleId}`, data);
     },
 };
 

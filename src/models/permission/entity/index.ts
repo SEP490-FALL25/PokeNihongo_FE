@@ -27,6 +27,7 @@ export const PermissionEntitySchema = z.object({
     module: z.string(),
     path: z.string(),
     method: z.string(),
+    hasPermission: z.boolean(),
     ...byUser,
     ...at,
 });
