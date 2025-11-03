@@ -64,11 +64,12 @@ const ManagerLayout = () => {
     /**
      * Handle check role
      */
-    const isManager = useMemo(() => decodeJWT()?.roleId === ROLE_ID.MANAGER, []);
-    if (!isManager) {
-        CookiesService.remove(COOKIES.ACCESS_TOKEN);
-        return <NotFoundPage />;
-    }
+    //TODO: Remove this after testing
+    // const isManager = useMemo(() => decodeJWT()?.roleId === ROLE_ID.MANAGER, []);
+    // if (!isManager) {
+    //     CookiesService.remove(COOKIES.ACCESS_TOKEN);
+    //     return <NotFoundPage />;
+    // }
     //-----------------------End--------------------//
 
     return (
