@@ -25,6 +25,7 @@ const PackageManagement = lazy(() => import("@pages/AdminPage/PackageManagement"
 const PokemonManagement = lazy(() => import("@pages/AdminPage/Pokemon"))
 const TournamentManagement = lazy(() => import("@pages/AdminPage/Tournaments"))
 const AIPromptManagement = lazy(() => import("@pages/AdminPage/AIPrompts"))
+const CustomAIManagement = lazy(() => import("@pages/AdminPage/CustomAI"))
 const DailyQuestManagement = lazy(() => import("@pages/AdminPage/DailyQuest"))
 const RewardManagement = lazy(() => import("@pages/AdminPage/Reward"))
 const QuestionBankManagement = lazy(() => import("@pages/AdminPage/QuestionBank"))
@@ -57,6 +58,7 @@ const RouterComponent = () => {
                                 { path: ROUTES.ADMIN.POKEMON_MANAGEMENT, element: <PokemonManagement /> },
                                 { path: ROUTES.ADMIN.TOURNAMENT_MANAGEMENT, element: <TournamentManagement /> },
                                 { path: ROUTES.ADMIN.AI_PROMPTS_MANAGEMENT, element: <AIPromptManagement /> },
+                                { path: ROUTES.ADMIN.CUSTOM_AI_MANAGEMENT, element: <CustomAIManagement /> },
                                 { path: ROUTES.ADMIN.DAILY_QUEST_MANAGEMENT, element: <DailyQuestManagement /> },
                                 { path: ROUTES.ADMIN.REWARD_MANAGEMENT, element: <RewardManagement /> },
                                 { path: ROUTES.ADMIN.CONFIG_SHOP, element: <ConfigShop /> },

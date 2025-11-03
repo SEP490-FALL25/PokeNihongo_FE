@@ -62,7 +62,7 @@ const AdminLayout = () => {
         },
         {
           name: t("navigation.customAI"),
-          href: "/admin/config-ai/custom",
+          href: ROUTES.ADMIN.CUSTOM_AI_MANAGEMENT,
           icon: Brain,
         },
       ],
