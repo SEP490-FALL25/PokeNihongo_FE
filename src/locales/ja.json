@@ -91,7 +91,11 @@
         "viewDetail": "詳細を見る",
         "cancel": "キャンセル",
         "saveChanges": "変更を保存",
-        "chars": "文字"
+        "chars": "文字",
+        "search": "検索",
+        "selectAll": "すべて選択",
+        "loadingMore": "さらに設定を読み込み中...",
+        "loadedAllCount": "✓ すべての{{count}}件の設定を表示しました"
     },
     "aiCustom": {
         "title": "AI設定 - カスタムAI",
@@ -118,7 +122,35 @@
         "presetLabel": "プリセット",
         "maxTokens": "最大トークン数",
         "systemInstruction": "システム指示:",
-        "detailTitle": "設定の詳細"
+        "detailTitle": "設定の詳細",
+        "modalEntity": {
+            "title": "スキーマエンティティを選択",
+            "description": "スキーマエンティティを検索して選択して設定",
+            "searchPlaceholder": "スキーマエンティティを検索...",
+            "selected": "選択済み"
+        },
+        "selectEntities": "エンティティを選択",
+        "schemaEntities": {
+            "title": "スキーマエンティティ & フィールド",
+            "description": "スキーマエンティティを検索して選択して設定",
+            "expandAll": "すべて展開",
+            "selectAll": "すべて選択",
+            "limit": "制限:",
+            "fieldsTotal": "fields",
+            "fieldTotal": "field",
+            "selected": "選択済み",
+            "noEntitiesFound": "エンティティが見つかりません",
+            "selectEntitiesToView": "エンティティを選択してフィールドを表示",
+            "noEntitiesMatch": "現在の検索条件に一致するエンティティがありません。",
+            "saveChanges": "変更を保存",
+            "saving": "保存中...",
+            "undo": "元に戻す",
+            "redo": "やり直す"
+        },
+        "errors": {
+            "missingConfigData": "設定データが見つかりません。ページを再読み込みしてください。",
+            "missingPolicy": "設定にポリシーが見つかりません。データを再度確認してください。"
+        }
     },
     "aiPrompts": {
         "title": "AIプロンプト管理",

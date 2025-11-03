@@ -111,7 +111,11 @@
         "viewDetail": "View detail",
         "cancel": "Cancel",
         "saveChanges": "Save changes",
-        "chars": "characters"
+        "chars": "characters",
+        "search": "Search",
+        "selectAll": "Select All",
+        "loadingMore": "Loading more configs...",
+        "loadedAllCount": "✓ Displayed all {{count}} configs"
     },
     "aiCustom": {
         "title": "Config AI - Custom AI",
@@ -138,7 +142,35 @@
         "presetLabel": "Preset",
         "maxTokens": "Max Tokens",
         "systemInstruction": "System Instruction:",
-        "detailTitle": "Config detail"
+        "detailTitle": "Config detail",
+        "modalEntity": {
+            "title": "Select Schema Entities",
+            "description": "Search and select schema entities to configure",
+            "searchPlaceholder": "Search schema entities...",
+            "selected": "selected"
+        },
+        "selectEntities": "Select Entities",
+        "schemaEntities": {
+            "title": "Schema Entities & Fields",
+            "description": "Search and select schema entities to configure",
+            "expandAll": "Expand All",
+            "selectAll": "Select All",
+            "limit": "Limit:",
+            "fieldsTotal": "fields",
+            "fieldTotal": "field",
+            "selected": "selected",
+            "noEntitiesFound": "No Entities Found",
+            "selectEntitiesToView": "Select entities to view their fields",
+            "noEntitiesMatch": "No entities match your current search criteria.",
+            "saveChanges": "Save Changes",
+            "saving": "Saving...",
+            "undo": "Undo",
+            "redo": "Redo"
+        },
+        "errors": {
+            "missingConfigData": "Configuration data not found. Please refresh the page.",
+            "missingPolicy": "Policy not found in configuration. Please check the data again."
+        }
     },
     "aiPrompts": {
         "title": "AI Prompts Management",

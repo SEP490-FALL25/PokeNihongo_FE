@@ -261,13 +261,13 @@ const CustomAIDetail = () => {
 
     const handleSave = async () => {
         if (!configData) {
-            const errorMsg = 'Không tìm thấy dữ liệu cấu hình. Vui lòng tải lại trang.'
+            const errorMsg = t('aiCustom.errors.missingConfigData', { defaultValue: 'Không tìm thấy dữ liệu cấu hình. Vui lòng tải lại trang.' })
             console.error('❌ Save failed: Missing configData')
             toast.error(errorMsg)
             return
         }
         if (!initialPolicy) {
-            const errorMsg = 'Không tìm thấy policy trong cấu hình. Vui lòng kiểm tra lại dữ liệu.'
+            const errorMsg = t('aiCustom.errors.missingPolicy', { defaultValue: 'Không tìm thấy policy trong cấu hình. Vui lòng kiểm tra lại dữ liệu.' })
             console.error('❌ Save failed: Missing initialPolicy', {
                 configData: configData,
                 extraParams: configData.extraParams
@@ -465,11 +465,11 @@ const CustomAIDetail = () => {
                                     <div className="flex items-center gap-1.5">
                                         <span className="text-lg">⚙️</span>
                                         <CardTitle className="text-base font-bold text-gray-900">
-                                            Schema Entities & Fields
+                                            {t('aiCustom.schemaEntities.title', { defaultValue: 'Schema Entities & Fields' })}
                                         </CardTitle>
                                     </div>
                                     <p className="text-xs text-gray-600">
-                                        {t('aiCustom.modalEntity.description', { defaultValue: 'Search and select schema entities to configure' })}
+                                        {t('aiCustom.schemaEntities.description', { defaultValue: 'Search and select schema entities to configure' })}
                                     </p>
                                     {selectedSchemas.size > 0 && (
                                         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-50 border border-green-200 rounded-lg">
@@ -478,7 +478,7 @@ const CustomAIDetail = () => {
                                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-600"></span>
                                             </span>
                                             <span className="text-xs font-bold text-green-700">
-                                                {selectedSchemas.size} {selectedSchemas.size === 1 ? 'entity' : 'entities'} selected
+                                                {selectedSchemas.size} {selectedSchemas.size === 1 ? 'entity' : 'entities'} {t('aiCustom.schemaEntities.selected', { defaultValue: 'selected' })}
                                             </span>
                                         </div>
                                     )}
@@ -505,7 +505,7 @@ const CustomAIDetail = () => {
                                         onCheckedChange={(val) => setExpandedEntities(val ? paginatedEntityKeys : [])}
                                     />
                                     <label htmlFor="expand-all" className="text-xs font-bold cursor-pointer hover:text-green-600 transition-colors select-none text-gray-700">
-                                        Expand All
+                                        {t('aiCustom.schemaEntities.expandAll', { defaultValue: 'Expand All' })}
                                     </label>
                                 </div>
 
@@ -516,7 +516,7 @@ const CustomAIDetail = () => {
                                             onClick={handleUndo}
                                             disabled={historyIndex <= 0}
                                             className={`p-2 rounded-lg border border-gray-200 hover:border-green-300 transition-all ${historyIndex <= 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                                            title="Undo"
+                                            title={t('aiCustom.schemaEntities.undo', { defaultValue: 'Undo' })}
                                         >
                                             <Undo className="h-4 w-4" />
                                         </button>
@@ -524,7 +524,7 @@ const CustomAIDetail = () => {
                                             onClick={handleRedo}
                                             disabled={historyIndex >= history.length - 1}
                                             className={`p-2 rounded-lg border border-gray-200 hover:border-green-300 transition-all ${historyIndex >= history.length - 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                                            title="Redo"
+                                            title={t('aiCustom.schemaEntities.redo', { defaultValue: 'Redo' })}
                                         >
                                             <Redo className="h-4 w-4" />
                                         </button>
@@ -541,12 +541,12 @@ const CustomAIDetail = () => {
                                             {isSaving ? (
                                                 <>
                                                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                                    Saving...
+                                                    {t('aiCustom.schemaEntities.saving', { defaultValue: 'Saving...' })}
                                                 </>
                                             ) : (
                                                 <>
                                                     <Save className="h-4 w-4 mr-2" />
-                                                    Save Changes
+                                                    {t('aiCustom.schemaEntities.saveChanges', { defaultValue: 'Save Changes' })}
                                                 </>
                                             )}
                                         </Button>
@@ -588,11 +588,11 @@ const CustomAIDetail = () => {
                             ) : entityKeys.length === 0 ? (
                                 <div className="text-center py-12 px-6 bg-white rounded-xl border border-dashed border-gray-300">
                                     <Database className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-                                    <h3 className="font-bold text-base mb-2 text-gray-900">No Entities Found</h3>
+                                    <h3 className="font-bold text-base mb-2 text-gray-900">{t('aiCustom.schemaEntities.noEntitiesFound', { defaultValue: 'No Entities Found' })}</h3>
                                     <p className="text-xs text-gray-600 max-w-md mx-auto">
                                         {selectedSchemas.size === 0
-                                            ? 'Select entities to view their fields'
-                                            : 'No entities match your current search criteria.'}
+                                            ? t('aiCustom.schemaEntities.selectEntitiesToView', { defaultValue: 'Select entities to view their fields' })
+                                            : t('aiCustom.schemaEntities.noEntitiesMatch', { defaultValue: 'No entities match your current search criteria.' })}
                                     </p>
                                 </div>
                             ) : (
@@ -616,7 +616,7 @@ const CustomAIDetail = () => {
                                                             <span className="font-bold text-sm text-gray-900 block">{entityName}</span>
                                                             <div className="flex items-center gap-2 mt-0.5">
                                                                 <span className="text-[10px] font-medium text-gray-500">
-                                                                    {fields.length} {fields.length !== 1 ? 'fields' : 'field'} total
+                                                                    {fields.length} {fields.length !== 1 ? t('aiCustom.schemaEntities.fieldsTotal', { defaultValue: 'fields' }) : t('aiCustom.schemaEntities.fieldTotal', { defaultValue: 'field' })}
                                                                 </span>
                                                                 {selectedFields[entityName] && selectedFields[entityName].size > 0 && (
                                                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 border border-green-300">
@@ -625,7 +625,7 @@ const CustomAIDetail = () => {
                                                                             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-600"></span>
                                                                         </span>
                                                                         <span className="text-[10px] font-bold text-green-700">
-                                                                            {selectedFields[entityName].size}/{fields.length} selected
+                                                                            {selectedFields[entityName].size}/{fields.length} {t('aiCustom.schemaEntities.selected', { defaultValue: 'selected' })}
                                                                         </span>
                                                                     </span>
                                                                 )}
@@ -635,7 +635,7 @@ const CustomAIDetail = () => {
                                                     <div className="ml-auto flex items-center gap-3 pr-1">
                                                         <div className="flex items-center gap-2">
                                                             <label htmlFor={`limit-${entityName}`} className="text-[10px] font-medium text-gray-600 whitespace-nowrap">
-                                                                Limit:
+                                                                {t('aiCustom.schemaEntities.limit', { defaultValue: 'Limit:' })}
                                                             </label>
                                                             <Input
                                                                 id={`limit-${entityName}`}
@@ -653,7 +653,7 @@ const CustomAIDetail = () => {
                                                         </div>
                                                         <div className="flex items-center gap-2">
                                                             <label htmlFor={`select-entity-all-${entityName}`} className="text-xs font-bold text-gray-600 cursor-pointer hover:text-green-600 transition-colors select-none">
-                                                                Select All
+                                                                {t('aiCustom.schemaEntities.selectAll', { defaultValue: 'Select All' })}
                                                             </label>
                                                             <Switch
                                                                 id={`select-entity-all-${entityName}`}

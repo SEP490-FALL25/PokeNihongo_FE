@@ -91,7 +91,11 @@
         "viewDetail": "Xem chi tiết",
         "cancel": "Hủy",
         "saveChanges": "Lưu thay đổi",
-        "chars": "ký tự"
+        "chars": "ký tự",
+        "search": "Tìm kiếm",
+        "selectAll": "Chọn tất cả",
+        "loadingMore": "Đang tải thêm cấu hình...",
+        "loadedAllCount": "✓ Đã hiển thị tất cả {{count}} cấu hình"
     },
     "aiCustom": {
         "title": "Config AI - Custom AI",
@@ -118,7 +122,35 @@
         "presetLabel": "Preset",
         "maxTokens": "Max Tokens",
         "systemInstruction": "System Instruction:",
-        "detailTitle": "Chi tiết cấu hình"
+        "detailTitle": "Chi tiết cấu hình",
+        "modalEntity": {
+            "title": "Chọn Schema Entities",
+            "description": "Tìm kiếm và chọn schema entities để cấu hình",
+            "searchPlaceholder": "Tìm kiếm schema entities...",
+            "selected": "đã chọn"
+        },
+        "selectEntities": "Chọn Entities",
+        "schemaEntities": {
+            "title": "Schema Entities & Fields",
+            "description": "Tìm kiếm và chọn schema entities để cấu hình",
+            "expandAll": "Mở rộng tất cả",
+            "selectAll": "Chọn tất cả",
+            "limit": "Giới hạn:",
+            "fieldsTotal": "fields",
+            "fieldTotal": "field",
+            "selected": "đã chọn",
+            "noEntitiesFound": "Không tìm thấy Entities",
+            "selectEntitiesToView": "Chọn entities để xem các fields của chúng",
+            "noEntitiesMatch": "Không có entities nào khớp với tiêu chí tìm kiếm hiện tại.",
+            "saveChanges": "Lưu thay đổi",
+            "saving": "Đang lưu...",
+            "undo": "Hoàn tác",
+            "redo": "Làm lại"
+        },
+        "errors": {
+            "missingConfigData": "Không tìm thấy dữ liệu cấu hình. Vui lòng tải lại trang.",
+            "missingPolicy": "Không tìm thấy policy trong cấu hình. Vui lòng kiểm tra lại dữ liệu."
+        }
     },
     "aiPrompts": {
         "title": "Quản lý AI Prompts",
