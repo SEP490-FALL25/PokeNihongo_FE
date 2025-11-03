@@ -1,5 +1,5 @@
 import { axiosPrivate } from "@configs/axios";
-import { ICreateGeminiConfigModelsRequest } from "@models/ai/request";
+import { ICreateGeminiConfigModelsRequest, IUpdateModelConfigsPolicySchemaRequest } from "@models/ai/request";
 import { IQueryRequest } from "@models/common/request";
 
 const geminiService = {
@@ -75,6 +75,14 @@ const geminiService = {
                 pageSize: limit,
             },
         });
+    },
+
+    getModelConfigsPolicySchema: async () => {
+        return await axiosPrivate.get('/gemini-config/admin/schema');
+    },
+
+    updateModelConfigsPolicySchema: async (modelId: number, data: IUpdateModelConfigsPolicySchemaRequest) => {
+        return await axiosPrivate.put(`/gemini-config/admin/schema/${modelId}`, data);
     },
 
     createGeminiConfigModels: async (data: ICreateGeminiConfigModelsRequest) => {

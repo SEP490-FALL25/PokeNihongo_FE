@@ -97,3 +97,23 @@ export const GeminiConfigModelsEntitySchema = z.object({
 export type IGeminiConfigModelsEntity = z.infer<typeof GeminiConfigModelsEntitySchema>;
 //-----------------------End--------------------//
 //--------------------------------------End Gemini Config Models--------------------------------------//
+
+
+
+
+
+
+//----------------------Model Configs Policy Schema Entity----------------------//
+/**
+ * Model Configs Policy Schema Entity Schema
+ */
+export const ModelConfigsPolicySchemaEntitySchema = z.object({
+    name: z.string(),
+    fields: z.array(z.object({
+        name: z.string(),
+    })),
+});
+
+export type IModelConfigsPolicySchemaEntity = z.infer<typeof ModelConfigsPolicySchemaEntitySchema>;
+//-----------------------End--------------------//
+//--------------------------------------End Model Configs Policy Schema--------------------------------------//

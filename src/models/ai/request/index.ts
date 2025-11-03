@@ -1,3 +1,4 @@
+import { AI_POLICY_SCOPE, PURPOSE_POLICY_AI } from "@constants/ai";
 import { z } from "zod";
 
 /**
@@ -18,4 +19,25 @@ export const createCreateGeminiConfigModelsSchema = (t: (key: string, opts?: any
 });
 
 export type ICreateGeminiConfigModelsRequest = z.infer<ReturnType<typeof createCreateGeminiConfigModelsSchema>>;
+//------------------------End------------------------//
+
+
+/**
+ * Update Model Configs Policy Schema Request Schema
+ * @param t 
+ * @returns 
+ */
+export const updateModelConfigsPolicySchemaSchema = () => z.object({
+    policy: z.object({
+        purpose: z.enum(PURPOSE_POLICY_AI),
+        entities: z.array(z.object({
+            entity: z.string(),
+            scope: z.enum(AI_POLICY_SCOPE),
+            fields: z.array(z.string()),
+        })),
+        maskingRules: z.record(z.string(), z.string()),
+    }),
+});
+
+export type IUpdateModelConfigsPolicySchemaRequest = z.infer<ReturnType<typeof updateModelConfigsPolicySchemaSchema>>;
 //------------------------End------------------------//

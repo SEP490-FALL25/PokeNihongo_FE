@@ -105,3 +105,24 @@ export const useGetAIGeminiConfigPresets = () => {
 }
 //-----------------------End-----------------------//
 //---------------------------------------------End Config Presets---------------------------------------------//
+
+
+
+
+
+
+
+//--------------------------------------Model Configs Policy Schema--------------------------------------//
+/**
+ * Handle Get Model Configs Policy Schema
+ * @returns 
+ */
+export const useGetAIGeminiModelConfigsPolicySchema = () => {
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['gemini-model-configs-policy-schema'],
+        queryFn: () => geminiService.getModelConfigsPolicySchema(),
+    });
+    return { data: data?.data?.data, isLoading, error };
+}
+//-----------------------End-----------------------//
+//---------------------------------------------End Model Configs Policy Schema---------------------------------------------//
