@@ -89,8 +89,79 @@
         "configGacha": "Gacha Configuration",
         "testSets": "Test Sets",
         "permissionManagement": "Permission Management",
-        "test": "Test Management"
+        "test": "Test Management",
+        "configAI": "Config AI",
+        "customAI": "Custom AI"
     },
+    "aiCommon": {
+        "inSystem": "In system",
+        "scrollForMore": "Scroll down to load more",
+        "loadedAll": "Loaded all",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "sort": "Sort:",
+        "created": "Created",
+        "updated": "Updated",
+        "createdAt": "Created at",
+        "updatedAt": "Last updated",
+        "loading": "Loading data...",
+        "loadError": "An error occurred while loading data",
+        "all": "All",
+        "viewDetail": "View detail",
+        "cancel": "Cancel",
+        "saveChanges": "Save changes",
+        "chars": "characters"
+    },
+    "aiCustom": {
+        "title": "Config AI - Custom AI",
+        "description": "Manage custom AI configurations",
+        "stats": {
+            "total": "Total configs",
+            "loaded": "Loaded",
+            "progress": "Progress"
+        },
+        "searchPlaceholder": "Search configs by name...",
+        "createConfig": "Create config",
+        "geminiModel": "Gemini Model",
+        "preset": "Preset",
+        "jsonMode": "JSON Mode",
+        "jsonOn": "Enable JSON Mode",
+        "jsonOff": "Disable JSON Mode",
+        "active": "Active",
+        "inactive": "Inactive",
+        "empty": {
+            "title": "No config found",
+            "subtitle": "Try changing filters or create a new config"
+        },
+        "modelLabel": "Model",
+        "presetLabel": "Preset",
+        "maxTokens": "Max Tokens",
+        "systemInstruction": "System Instruction:",
+        "detailTitle": "Config detail"
+    },
+    "aiPrompts": {
+        "title": "AI Prompts Management",
+        "desc": "Manage contextual prompts for AI learning assistant",
+        "stats": {
+            "total": "Total prompts",
+            "loaded": "Loaded",
+            "progress": "Progress"
+        },
+        "search": "Search prompts...",
+        "create": "Create",
+        "createTitle": "Create New AI Prompt",
+        "content": "Prompt Content",
+        "contentPlaceholder": "Enter detailed prompt content...",
+        "activeHint": "Enable to make the prompt usable",
+        "itemTitle": "AI Prompt",
+        "activeState": "Active state",
+        "activeOn": "Prompt is active and can be used in the system",
+        "activeOff": "Prompt is currently disabled and cannot be used",
+        "loadingMorePrompts": "Loading more prompts...",
+        "loadedAllCountPrompts": "✓ Displayed all {{count}} prompts"
+    },
+    "locale": "en-US",
     "dailyQuest": {
         "title": "Daily Quest Management",
         "description": "View, add, edit, delete daily quests",

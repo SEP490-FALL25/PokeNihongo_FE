@@ -10,8 +10,10 @@ import HeaderAdmin from "@organisms/Header/Admin"
 import { useGetAIConfigModels, useGetAIGeminiModels, useGetAIGeminiConfigPresets } from "@hooks/useAI"
 import { IGeminiConfigModelsEntity } from "@models/ai/entity"
 import CreateConfigModel from "@pages/AdminPage/AICustom/components/CreateConfigModel"
+import { useTranslation } from "react-i18next"
 
 export default function CustomAIManagement() {
+    const { t } = useTranslation()
     const [searchQuery, setSearchQuery] = useState("")
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
     const [showCreateDialog, setShowCreateDialog] = useState(false)
@@ -130,11 +132,11 @@ export default function CustomAIManagement() {
     }
 
     const getStatusLabel = (isEnabled: boolean) => {
-        return isEnabled ? "Hoạt động" : "Tắt"
+        return isEnabled ? t('aiCustom.active', { defaultValue: 'Hoạt động' }) : t('aiCustom.inactive', { defaultValue: 'Tắt' })
     }
 
     const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString("vi-VN", {
+        return new Date(dateString).toLocaleDateString(t('locale', { defaultValue: 'vi-VN' }) as string, {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
@@ -155,25 +157,25 @@ export default function CustomAIManagement() {
     return (
         <>
             {/* Header */}
-            <HeaderAdmin title="Config AI - Custom AI" description="Quản lý các cấu hình AI tuỳ chỉnh" />
+            <HeaderAdmin title={t('aiCustom.title', { defaultValue: 'Config AI - Custom AI' })} description={t('aiCustom.description', { defaultValue: 'Quản lý các cấu hình AI tuỳ chỉnh' })} />
 
             <div className="mt-24 p-8 rounded-2xl bg-muted/60 backdrop-blur-sm">
                 {/* Stats Cards */}
                 <div className="grid gap-6 md:grid-cols-3 mb-8">
                     <Card className="bg-slate-50 border-border shadow-md">
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Tổng cấu hình</CardTitle>
+                            <CardTitle className="text-sm font-medium text-muted-foreground">{t('aiCustom.stats.total', { defaultValue: 'Tổng cấu hình' })}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="text-3xl font-bold text-foreground">
                                 {pagination?.totalItem || 0}
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1">Trong hệ thống</p>
+                            <p className="text-xs text-muted-foreground mt-1">{t('aiCommon.inSystem', { defaultValue: 'Trong hệ thống' })}</p>
                         </CardContent>
                     </Card>
                     <Card className="bg-slate-50 border-border shadow-md">
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Đã tải</CardTitle>
+                            <CardTitle className="text-sm font-medium text-muted-foreground">{t('aiCustom.stats.loaded', { defaultValue: 'Đã tải' })}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="text-3xl font-bold text-foreground">
@@ -181,14 +183,14 @@ export default function CustomAIManagement() {
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
                                 {pagination && pagination.current < pagination.totalPage
-                                    ? 'Cuộn xuống để xem thêm'
-                                    : 'Đã tải hết'}
+                                    ? t('aiCommon.scrollForMore', { defaultValue: 'Cuộn xuống để xem thêm' })
+                                    : t('aiCommon.loadedAll', { defaultValue: 'Đã tải hết' })}
                             </p>
                         </CardContent>
                     </Card>
                     <Card className="bg-slate-50 border-border shadow-md">
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Tiến độ</CardTitle>
+                            <CardTitle className="text-sm font-medium text-muted-foreground">{t('aiCustom.stats.progress', { defaultValue: 'Tiến độ' })}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="text-3xl font-bold text-foreground">
@@ -213,7 +215,7 @@ export default function CustomAIManagement() {
                                 <div className="flex-1 w-full sm:max-w-md relative">
                                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                     <Input
-                                        placeholder="Tìm kiếm theo tên cấu hình..."
+                                        placeholder={t('aiCustom.searchPlaceholder', { defaultValue: 'Tìm kiếm theo tên cấu hình...' })}
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         className="pl-10 bg-background border-border text-foreground"
@@ -221,7 +223,7 @@ export default function CustomAIManagement() {
                                 </div>
                                 <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm" onClick={() => setShowCreateDialog(true)}>
                                     <Plus className="h-4 w-4 mr-2" />
-                                    Tạo cấu hình
+                                    {t('aiCustom.createConfig', { defaultValue: 'Tạo cấu hình' })}
                                 </Button>
                             </div>
 
@@ -229,21 +231,21 @@ export default function CustomAIManagement() {
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                                     <SelectTrigger className="bg-background border-border text-foreground">
-                                        <SelectValue placeholder="Trạng thái" />
+                                        <SelectValue placeholder={t('aiCommon.status', { defaultValue: 'Trạng thái' })} />
                                     </SelectTrigger>
                                     <SelectContent className="bg-card border-border">
-                                        <SelectItem value="all">Tất cả trạng thái</SelectItem>
-                                        <SelectItem value="active">Hoạt động</SelectItem>
-                                        <SelectItem value="inactive">Tắt</SelectItem>
+                                        <SelectItem value="all">{t('aiCommon.allStatuses', { defaultValue: 'Tất cả trạng thái' })}</SelectItem>
+                                        <SelectItem value="active">{t('aiCommon.active', { defaultValue: 'Hoạt động' })}</SelectItem>
+                                        <SelectItem value="inactive">{t('aiCommon.inactive', { defaultValue: 'Tắt' })}</SelectItem>
                                     </SelectContent>
                                 </Select>
 
                                 <Select value={geminiModelFilter} onValueChange={setGeminiModelFilter}>
                                     <SelectTrigger className="bg-background border-border text-foreground">
-                                        <SelectValue placeholder="Gemini Model" />
+                                        <SelectValue placeholder={t('aiCustom.geminiModel', { defaultValue: 'Gemini Model' })} />
                                     </SelectTrigger>
                                     <SelectContent className="bg-card border-border">
-                                        <SelectItem value="all">Tất cả model</SelectItem>
+                                        <SelectItem value="all">{t('aiCommon.allModels', { defaultValue: 'Tất cả model' })}</SelectItem>
                                         {geminiModels && Array.isArray(geminiModels) && geminiModels.map((m: any) => (
                                             <SelectItem key={m.id} value={String(m.id)}>
                                                 {m.key}
@@ -254,10 +256,10 @@ export default function CustomAIManagement() {
 
                                 <Select value={presetFilter} onValueChange={setPresetFilter}>
                                     <SelectTrigger className="bg-background border-border text-foreground">
-                                        <SelectValue placeholder="Preset" />
+                                        <SelectValue placeholder={t('aiCustom.preset', { defaultValue: 'Preset' })} />
                                     </SelectTrigger>
                                     <SelectContent className="bg-card border-border">
-                                        <SelectItem value="all">Tất cả preset</SelectItem>
+                                        <SelectItem value="all">{t('aiCommon.allPresets', { defaultValue: 'Tất cả preset' })}</SelectItem>
                                         {configPresets && Array.isArray(configPresets) && configPresets.map((p: any) => (
                                             <SelectItem key={p.id} value={String(p.id)}>
                                                 {p.name}
@@ -268,26 +270,26 @@ export default function CustomAIManagement() {
 
                                 <Select value={jsonModeFilter} onValueChange={setJsonModeFilter}>
                                     <SelectTrigger className="bg-background border-border text-foreground">
-                                        <SelectValue placeholder="JSON Mode" />
+                                        <SelectValue placeholder={t('aiCustom.jsonMode', { defaultValue: 'JSON Mode' })} />
                                     </SelectTrigger>
                                     <SelectContent className="bg-card border-border">
-                                        <SelectItem value="all">Tất cả</SelectItem>
-                                        <SelectItem value="true">Bật JSON Mode</SelectItem>
-                                        <SelectItem value="false">Tắt JSON Mode</SelectItem>
+                                        <SelectItem value="all">{t('aiCommon.all', { defaultValue: 'Tất cả' })}</SelectItem>
+                                        <SelectItem value="true">{t('aiCustom.jsonOn', { defaultValue: 'Bật JSON Mode' })}</SelectItem>
+                                        <SelectItem value="false">{t('aiCustom.jsonOff', { defaultValue: 'Tắt JSON Mode' })}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
 
                             {/* Sort Controls */}
                             <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-sm text-muted-foreground">Sắp xếp:</span>
+                                <span className="text-sm text-muted-foreground">{t('aiCommon.sort', { defaultValue: 'Sắp xếp:' })}</span>
                                 <Button
                                     variant="outline"
                                     size="sm"
                                     onClick={() => handleSort("createdAt")}
                                     className={`border-border ${sortBy === "createdAt" ? "bg-primary/10 border-primary" : ""}`}
                                 >
-                                    Ngày tạo {sortBy === "createdAt" && (sortOrder === "asc" ? "↑" : "↓")}
+                                    {t('aiCommon.createdAt', { defaultValue: 'Ngày tạo' })} {sortBy === "createdAt" && (sortOrder === "asc" ? "↑" : "↓")}
                                 </Button>
                                 <Button
                                     variant="outline"
@@ -295,7 +297,7 @@ export default function CustomAIManagement() {
                                     onClick={() => handleSort("name")}
                                     className={`border-border ${sortBy === "name" ? "bg-primary/10 border-primary" : ""}`}
                                 >
-                                    Tên {sortBy === "name" && (sortOrder === "asc" ? "↑" : "↓")}
+                                    {t('aiCommon.name', { defaultValue: 'Tên' })} {sortBy === "name" && (sortOrder === "asc" ? "↑" : "↓")}
                                 </Button>
                             </div>
                         </div>
@@ -306,20 +308,20 @@ export default function CustomAIManagement() {
                 {isLoading && currentPage === 1 && accumulatedResults.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16">
                         <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-                        <p className="text-muted-foreground">Đang tải dữ liệu...</p>
+                        <p className="text-muted-foreground">{t('aiCommon.loading', { defaultValue: 'Đang tải dữ liệu...' })}</p>
                     </div>
                 ) : error ? (
                     <Card className="bg-slate-50 border-border border-destructive/50 shadow-md">
                         <CardContent className="py-12 text-center">
-                            <div className="text-destructive">Có lỗi xảy ra khi tải dữ liệu</div>
+                            <div className="text-destructive">{t('aiCommon.loadError', { defaultValue: 'Có lỗi xảy ra khi tải dữ liệu' })}</div>
                         </CardContent>
                     </Card>
                 ) : accumulatedResults.length === 0 ? (
                     <Card className="bg-slate-50 border-border border-dashed shadow-md">
                         <CardContent className="py-16 text-center">
                             <Settings className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-30" />
-                            <p className="text-lg font-medium text-foreground mb-2">Không tìm thấy cấu hình</p>
-                            <p className="text-sm text-muted-foreground">Thử thay đổi bộ lọc hoặc tạo cấu hình mới</p>
+                            <p className="text-lg font-medium text-foreground mb-2">{t('aiCustom.empty.title', { defaultValue: 'Không tìm thấy cấu hình' })}</p>
+                            <p className="text-sm text-muted-foreground">{t('aiCustom.empty.subtitle', { defaultValue: 'Thử thay đổi bộ lọc hoặc tạo cấu hình mới' })}</p>
                         </CardContent>
                     </Card>
                 ) : (
@@ -353,24 +355,24 @@ export default function CustomAIManagement() {
                                                         {config.jsonMode && (
                                                             <Badge className="bg-chart-2 text-white">
                                                                 <Code className="h-3 w-3 mr-1" />
-                                                                JSON Mode
+                                                                {t('aiCustom.jsonMode', { defaultValue: 'JSON Mode' })}
                                                             </Badge>
                                                         )}
                                                     </div>
                                                     <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
                                                         <div className="flex items-center gap-1">
                                                             <Brain className="h-3 w-3" />
-                                                            <span>Model: {config.geminiModel?.key || `ID ${config.geminiModelId}`}</span>
+                                                            <span>{t('aiCustom.modelLabel', { defaultValue: 'Model' })}: {config.geminiModel?.key || `ID ${config.geminiModelId}`}</span>
                                                         </div>
                                                         <span>•</span>
                                                         <div className="flex items-center gap-1">
                                                             <Sparkles className="h-3 w-3" />
-                                                            <span>Preset: {config.preset?.name || `ID ${config.presetId}`}</span>
+                                                            <span>{t('aiCustom.presetLabel', { defaultValue: 'Preset' })}: {config.preset?.name || `ID ${config.presetId}`}</span>
                                                         </div>
                                                         <span>•</span>
                                                         <div className="flex items-center gap-1">
                                                             <Hash className="h-3 w-3" />
-                                                            <span>Max Tokens: {config.maxTokens}</span>
+                                                            <span>{t('aiCustom.maxTokens', { defaultValue: 'Max Tokens' })}: {config.maxTokens}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -378,7 +380,7 @@ export default function CustomAIManagement() {
 
                                             {/* System Instruction Preview */}
                                             <div className="bg-muted/40 rounded-lg p-4 border border-border/50">
-                                                <p className="text-xs font-medium text-muted-foreground mb-2">System Instruction:</p>
+                                                <p className="text-xs font-medium text-muted-foreground mb-2">{t('aiCustom.systemInstruction', { defaultValue: 'System Instruction:' })}</p>
                                                 <p className="text-sm font-mono text-foreground leading-relaxed line-clamp-3">
                                                     {config.systemInstruction}
                                                 </p>
@@ -388,12 +390,12 @@ export default function CustomAIManagement() {
                                             <div className="flex items-center gap-4 text-xs text-muted-foreground">
                                                 <div className="flex items-center gap-1.5">
                                                     <Calendar className="h-3.5 w-3.5" />
-                                                    <span>Tạo: {config.createdAt ? formatDate(config.createdAt) : 'N/A'}</span>
+                                                    <span>{t('aiCommon.created', { defaultValue: 'Tạo' })}: {config.createdAt ? formatDate(config.createdAt) : 'N/A'}</span>
                                                 </div>
                                                 <span>•</span>
                                                 <div className="flex items-center gap-1.5">
                                                     <Calendar className="h-3.5 w-3.5" />
-                                                    <span>Cập nhật: {config.updatedAt ? formatDate(config.updatedAt) : 'N/A'}</span>
+                                                    <span>{t('aiCommon.updated', { defaultValue: 'Cập nhật' })}: {config.updatedAt ? formatDate(config.updatedAt) : 'N/A'}</span>
                                                 </div>
                                                 <span>•</span>
                                                 <div className="flex items-center gap-1.5">
@@ -410,7 +412,7 @@ export default function CustomAIManagement() {
                                                 size="icon"
                                                 className="h-9 w-9 hover:bg-primary/10 hover:text-primary"
                                                 onClick={() => setSelectedConfig(config)}
-                                                title="Xem chi tiết"
+                                                title={t('aiCommon.viewDetail', { defaultValue: 'Xem chi tiết' }) as string}
                                             >
                                                 <Eye className="h-4 w-4" />
                                             </Button>
@@ -430,11 +432,11 @@ export default function CustomAIManagement() {
                                                         onClick={() => setSelectedConfig(config)}
                                                     >
                                                         <Edit className="h-4 w-4 mr-2" />
-                                                        Chỉnh sửa
+                                                        {t('aiCommon.edit', { defaultValue: 'Chỉnh sửa' })}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem className="text-destructive hover:bg-destructive/10 cursor-pointer">
                                                         <Trash2 className="h-4 w-4 mr-2" />
-                                                        Xóa
+                                                        {t('aiCommon.delete', { defaultValue: 'Xóa' })}
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -448,7 +450,7 @@ export default function CustomAIManagement() {
                         {isLoading && currentPage > 1 && (
                             <div className="flex items-center justify-center py-6">
                                 <Loader2 className="h-6 w-6 animate-spin text-primary mr-3" />
-                                <span className="text-sm text-muted-foreground">Đang tải thêm cấu hình...</span>
+                                <span className="text-sm text-muted-foreground">{t('aiCommon.loadingMore', { defaultValue: 'Đang tải thêm cấu hình...' })}</span>
                             </div>
                         )}
 
@@ -457,7 +459,7 @@ export default function CustomAIManagement() {
                             <Card className="bg-muted/50 border-0 shadow-none">
                                 <CardContent className="py-4 text-center">
                                     <p className="text-sm text-muted-foreground">
-                                        ✓ Đã hiển thị tất cả {pagination.totalItem} cấu hình
+                                        {t('aiCommon.loadedAllCount', { defaultValue: '✓ Đã hiển thị tất cả {{count}} cấu hình', count: pagination.totalItem })}
                                     </p>
                                 </CardContent>
                             </Card>
@@ -481,9 +483,9 @@ export default function CustomAIManagement() {
             {selectedConfig && (
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setSelectedConfig(null)}>
                     <div className="bg-card border-border rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                        <h2 className="text-xl font-bold mb-4">Chi tiết cấu hình: {selectedConfig.name}</h2>
+                        <h2 className="text-xl font-bold mb-4">{t('aiCustom.detailTitle', { defaultValue: 'Chi tiết cấu hình' })}: {selectedConfig.name}</h2>
                         {/* Add detailed view here */}
-                        <Button onClick={() => setSelectedConfig(null)} className="mt-4">Đóng</Button>
+                        <Button onClick={() => setSelectedConfig(null)} className="mt-4">{t('aiCommon.close', { defaultValue: 'Đóng' })}</Button>
                     </div>
                 </div>
             )}

@@ -73,6 +73,75 @@
         "permissionManagement": "Quản lý quyền",
         "test": "Quản lý bài kiểm tra"
     },
+    "aiCommon": {
+        "inSystem": "Trong hệ thống",
+        "scrollForMore": "Cuộn xuống để xem thêm",
+        "loadedAll": "Đã tải hết",
+        "status": "Trạng thái",
+        "active": "Hoạt động",
+        "inactive": "Tắt",
+        "sort": "Sắp xếp:",
+        "created": "Tạo",
+        "updated": "Cập nhật",
+        "createdAt": "Ngày tạo",
+        "updatedAt": "Cập nhật lần cuối",
+        "loading": "Đang tải dữ liệu...",
+        "loadError": "Có lỗi xảy ra khi tải dữ liệu",
+        "all": "Tất cả",
+        "viewDetail": "Xem chi tiết",
+        "cancel": "Hủy",
+        "saveChanges": "Lưu thay đổi",
+        "chars": "ký tự"
+    },
+    "aiCustom": {
+        "title": "Config AI - Custom AI",
+        "description": "Quản lý các cấu hình AI tuỳ chỉnh",
+        "stats": {
+            "total": "Tổng cấu hình",
+            "loaded": "Đã tải",
+            "progress": "Tiến độ"
+        },
+        "searchPlaceholder": "Tìm kiếm theo tên cấu hình...",
+        "createConfig": "Tạo cấu hình",
+        "geminiModel": "Gemini Model",
+        "preset": "Preset",
+        "jsonMode": "JSON Mode",
+        "jsonOn": "Bật JSON Mode",
+        "jsonOff": "Tắt JSON Mode",
+        "active": "Hoạt động",
+        "inactive": "Tắt",
+        "empty": {
+            "title": "Không tìm thấy cấu hình",
+            "subtitle": "Thử thay đổi bộ lọc hoặc tạo cấu hình mới"
+        },
+        "modelLabel": "Model",
+        "presetLabel": "Preset",
+        "maxTokens": "Max Tokens",
+        "systemInstruction": "System Instruction:",
+        "detailTitle": "Chi tiết cấu hình"
+    },
+    "aiPrompts": {
+        "title": "Quản lý AI Prompts",
+        "desc": "Quản lý các prompt ngữ cảnh cho AI trợ giúp học tập",
+        "stats": {
+            "total": "Tổng prompts",
+            "loaded": "Đã tải",
+            "progress": "Tiến độ"
+        },
+        "search": "Tìm kiếm prompt...",
+        "create": "Tạo mới",
+        "createTitle": "Tạo AI Prompt mới",
+        "content": "Nội dung Prompt",
+        "contentPlaceholder": "Nhập nội dung prompt chi tiết...",
+        "activeHint": "Kích hoạt để có thể sử dụng prompt",
+        "itemTitle": "AI Prompt",
+        "activeState": "Trạng thái hoạt động",
+        "activeOn": "Prompt đang được kích hoạt và có thể sử dụng trong hệ thống",
+        "activeOff": "Prompt hiện đang tắt và không thể sử dụng",
+        "loadingMorePrompts": "Đang tải thêm prompts...",
+        "loadedAllCountPrompts": "✓ Đã hiển thị tất cả {{count}} prompts"
+    },
+    "locale": "vi-VN",
     "dailyQuest": {
         "title": "Quản lý Nhiệm vụ hàng ngày",
         "description": "Xem, thêm, sửa, xóa các nhiệm vụ hàng ngày",

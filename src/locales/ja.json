@@ -69,8 +69,79 @@
         "configGacha": "ガチャ設定",
         "testSets": "テストセット",
         "permissionManagement": "権限管理",
-        "test": "テスト管理"
+        "test": "テスト管理",
+        "configAI": "AI設定",
+        "customAI": "カスタムAI"
     },
+    "aiCommon": {
+        "inSystem": "システム内",
+        "scrollForMore": "下にスクロールしてさらに読み込む",
+        "loadedAll": "すべて読み込み済み",
+        "status": "ステータス",
+        "active": "アクティブ",
+        "inactive": "非アクティブ",
+        "sort": "並び替え:",
+        "created": "作成",
+        "updated": "更新",
+        "createdAt": "作成日",
+        "updatedAt": "最終更新",
+        "loading": "データを読み込み中...",
+        "loadError": "データ読み込み中にエラーが発生しました",
+        "all": "すべて",
+        "viewDetail": "詳細を見る",
+        "cancel": "キャンセル",
+        "saveChanges": "変更を保存",
+        "chars": "文字"
+    },
+    "aiCustom": {
+        "title": "AI設定 - カスタムAI",
+        "description": "カスタムAI設定を管理",
+        "stats": {
+            "total": "合計設定数",
+            "loaded": "読み込み済み",
+            "progress": "進捗"
+        },
+        "searchPlaceholder": "設定名で検索...",
+        "createConfig": "設定を作成",
+        "geminiModel": "Geminiモデル",
+        "preset": "プリセット",
+        "jsonMode": "JSONモード",
+        "jsonOn": "JSONモードを有効化",
+        "jsonOff": "JSONモードを無効化",
+        "active": "アクティブ",
+        "inactive": "非アクティブ",
+        "empty": {
+            "title": "設定が見つかりません",
+            "subtitle": "フィルターを変更するか、新しい設定を作成してください"
+        },
+        "modelLabel": "モデル",
+        "presetLabel": "プリセット",
+        "maxTokens": "最大トークン数",
+        "systemInstruction": "システム指示:",
+        "detailTitle": "設定の詳細"
+    },
+    "aiPrompts": {
+        "title": "AIプロンプト管理",
+        "desc": "学習支援AIのためのコンテキストプロンプトを管理",
+        "stats": {
+            "total": "合計プロンプト数",
+            "loaded": "読み込み済み",
+            "progress": "進捗"
+        },
+        "search": "プロンプトを検索...",
+        "create": "作成",
+        "createTitle": "新しいAIプロンプトを作成",
+        "content": "プロンプト内容",
+        "contentPlaceholder": "詳細なプロンプト内容を入力...",
+        "activeHint": "有効化するとプロンプトを使用できます",
+        "itemTitle": "AIプロンプト",
+        "activeState": "アクティブ状態",
+        "activeOn": "プロンプトは有効で、システムで使用できます",
+        "activeOff": "プロンプトは無効で、使用できません",
+        "loadingMorePrompts": "さらにプロンプトを読み込み中...",
+        "loadedAllCountPrompts": "✓ すべての{{count}}件のプロンプトを表示しました"
+    },
+    "locale": "ja-JP",
     "dailyQuest": {
         "title": "デイリークエスト管理",
         "description": "デイリークエストの表示、追加、編集、削除",
