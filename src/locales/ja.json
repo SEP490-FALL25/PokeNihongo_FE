@@ -149,7 +149,8 @@
             "purpose": "目的:",
             "purposePersonalizedRecommendations": "パーソナライズされた推奨",
             "purposeSpeakingEvaluation": "スピーキング評価",
-            "purposeAiKaiwa": "AI会話"
+            "purposeAiKaiwa": "AI会話",
+            "removeEntity": "エンティティを削除"
         },
         "errors": {
             "missingConfigData": "設定データが見つかりません。ページを再読み込みしてください。",
