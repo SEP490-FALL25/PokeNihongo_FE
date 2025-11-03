@@ -12,6 +12,7 @@ import ConfigShop from "@pages/AdminPage/ConfigShop"
 import ShopBannerDetail from "@pages/AdminPage/ConfigShop/components/ShopBannerDetail"
 import ConfigGacha from "@pages/AdminPage/ConfigGacha"
 import GachaBannerDetail from "@pages/AdminPage/ConfigGacha/components/GachaBannerDetail"
+import PersistToken from "@layouts/PersistToken"
 
 const AdminDashboard = lazy(() => import("@pages/AdminPage/Dashboard"))
 const PermissionManagement = lazy(() => import("@pages/AdminPage/Permission"))
@@ -39,7 +40,7 @@ const RouterComponent = () => {
 
         //#region Private routes
         {
-            // element: <PersistToken />,
+            element: <PersistToken />,
             children: [
                 //Admin routes
                 {

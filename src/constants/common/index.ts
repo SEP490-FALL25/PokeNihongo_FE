@@ -1,5 +1,5 @@
 const COOKIES = {
-    ACCESS_TOKEN: 'access_token',
+    ACCESS_TOKEN: 'accessToken',
 };
 
 const ROLE_ID = {

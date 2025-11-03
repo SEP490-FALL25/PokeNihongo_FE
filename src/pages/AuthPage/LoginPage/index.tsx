@@ -9,7 +9,7 @@ import { CookiesService } from '@utils/cookies';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@constants/route';
 import { decodeJWT } from '@utils/token';
-import { ROLE_ID } from '@constants/common';
+import { COOKIES, ROLE_ID } from '@constants/common';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -33,7 +33,7 @@ const LoginPage = () => {
         try {
             setIsLoading(true);
             const res = await authService.login(data);
-            CookiesService.set('accessToken', res.data.data.accessToken);
+            CookiesService.set(COOKIES.ACCESS_TOKEN, res.data.data.accessToken);
             const decodeToken = decodeJWT();
             console.log('decodeToken', decodeToken);
             switch (decodeToken?.roleId) {
