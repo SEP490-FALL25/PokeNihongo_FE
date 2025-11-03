@@ -88,11 +88,21 @@ const geminiService = {
     },
 
     getModelConfigsPolicySchemaFields: async (entities: string[]) => {
-        return await axiosPrivate.get('/gemini-config/admin/schema/fields', {
-            params: {
-                entities,
-            },
-        });
+        console.log('🔍 Service: API call with entities:', entities)
+        try {
+            // Try multiple formats - first try comma-separated string
+            const response = await axiosPrivate.get('/gemini-config/admin/schema/fields', {
+                params: {
+                    entities: entities.join(','), // Send as comma-separated string
+                },
+            });
+            console.log('🔍 Service: API response:', response)
+            console.log('🔍 Service: response.data:', response?.data)
+            return response
+        } catch (error) {
+            console.error('🔍 Service: API error:', error)
+            throw error
+        }
     },
 
     updateModelConfigsPolicySchema: async (modelId: number, data: IUpdateModelConfigsPolicySchemaRequest) => {

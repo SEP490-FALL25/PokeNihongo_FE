@@ -9,10 +9,11 @@ import { Badge } from '@ui/Badge'
 import PaginationControls from '@ui/PaginationControls'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@ui/Accordion'
 import { Skeleton } from '@ui/Skeleton'
-import { useGetAIConfigModelById, useGetAIModelConfigPolicySchemaFields } from '@hooks/useAI'
+import { useGetAIConfigModelById, useGetAIModelConfigPolicySchemaFields, useUpdateModelConfigsPolicySchema } from '@hooks/useAI'
 import ModalEntityCustomAI from '@pages/AdminPage/AICustom/components/ModalEntity'
-import { ChevronLeft, Database, Settings, Brain, Sparkles, Hash, Calendar, Code, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
+import { ChevronLeft, Database, Settings, Brain, Sparkles, Hash, Calendar, Code, CheckCircle2, XCircle, Loader2, Undo, Redo, Save } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { AI_POLICY_SCOPE, PURPOSE_POLICY_AI } from '@constants/ai'
 
 const CustomAIDetail = () => {
     const { t } = useTranslation()
@@ -23,57 +24,114 @@ const CustomAIDetail = () => {
     const configIdNumber = configId ? parseInt(configId, 10) : 0
     const { data: configData, isLoading: isLoadingConfig, error: configError } = useGetAIConfigModelById(configIdNumber)
 
-    // Extract entities from configData
+    // Extract entities and policy info from configData
+    const initialPolicy = useMemo(() => {
+        if (!configData?.extraParams) return null
+        return (configData.extraParams as any)?.policy || null
+    }, [configData])
+
     const entities = useMemo(() => {
         if (!configData?.extraParams) return []
         const policyEntities = (configData.extraParams as any)?.policy?.entities
         const directEntities = configData.extraParams.entities
-        return Array.isArray(policyEntities) ? policyEntities : (Array.isArray(directEntities) ? directEntities : [])
+        const result = Array.isArray(policyEntities) ? policyEntities : (Array.isArray(directEntities) ? directEntities : [])
+        console.log('🔍 entities from configData:', result)
+        return result
     }, [configData])
 
-    // Selection state (schema names)
-    const [selectedSchemas, setSelectedSchemas] = useState<Set<string>>(new Set())
-    const [selectedFields, setSelectedFields] = useState<Record<string, Set<string>>>({})
+    // Draft state (local changes, not saved yet)
+    type DraftState = {
+        selectedSchemas: Set<string>
+        selectedFields: Record<string, Set<string>>
+    }
+    const [history, setHistory] = useState<DraftState[]>([])
+    const [historyIndex, setHistoryIndex] = useState<number>(-1)
     const [showEntityModal, setShowEntityModal] = useState(false)
     const [expandedEntities, setExpandedEntities] = useState<string[]>([])
     const [page, setPage] = useState(1)
-    const [limit, setLimit] = useState(12)
+    const [limit, setLimit] = useState(15)
     const [searchQuery, setSearchQuery] = useState('')
 
-    // Initialize selectedSchemas from configData.extraParams.policy.entities
+    // Derive selectedSchemas and selectedFields directly from entities
+    const selectedSchemasFromEntities = useMemo(() => {
+        if (entities.length > 0) {
+            const entityNames = new Set(entities.map((e: any) => e.entity).filter(Boolean))
+            console.log('🔍 selectedSchemasFromEntities:', Array.from(entityNames))
+            return entityNames
+        }
+        console.log('🔍 selectedSchemasFromEntities: empty')
+        return new Set<string>()
+    }, [entities])
+
+    const selectedFieldsFromEntities = useMemo(() => {
+        const fieldsMap: Record<string, Set<string>> = {}
+        entities.forEach((entity: any) => {
+            if (entity.entity && entity.fields && Array.isArray(entity.fields)) {
+                fieldsMap[entity.entity] = new Set(entity.fields)
+            }
+        })
+        return fieldsMap
+    }, [entities])
+
+    // Initialize draft from configData
     useEffect(() => {
         if (entities.length > 0) {
-            const entityNames = entities.map((entity: any) => entity.entity).filter(Boolean)
-            setSelectedSchemas(new Set(entityNames))
-        } else {
-            setSelectedSchemas(new Set())
+            const initialDraft: DraftState = {
+                selectedSchemas: selectedSchemasFromEntities,
+                selectedFields: selectedFieldsFromEntities
+            }
+            setHistory([initialDraft])
+            setHistoryIndex(0)
+        } else if (configData && entities.length === 0) {
+            // Config exists but no entities - initialize empty
+            const emptyDraft: DraftState = { selectedSchemas: new Set(), selectedFields: {} }
+            setHistory([emptyDraft])
+            setHistoryIndex(0)
         }
-    }, [entities])
+    }, [entities, configData, selectedSchemasFromEntities, selectedFieldsFromEntities])
+
+    // Get current draft from history
+    const currentDraft = useMemo(() => {
+        if (historyIndex >= 0 && historyIndex < history.length) {
+            return history[historyIndex]
+        }
+        // Return entities state if history not initialized yet
+        return { selectedSchemas: selectedSchemasFromEntities, selectedFields: selectedFieldsFromEntities }
+    }, [history, historyIndex, selectedSchemasFromEntities, selectedFieldsFromEntities])
+
+    const selectedSchemas = currentDraft.selectedSchemas
+    const selectedFields = currentDraft.selectedFields
+
+    // Push new state to history
+    const pushHistory = (nextDraft: DraftState) => {
+        const base = history.slice(0, historyIndex + 1)
+        const newHistory = [...base, nextDraft]
+        setHistory(newHistory)
+        setHistoryIndex(newHistory.length - 1)
+    }
+
+    const handleUndo = () => {
+        if (historyIndex <= 0) return
+        setHistoryIndex(historyIndex - 1)
+    }
+
+    const handleRedo = () => {
+        if (historyIndex >= history.length - 1) return
+        setHistoryIndex(historyIndex + 1)
+    }
 
     // Get schema fields for selected entities
     const selectedEntitiesArray = Array.from(selectedSchemas)
-    const { data: schemaFieldsData, isLoading: isLoadingFields } = useGetAIModelConfigPolicySchemaFields(
-        selectedEntitiesArray.length > 0 ? selectedEntitiesArray : []
-    )
-
-    // Initialize selectedFields from configData entities
-    useEffect(() => {
-        if (entities.length > 0 && schemaFieldsData) {
-            const initialFields: Record<string, Set<string>> = {}
-            entities.forEach((entity: any) => {
-                if (entity.entity && entity.fields && Array.isArray(entity.fields)) {
-                    initialFields[entity.entity] = new Set(entity.fields)
-                }
-            })
-            if (Object.keys(initialFields).length > 0) {
-                setSelectedFields(initialFields)
-            }
-        }
-    }, [entities, schemaFieldsData])
+    console.log('🔍 selectedEntitiesArray for API:', selectedEntitiesArray)
+    console.log('🔍 selectedSchemas size:', selectedSchemas.size)
+    const { data: schemaFieldsData, isLoading: isLoadingFields } = useGetAIModelConfigPolicySchemaFields(selectedEntitiesArray)
+    console.log('🔍 schemaFieldsData:', schemaFieldsData)
+    console.log('🔍 isLoadingFields:', isLoadingFields)
 
     // Filter entities and fields based on search (local search only)
     const filteredSchemaFields = useMemo(() => {
-        if (!schemaFieldsData || !searchQuery.trim()) return schemaFieldsData || {}
+        if (!schemaFieldsData) return {}
+        if (!searchQuery.trim()) return schemaFieldsData
         const query = searchQuery.toLowerCase()
         const filtered: Record<string, string[]> = {}
         Object.entries(schemaFieldsData).forEach(([entityName, fields]) => {
@@ -92,6 +150,7 @@ const CustomAIDetail = () => {
     }, [schemaFieldsData, searchQuery])
 
     const entityKeys = useMemo(() => Object.keys(filteredSchemaFields), [filteredSchemaFields])
+
     const totalItems = entityKeys.length
     const totalPages = Math.max(1, Math.ceil(totalItems / limit))
     const paginatedEntityKeys = useMemo(() => {
@@ -102,32 +161,107 @@ const CustomAIDetail = () => {
     useEffect(() => { setPage(1) }, [searchQuery])
 
     const toggleSelectEntityAllFields = (entityName: string, checked: boolean) => {
-        setSelectedFields(prev => {
-            const next = { ...prev }
-            const fields = (filteredSchemaFields[entityName] || []) as string[]
-            if (checked) {
-                next[entityName] = new Set(fields)
-            } else {
-                delete next[entityName]
-            }
-            return next
-        })
+        const nextDraft: DraftState = {
+            selectedSchemas: new Set(selectedSchemas),
+            selectedFields: { ...selectedFields }
+        }
+        const fields = (filteredSchemaFields[entityName] || []) as string[]
+        if (checked) {
+            nextDraft.selectedFields[entityName] = new Set(fields)
+        } else {
+            delete nextDraft.selectedFields[entityName]
+        }
+        pushHistory(nextDraft)
     }
 
     const toggleSelectField = (entityName: string, fieldName: string, checked: boolean) => {
-        setSelectedFields(prev => {
-            const next = { ...prev }
-            if (!next[entityName]) next[entityName] = new Set()
-            if (checked) {
-                next[entityName].add(fieldName)
-            } else {
-                next[entityName].delete(fieldName)
-                if (next[entityName].size === 0) {
-                    delete next[entityName]
-                }
+        const nextDraft: DraftState = {
+            selectedSchemas: new Set(selectedSchemas),
+            selectedFields: { ...selectedFields }
+        }
+        if (!nextDraft.selectedFields[entityName]) nextDraft.selectedFields[entityName] = new Set()
+        if (checked) {
+            nextDraft.selectedFields[entityName].add(fieldName)
+        } else {
+            nextDraft.selectedFields[entityName].delete(fieldName)
+            if (nextDraft.selectedFields[entityName].size === 0) {
+                delete nextDraft.selectedFields[entityName]
             }
-            return next
+        }
+        pushHistory(nextDraft)
+    }
+
+    // Check if draft has changes
+    const isDirty = useMemo(() => {
+        if (historyIndex !== history.length - 1) return true
+        const initialDraft = history[0] || { selectedSchemas: new Set(), selectedFields: {} }
+        const current = history[historyIndex] || { selectedSchemas: new Set(), selectedFields: {} }
+
+        // Compare schemas
+        if (initialDraft.selectedSchemas.size !== current.selectedSchemas.size) return true
+        for (const schema of initialDraft.selectedSchemas) {
+            if (!current.selectedSchemas.has(schema)) return true
+        }
+        for (const schema of current.selectedSchemas) {
+            if (!initialDraft.selectedSchemas.has(schema)) return true
+        }
+
+        // Compare fields
+        const initialKeys = Object.keys(initialDraft.selectedFields)
+        const currentKeys = Object.keys(current.selectedFields)
+        if (initialKeys.length !== currentKeys.length) return true
+
+        for (const entityName of initialKeys) {
+            const initialFields = initialDraft.selectedFields[entityName] || new Set()
+            const currentFields = current.selectedFields[entityName] || new Set()
+            if (initialFields.size !== currentFields.size) return true
+            for (const field of initialFields) {
+                if (!currentFields.has(field)) return true
+            }
+        }
+
+        return false
+    }, [history, historyIndex])
+
+    // Save mutation
+    const { mutateAsync: updatePolicySchema, isPending: isSaving } = useUpdateModelConfigsPolicySchema()
+
+    const handleSave = async () => {
+        if (!configData || !initialPolicy) return
+
+        const current = history[historyIndex]
+
+        // Build entities array from draft
+        const entitiesArray = Array.from(current.selectedSchemas).map(entityName => {
+            const fields = Array.from(current.selectedFields[entityName] || [])
+            // Get scope from original entity or default to SELF_ONLY
+            const originalEntity = entities.find((e: any) => e.entity === entityName)
+            const scope = originalEntity?.scope || AI_POLICY_SCOPE.SELF_ONLY
+
+            return {
+                entity: entityName,
+                scope: scope as any,
+                fields: fields,
+            }
         })
+
+        const payload = {
+            policy: {
+                purpose: (initialPolicy.purpose || PURPOSE_POLICY_AI.PERSONALIZED_RECOMMENDATIONS) as any,
+                entities: entitiesArray,
+                maskingRules: initialPolicy.maskingRules || {},
+            }
+        }
+
+        await updatePolicySchema({ modelId: configIdNumber, data: payload })
+
+        // Reset history after save
+        const savedDraft: DraftState = {
+            selectedSchemas: new Set(current.selectedSchemas),
+            selectedFields: { ...current.selectedFields }
+        }
+        setHistory([savedDraft])
+        setHistoryIndex(0)
     }
 
     const isAllFieldsSelectedInEntity = (entityName: string) => {
@@ -316,6 +450,48 @@ const CustomAIDetail = () => {
                                         Expand All
                                     </label>
                                 </div>
+
+                                {/* Undo/Redo */}
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={handleUndo}
+                                        disabled={historyIndex <= 0}
+                                        className={`p-2 rounded-lg border border-gray-200 hover:border-green-300 transition-all ${historyIndex <= 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                                        title="Undo"
+                                    >
+                                        <Undo className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        onClick={handleRedo}
+                                        disabled={historyIndex >= history.length - 1}
+                                        className={`p-2 rounded-lg border border-gray-200 hover:border-green-300 transition-all ${historyIndex >= history.length - 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                                        title="Redo"
+                                    >
+                                        <Redo className="h-4 w-4" />
+                                    </button>
+                                </div>
+
+                                {/* Save Button */}
+                                {isDirty && (
+                                    <Button
+                                        onClick={handleSave}
+                                        disabled={isSaving}
+                                        size="sm"
+                                        className="bg-gradient-to-r from-green-600 to-green-600 hover:from-green-700 hover:to-green-700 text-white shadow-md hover:shadow-lg transition-all duration-200 font-bold h-9 px-6 text-sm"
+                                    >
+                                        {isSaving ? (
+                                            <>
+                                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                                Saving...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Save className="h-4 w-4 mr-2" />
+                                                Save Changes
+                                            </>
+                                        )}
+                                    </Button>
+                                )}
                             </div>
                         </CardHeader>
                         <CardContent className="p-4 bg-gray-50">
@@ -376,11 +552,24 @@ const CustomAIDetail = () => {
                                                         <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-md">
                                                             <span className="text-lg font-black text-white">{entityName.charAt(0)}</span>
                                                         </div>
-                                                        <div className="text-left">
+                                                        <div className="text-left flex-1">
                                                             <span className="font-bold text-sm text-gray-900 block">{entityName}</span>
-                                                            <span className="text-[10px] font-semibold text-gray-500">
-                                                                {fields.length} {fields.length !== 1 ? 'fields' : 'field'}
-                                                            </span>
+                                                            <div className="flex items-center gap-2 mt-0.5">
+                                                                <span className="text-[10px] font-medium text-gray-500">
+                                                                    {fields.length} {fields.length !== 1 ? 'fields' : 'field'} total
+                                                                </span>
+                                                                {selectedFields[entityName] && selectedFields[entityName].size > 0 && (
+                                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 border border-green-300">
+                                                                        <span className="relative flex h-1.5 w-1.5">
+                                                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                                                                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-600"></span>
+                                                                        </span>
+                                                                        <span className="text-[10px] font-bold text-green-700">
+                                                                            {selectedFields[entityName].size}/{fields.length} selected
+                                                                        </span>
+                                                                    </span>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div className="ml-auto flex items-center gap-2 pr-1">
@@ -453,7 +642,17 @@ const CustomAIDetail = () => {
                 onOpenChange={setShowEntityModal}
                 initialSelected={Array.from(selectedSchemas)}
                 onConfirm={(selected) => {
-                    setSelectedSchemas(new Set(selected))
+                    const nextDraft: DraftState = {
+                        selectedSchemas: new Set(selected),
+                        selectedFields: { ...selectedFields }
+                    }
+                    // Remove fields for entities that are no longer selected
+                    Object.keys(nextDraft.selectedFields).forEach(entityName => {
+                        if (!nextDraft.selectedSchemas.has(entityName)) {
+                            delete nextDraft.selectedFields[entityName]
+                        }
+                    })
+                    pushHistory(nextDraft)
                 }}
             />
         </>
