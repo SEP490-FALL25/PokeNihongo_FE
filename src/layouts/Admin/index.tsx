@@ -51,9 +51,21 @@ const AdminLayout = () => {
       icon: Package,
     },
     {
-      name: t("navigation.aiPrompts"),
+      name: t("navigation.configAI"),
       href: ROUTES.ADMIN.AI_PROMPTS_MANAGEMENT,
       icon: Brain,
+      children: [
+        {
+          name: t("navigation.aiPrompts"),
+          href: ROUTES.ADMIN.AI_PROMPTS_MANAGEMENT,
+          icon: Brain,
+        },
+        {
+          name: t("navigation.customAI"),
+          href: ROUTES.ADMIN.CUSTOM_AI_MANAGEMENT,
+          icon: Brain,
+        },
+      ],
     },
     {
       name: t("navigation.analytics"),

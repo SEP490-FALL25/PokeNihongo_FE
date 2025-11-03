@@ -1,360 +1,539 @@
-"use client"
-
-import { useState } from "react"
+import { useState, useMemo, useEffect, useCallback, useRef } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card"
 import { Badge } from "@ui/Badge"
-import { Brain, Plus, Search, Edit, Trash2, Copy, Play, FileText, MessageSquare, Sparkles } from "lucide-react"
+import { Button } from "@ui/Button"
+import { Input } from "@ui/Input"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@ui/Dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select"
+import { Textarea } from "@ui/Textarea"
+import { Plus, Search, Edit, Trash2, MoreVertical, Loader2, Brain, Sparkles, Copy, Eye, Calendar, Hash } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@ui/DropdownMenu"
+import { Switch } from "@ui/Switch"
+import HeaderAdmin from "@organisms/Header/Admin"
+import { useConfigPromptsCustom } from "@hooks/useAI"
+import { GeminiConfigPromptsEntity } from "@models/ai/entity"
+import { useTranslation } from "react-i18next"
 
 export default function AIPromptManagement() {
+    const { t } = useTranslation()
     const [searchQuery, setSearchQuery] = useState("")
-    const [selectedCategory, setSelectedCategory] = useState("all")
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
     const [showAddDialog, setShowAddDialog] = useState(false)
-    const [selectedPrompt, setSelectedPrompt] = useState<number | null>(null)
+    const [selectedPrompt, setSelectedPrompt] = useState<GeminiConfigPromptsEntity | null>(null)
+    const [currentPage, setCurrentPage] = useState(1)
+    const [pageSize] = useState(10)
+    const [statusFilter, setStatusFilter] = useState<string>("all")
+    const [sortBy] = useState<string>("id")
+    const [sortOrder] = useState<"asc" | "desc">("desc")
 
-    const prompts = [
-        {
-            id: 1,
-            name: "Trợ giúp học từ vựng",
-            category: "vocabulary",
-            description: "AI giúp học viên ghi nhớ từ vựng tiếng Nhật thông qua Pokemon",
-            prompt:
-                "Bạn là trợ lý học tiếng Nhật. Hãy giúp học viên ghi nhớ từ vựng bằng cách liên kết với Pokemon. Ví dụ: ピカチュウ (Pikachu) có 'ピカ' nghĩa là lấp lánh, phù hợp với Pokemon điện.",
-            usageCount: 1234,
-            status: "active",
-            lastUsed: "2024-03-15",
-        },
-        {
-            id: 2,
-            name: "Giải thích ngữ pháp",
-            category: "grammar",
-            description: "Giải thích các cấu trúc ngữ pháp tiếng Nhật một cách dễ hiểu",
-            prompt:
-                "Bạn là giáo viên tiếng Nhật. Giải thích ngữ pháp một cách đơn giản, sử dụng ví dụ từ thế giới Pokemon để học viên dễ hiểu và ghi nhớ.",
-            usageCount: 892,
-            status: "active",
-            lastUsed: "2024-03-14",
-        },
-        {
-            id: 3,
-            name: "Luyện hội thoại",
-            category: "conversation",
-            description: "Tạo các tình huống hội thoại thực tế cho học viên",
-            prompt:
-                "Tạo các tình huống hội thoại tiếng Nhật trong thế giới Pokemon. Học viên sẽ đóng vai trainer và bạn sẽ đóng vai các nhân vật khác.",
-            usageCount: 567,
-            status: "active",
-            lastUsed: "2024-03-13",
-        },
-        {
-            id: 4,
-            name: "Đánh giá phát âm",
-            category: "pronunciation",
-            description: "Phân tích và đưa ra phản hồi về phát âm của học viên",
-            prompt:
-                "Phân tích phát âm tiếng Nhật của học viên. Chỉ ra điểm mạnh, điểm cần cải thiện và đưa ra bài tập luyện tập cụ thể.",
-            usageCount: 345,
-            status: "active",
-            lastUsed: "2024-03-12",
-        },
-        {
-            id: 5,
-            name: "Tạo câu chuyện",
-            category: "story",
-            description: "Tạo câu chuyện tiếng Nhật với Pokemon để học viên đọc hiểu",
-            prompt:
-                "Viết một câu chuyện ngắn bằng tiếng Nhật về cuộc phiêu lưu của trainer và Pokemon. Sử dụng từ vựng và ngữ pháp phù hợp với trình độ của học viên.",
-            usageCount: 678,
-            status: "active",
-            lastUsed: "2024-03-11",
-        },
-        {
-            id: 6,
-            name: "Kiểm tra hiểu biết",
-            category: "quiz",
-            description: "Tạo câu hỏi kiểm tra kiến thức tiếng Nhật",
-            prompt:
-                "Tạo các câu hỏi trắc nghiệm và tự luận để kiểm tra kiến thức tiếng Nhật của học viên. Câu hỏi liên quan đến Pokemon để tăng hứng thú.",
-            usageCount: 456,
-            status: "draft",
-            lastUsed: "2024-03-10",
-        },
-    ]
-
-    const categories = [
-        { value: "all", label: "Tất cả", icon: Brain },
-        { value: "vocabulary", label: "Từ vựng", icon: FileText },
-        { value: "grammar", label: "Ngữ pháp", icon: MessageSquare },
-        { value: "conversation", label: "Hội thoại", icon: MessageSquare },
-        { value: "pronunciation", label: "Phát âm", icon: Sparkles },
-        { value: "story", label: "Câu chuyện", icon: FileText },
-        { value: "quiz", label: "Kiểm tra", icon: FileText },
-    ]
-
-    const stats = [
-        { label: "Tổng prompts", value: "24", icon: Brain, color: "text-blue-400" },
-        { label: "Đang hoạt động", value: "18", icon: Sparkles, color: "text-green-400" },
-        { label: "Lượt sử dụng", value: "4,172", icon: Play, color: "text-purple-400" },
-        { label: "Trung bình/ngày", value: "156", icon: MessageSquare, color: "text-yellow-400" },
-    ]
-
-    const getCategoryColor = (category: string) => {
-        const colors: Record<string, string> = {
-            vocabulary: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-            grammar: "bg-green-500/20 text-green-400 border-green-500/30",
-            conversation: "bg-purple-500/20 text-purple-400 border-purple-500/30",
-            pronunciation: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-            story: "bg-pink-500/20 text-pink-400 border-pink-500/30",
-            quiz: "bg-orange-500/20 text-orange-400 border-orange-500/30",
+    // Build query params
+    const queryParams = useMemo(() => {
+        const params: any = {
+            page: currentPage,
+            limit: pageSize,
+            sortBy,
+            sortOrder,
         }
-        return colors[category] || "bg-gray-500/20 text-gray-400 border-gray-500/30"
+
+        if (debouncedSearchQuery) {
+            params.promptLike = debouncedSearchQuery
+        }
+
+        if (statusFilter !== "all") {
+            params.isActive = statusFilter === "active"
+        }
+
+        return params
+    }, [currentPage, pageSize, debouncedSearchQuery, statusFilter, sortBy, sortOrder])
+
+    // Fetch prompts
+    const { data, isLoading, error } = useConfigPromptsCustom(queryParams)
+
+    /**
+     * Handle Accumulated Results
+     */
+    const [accumulatedResults, setAccumulatedResults] = useState<GeminiConfigPromptsEntity[]>([])
+    useEffect(() => {
+        const results = data?.results
+        if (results && Array.isArray(results) && results.length > 0) {
+            if (currentPage === 1) {
+                setAccumulatedResults(results)
+            } else {
+                setAccumulatedResults(prev => {
+                    const existingIds = new Set(prev.map(p => p.id))
+                    const newResults = results.filter((p: GeminiConfigPromptsEntity) => !existingIds.has(p.id))
+                    return [...prev, ...newResults]
+                })
+            }
+        } else if (!isLoading && currentPage === 1) {
+            setAccumulatedResults([])
+        }
+    }, [data, currentPage, isLoading])
+    //------------------------End------------------------//
+
+    /**
+     * Handle Intersection Observer
+     */
+    const observerRef = useRef<IntersectionObserver | null>(null)
+    const lastPromptElementRef = useCallback((node: HTMLTableRowElement | null) => {
+        if (observerRef.current) observerRef.current.disconnect()
+        observerRef.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting &&
+                data?.pagination?.current &&
+                data?.pagination?.totalPage &&
+                data?.pagination.current < data?.pagination.totalPage &&
+                !isLoading) {
+                setCurrentPage(prev => prev + 1)
+            }
+        })
+        if (node) observerRef.current.observe(node)
+    }, [data?.pagination, isLoading])
+    //------------------------End------------------------//
+
+    /**
+     * Handle Reset Page and Accumulated Results
+     */
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [debouncedSearchQuery, statusFilter])
+    //------------------------End------------------------//
+
+    /**
+     * Handle Debounce Search
+     */
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearchQuery(searchQuery.trim()), 500)
+        return () => clearTimeout(timer)
+    }, [searchQuery])
+    //------------------------End------------------------//
+
+
+    const prompts = accumulatedResults
+    const pagination = data?.pagination
+
+    const getStatusBadgeColor = (isActive: boolean) => {
+        return isActive ? "bg-chart-4 text-white" : "bg-muted text-muted-foreground"
     }
 
-    const getStatusColor = (status: string) => {
-        return status === "active"
-            ? "bg-green-500/20 text-green-400 border-green-500/30"
-            : "bg-gray-500/20 text-gray-400 border-gray-500/30"
+    const getStatusLabel = (isActive: boolean) => {
+        return isActive ? t('aiCommon.active', { defaultValue: 'Hoạt động' }) : t('aiCommon.inactive', { defaultValue: 'Không hoạt động' })
+    }
+
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString(t('locale', { defaultValue: 'vi-VN' }) as string, {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        })
     }
 
     return (
-        <div className="p-6 space-y-6">
+        <>
             {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold text-white">Quản lý AI Prompts</h1>
-                    <p className="text-gray-400 mt-1">Quản lý các prompt ngữ cảnh cho AI trợ giúp học tập</p>
-                </div>
-                <button
-                    onClick={() => setShowAddDialog(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                >
-                    <Plus className="w-4 h-4" />
-                    Tạo prompt mới
-                </button>
-            </div>
+            <HeaderAdmin title={t('aiPrompts.title', { defaultValue: 'Quản lý AI Prompts' })} description={t('aiPrompts.desc', { defaultValue: 'Quản lý các prompt ngữ cảnh cho AI trợ giúp học tập' })} />
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {stats.map((stat) => (
-                    <div key={stat.label} className="bg-gray-900 border border-gray-800 rounded-lg p-4">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-gray-400 text-sm">{stat.label}</p>
-                                <p className="text-2xl font-bold text-white mt-1">{stat.value}</p>
+            <div className="mt-24 p-8">
+                {/* Stats Cards */}
+                <div className="grid gap-6 md:grid-cols-3 mb-8">
+                    <Card className="bg-card border-border">
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">{t('aiPrompts.stats.total', { defaultValue: 'Tổng prompts' })}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-3xl font-bold text-foreground">
+                                {pagination?.totalItem || 0}
                             </div>
-                            <stat.icon className={`w-8 h-8 ${stat.color}`} />
+                            <p className="text-xs text-muted-foreground mt-1">{t('aiCommon.inSystem', { defaultValue: 'Trong hệ thống' })}</p>
+                        </CardContent>
+                    </Card>
+                    <Card className="bg-card border-border">
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">{t('aiPrompts.stats.loaded', { defaultValue: 'Đã tải' })}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-3xl font-bold text-foreground">
+                                {accumulatedResults.length}
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                                {pagination && pagination.current < pagination.totalPage
+                                    ? t('aiCommon.scrollForMore', { defaultValue: 'Cuộn xuống để xem thêm' })
+                                    : t('aiCommon.loadedAll', { defaultValue: 'Đã tải hết' })}
+                            </p>
+                        </CardContent>
+                    </Card>
+                    <Card className="bg-card border-border">
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">{t('aiPrompts.stats.progress', { defaultValue: 'Tiến độ' })}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-3xl font-bold text-foreground">
+                                {pagination?.totalItem ? Math.round((accumulatedResults.length / pagination.totalItem) * 100) : 0}%
+                            </div>
+                            <div className="w-full bg-muted rounded-full h-2 mt-2">
+                                <div
+                                    className="bg-primary h-2 rounded-full transition-all duration-300"
+                                    style={{ width: `${pagination?.totalItem ? (accumulatedResults.length / pagination.totalItem) * 100 : 0}%` }}
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Filters Bar */}
+                <Card className="bg-card border-border mb-4">
+                    <CardContent className="py-4">
+                        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+                            <div className="flex-1 w-full sm:max-w-md relative">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    placeholder={t('aiPrompts.search', { defaultValue: 'Tìm kiếm prompt...' })}
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="pl-10 bg-background border-border text-foreground"
+                                />
+                            </div>
+                            <div className="flex gap-2 w-full sm:w-auto">
+                                <Select value={statusFilter} onValueChange={(value) => {
+                                    setStatusFilter(value)
+                                }}>
+                                    <SelectTrigger className="w-[140px] bg-background border-border text-foreground">
+                                        <SelectValue placeholder={t('aiCommon.status', { defaultValue: 'Trạng thái' })} />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-card border-border">
+                                        <SelectItem value="all">{t('aiCommon.all', { defaultValue: 'Tất cả' })}</SelectItem>
+                                        <SelectItem value="active">{t('aiCommon.active', { defaultValue: 'Hoạt động' })}</SelectItem>
+                                        <SelectItem value="inactive">{t('aiCommon.inactive', { defaultValue: 'Tắt' })}</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+                                    <DialogTrigger asChild>
+                                        <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
+                                            <Plus className="h-4 w-4 mr-2" />
+                                            {t('aiPrompts.create', { defaultValue: 'Tạo mới' })}
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="bg-card border-border max-w-3xl">
+                                        <DialogHeader>
+                                            <DialogTitle className="text-foreground flex items-center gap-2">
+                                                <Brain className="h-5 w-5 text-primary" />
+                                                {t('aiPrompts.createTitle', { defaultValue: 'Tạo AI Prompt mới' })}
+                                            </DialogTitle>
+                                        </DialogHeader>
+                                        <div className="space-y-4 py-4">
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-foreground">{t('aiCommon.modelId', { defaultValue: 'Model ID' })}</label>
+                                                <Input placeholder={t('aiCommon.modelIdPlaceholder', { defaultValue: 'Nhập model ID' })} className="bg-background border-border text-foreground" type="number" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-foreground">{t('aiPrompts.content', { defaultValue: 'Nội dung Prompt' })}</label>
+                                                <Textarea
+                                                    rows={8}
+                                                    placeholder={t('aiPrompts.contentPlaceholder', { defaultValue: 'Nhập nội dung prompt chi tiết...' })}
+                                                    className="bg-background border-border text-foreground font-mono text-sm"
+                                                />
+                                            </div>
+                                            <Card className="bg-muted/30 border-0">
+                                                <CardContent className="p-4 flex items-center justify-between">
+                                                    <div>
+                                                        <label className="text-sm font-medium text-foreground block mb-1">{t('aiCommon.activeState', { defaultValue: 'Trạng thái hoạt động' })}</label>
+                                                        <p className="text-xs text-muted-foreground">{t('aiPrompts.activeHint', { defaultValue: 'Kích hoạt để có thể sử dụng prompt' })}</p>
+                                                    </div>
+                                                    <Switch />
+                                                </CardContent>
+                                            </Card>
+                                        </div>
+                                        <div className="flex justify-end gap-3">
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => setShowAddDialog(false)}
+                                                className="border-border text-foreground"
+                                            >
+                                                {t('aiCommon.cancel', { defaultValue: 'Hủy' })}
+                                            </Button>
+                                            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+                                                <Plus className="h-4 w-4 mr-2" />
+                                                {t('aiPrompts.create', { defaultValue: 'Tạo mới' })}
+                                            </Button>
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
                         </div>
+                    </CardContent>
+                </Card>
+
+                {/* Prompts Grid */}
+                {isLoading && currentPage === 1 && accumulatedResults.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-16">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+                        <p className="text-muted-foreground">{t('aiCommon.loading', { defaultValue: 'Đang tải dữ liệu...' })}</p>
                     </div>
-                ))}
-            </div>
-
-            {/* Filters */}
-            <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="Tìm kiếm prompts..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
-                    />
-                </div>
-                <div className="flex gap-2 overflow-x-auto">
-                    {categories.map((cat) => (
-                        <button
-                            key={cat.value}
-                            onClick={() => setSelectedCategory(cat.value)}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${selectedCategory === cat.value
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-gray-900 text-gray-400 hover:bg-gray-800 border border-gray-800"
-                                }`}
-                        >
-                            <cat.icon className="w-4 h-4" />
-                            {cat.label}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Prompts List */}
-            <div className="space-y-4">
-                {prompts.map((prompt) => (
-                    <div
-                        key={prompt.id}
-                        className="bg-gray-900 border border-gray-800 rounded-lg p-6 hover:border-gray-700 transition-colors"
-                    >
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <h3 className="text-lg font-semibold text-white">{prompt.name}</h3>
-                                    <Badge className={`${getCategoryColor(prompt.category)} border`}>
-                                        {categories.find((c) => c.value === prompt.category)?.label}
-                                    </Badge>
-                                    <Badge className={`${getStatusColor(prompt.status)} border`}>
-                                        {prompt.status === "active" ? "Hoạt động" : "Nháp"}
-                                    </Badge>
-                                </div>
-                                <p className="text-gray-400 text-sm">{prompt.description}</p>
-                            </div>
-                            <Brain className="w-6 h-6 text-blue-400 ml-4" />
-                        </div>
-
-                        <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 mb-4">
-                            <p className="text-gray-300 text-sm font-mono leading-relaxed">{prompt.prompt}</p>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-6 text-sm">
-                                <div className="flex items-center gap-2">
-                                    <Play className="w-4 h-4 text-gray-400" />
-                                    <span className="text-gray-400">Sử dụng:</span>
-                                    <span className="text-white font-semibold">{prompt.usageCount.toLocaleString()}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <MessageSquare className="w-4 h-4 text-gray-400" />
-                                    <span className="text-gray-400">Lần cuối:</span>
-                                    <span className="text-white">{prompt.lastUsed}</span>
-                                </div>
-                            </div>
-                            <div className="flex gap-2">
-                                <button className="flex items-center gap-2 px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors text-sm">
-                                    <Copy className="w-4 h-4" />
-                                    Sao chép
-                                </button>
-                                <button
-                                    onClick={() => setSelectedPrompt(prompt.id)}
-                                    className="flex items-center gap-2 px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors text-sm"
-                                >
-                                    <Edit className="w-4 h-4" />
-                                    Sửa
-                                </button>
-                                <button className="flex items-center gap-2 px-3 py-2 bg-gray-800 hover:bg-red-900/50 text-red-400 rounded-lg transition-colors text-sm">
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Add Prompt Dialog */}
-            {showAddDialog && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-                        <h2 className="text-xl font-bold text-white mb-4">Tạo AI Prompt mới</h2>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm text-gray-400 mb-1">Tên prompt</label>
-                                <input
-                                    type="text"
-                                    placeholder="VD: Trợ giúp học từ vựng"
-                                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-400 mb-1">Danh mục</label>
-                                <select className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
-                                    <option value="vocabulary">Từ vựng</option>
-                                    <option value="grammar">Ngữ pháp</option>
-                                    <option value="conversation">Hội thoại</option>
-                                    <option value="pronunciation">Phát âm</option>
-                                    <option value="story">Câu chuyện</option>
-                                    <option value="quiz">Kiểm tra</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-400 mb-1">Mô tả</label>
-                                <input
-                                    type="text"
-                                    placeholder="Mô tả ngắn gọn về prompt này"
-                                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-400 mb-1">Nội dung prompt</label>
-                                <textarea
-                                    rows={8}
-                                    placeholder="Nhập nội dung prompt chi tiết..."
-                                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 font-mono text-sm"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-400 mb-1">Trạng thái</label>
-                                <select className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
-                                    <option value="active">Hoạt động</option>
-                                    <option value="draft">Nháp</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="flex gap-3 mt-6">
-                            <button
-                                onClick={() => setShowAddDialog(false)}
-                                className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                ) : error ? (
+                    <Card className="bg-card border-border border-destructive/50">
+                        <CardContent className="py-12 text-center">
+                            <div className="text-destructive">{t('aiCommon.loadError', { defaultValue: 'Có lỗi xảy ra khi tải dữ liệu' })}</div>
+                        </CardContent>
+                    </Card>
+                ) : accumulatedResults.length === 0 ? (
+                    <Card className="bg-card border-border border-dashed">
+                        <CardContent className="py-16 text-center">
+                            <Brain className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-30" />
+                            <p className="text-lg font-medium text-foreground mb-2">{t('aiCommon.notFound', { defaultValue: 'Không tìm thấy prompt' })}</p>
+                            <p className="text-sm text-muted-foreground">{t('aiCommon.tryChangeFilters', { defaultValue: 'Thử thay đổi bộ lọc hoặc tạo prompt mới' })}</p>
+                        </CardContent>
+                    </Card>
+                ) : (
+                    <div className="space-y-4">
+                        {prompts.map((prompt: GeminiConfigPromptsEntity, index: number) => (
+                            <Card
+                                key={prompt.id}
+                                ref={index === prompts.length - 1 ? lastPromptElementRef : null}
+                                className="bg-card border-border hover:border-primary/50 hover:shadow-lg transition-all duration-200 group"
                             >
-                                Hủy
-                            </button>
-                            <button className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-                                Tạo prompt
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+                                <CardContent className="p-6">
+                                    <div className="flex items-start justify-between gap-4">
+                                        {/* Left Content */}
+                                        <div className="flex-1 min-w-0 space-y-4">
+                                            {/* Header */}
+                                            <div className="flex items-start gap-3">
+                                                <div className="p-3 bg-gradient-to-br from-primary/20 to-primary/5 rounded-xl group-hover:from-primary/30 group-hover:to-primary/10 transition-all">
+                                                    <Brain className="h-6 w-6 text-primary" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <h3 className="text-lg font-semibold text-foreground">{t('aiPrompts.itemTitle', { defaultValue: 'AI Prompt' })} #{prompt.id}</h3>
+                                                        <Badge className={getStatusBadgeColor(prompt.isActive)}>
+                                                            <Sparkles className="h-3 w-3 mr-1" />
+                                                            {getStatusLabel(prompt.isActive)}
+                                                        </Badge>
+                                                    </div>
+                                                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                                                        <div className="flex items-center gap-1">
+                                                            <Hash className="h-3 w-3" />
+                                                            <span>{t('aiCommon.modelId', { defaultValue: 'Model ID' })}: {prompt.geminiConfigModelId}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-            {/* Edit Prompt Dialog */}
-            {selectedPrompt && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-                        <h2 className="text-xl font-bold text-white mb-4">Chỉnh sửa prompt</h2>
-                        <div className="space-y-4">
-                            <Card className="bg-gray-800 border-gray-700">
-                                <CardHeader>
-                                    <CardTitle className="text-white text-sm">Thống kê sử dụng</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <div>
-                                            <p className="text-gray-400 text-xs">Tổng lượt dùng</p>
-                                            <p className="text-white font-bold text-lg">
-                                                {prompts.find((p) => p.id === selectedPrompt)?.usageCount.toLocaleString()}
-                                            </p>
+                                            {/* Prompt Content */}
+                                            <div className="bg-muted/40 rounded-lg p-4 border border-border/50">
+                                                <p className="text-sm font-mono text-foreground leading-relaxed line-clamp-4">
+                                                    {prompt.prompt}
+                                                </p>
+                                            </div>
+
+                                            {/* Footer Metadata */}
+                                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                                <div className="flex items-center gap-1.5">
+                                                    <Calendar className="h-3.5 w-3.5" />
+                                                    <span>{t('aiCommon.created', { defaultValue: 'Tạo' })}: {prompt.createdAt ? formatDate(prompt.createdAt) : 'N/A'}</span>
+                                                </div>
+                                                <span>•</span>
+                                                <div className="flex items-center gap-1.5">
+                                                    <Calendar className="h-3.5 w-3.5" />
+                                                    <span>{t('aiCommon.updated', { defaultValue: 'Cập nhật' })}: {prompt.updatedAt ? formatDate(prompt.updatedAt) : 'N/A'}</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="text-gray-400 text-xs">Lần cuối</p>
-                                            <p className="text-white font-bold text-lg">
-                                                {prompts.find((p) => p.id === selectedPrompt)?.lastUsed}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <p className="text-gray-400 text-xs">Trạng thái</p>
-                                            <Badge className="bg-green-500/20 text-green-400 mt-1">Hoạt động</Badge>
+
+                                        {/* Right Actions */}
+                                        <div className="flex flex-col gap-2">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-9 w-9 hover:bg-primary/10 hover:text-primary"
+                                                onClick={() => setSelectedPrompt(prompt)}
+                                                title={t('aiCommon.viewDetail', { defaultValue: 'Xem chi tiết' }) as string}
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                            </Button>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-9 w-9"
+                                                    >
+                                                        <MoreVertical className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="bg-card border-border w-48">
+                                                    <DropdownMenuItem
+                                                        className="text-foreground hover:bg-muted cursor-pointer"
+                                                        onClick={() => setSelectedPrompt(prompt)}
+                                                    >
+                                                        <Edit className="h-4 w-4 mr-2" />
+                                                        {t('aiCommon.edit', { defaultValue: 'Chỉnh sửa' })}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem className="text-foreground hover:bg-muted cursor-pointer">
+                                                        <Copy className="h-4 w-4 mr-2" />
+                                                        {t('aiCommon.copy', { defaultValue: 'Sao chép' })}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem className="text-destructive hover:bg-destructive/10 cursor-pointer">
+                                                        <Trash2 className="h-4 w-4 mr-2" />
+                                                        {t('aiCommon.delete', { defaultValue: 'Xóa' })}
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                         </div>
                                     </div>
                                 </CardContent>
                             </Card>
-                            <div>
-                                <label className="block text-sm text-gray-400 mb-1">Nội dung prompt</label>
-                                <textarea
-                                    rows={8}
-                                    defaultValue={prompts.find((p) => p.id === selectedPrompt)?.prompt}
-                                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 font-mono text-sm"
-                                />
+                        ))}
+
+                        {/* Loading indicator when loading more pages */}
+                        {isLoading && currentPage > 1 && (
+                            <div className="flex items-center justify-center py-6">
+                                <Loader2 className="h-6 w-6 animate-spin text-primary mr-3" />
+                                <span className="text-sm text-muted-foreground">{t('aiCommon.loadingMorePrompts', { defaultValue: 'Đang tải thêm prompts...' })}</span>
+                            </div>
+                        )}
+
+                        {/* End of list indicator */}
+                        {!isLoading && pagination && pagination.current >= pagination.totalPage && accumulatedResults.length > 0 && (
+                            <Card className="bg-muted/30 border-0">
+                                <CardContent className="py-4 text-center">
+                                    <p className="text-sm text-muted-foreground">
+                                        {t('aiCommon.loadedAllCountPrompts', { defaultValue: '✓ Đã hiển thị tất cả {{count}} prompts', count: pagination.totalItem })}
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {/* View/Edit Prompt Dialog */}
+            {selectedPrompt && (
+                <Dialog open={!!selectedPrompt} onOpenChange={() => setSelectedPrompt(null)}>
+                    <DialogContent className="bg-card border-border max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+                        <DialogHeader className="border-b border-border pb-4 space-y-3">
+                            <DialogTitle className="text-foreground flex items-center gap-3">
+                                <div className="p-2.5 bg-gradient-to-br from-primary/20 to-primary/5 rounded-xl">
+                                    <Brain className="h-6 w-6 text-primary" />
+                                </div>
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-xl font-bold">{t('aiPrompts.itemTitle', { defaultValue: 'AI Prompt' })} #{selectedPrompt.id}</span>
+                                        <Badge className={getStatusBadgeColor(selectedPrompt.isActive)}>
+                                            <Sparkles className="h-3 w-3 mr-1" />
+                                            {getStatusLabel(selectedPrompt.isActive)}
+                                        </Badge>
+                                    </div>
+                                    <p className="text-sm font-normal text-muted-foreground mt-1 flex items-center gap-1.5">
+                                        <Hash className="h-3.5 w-3.5" />
+                                        {t('aiCommon.modelId', { defaultValue: 'Model ID' })}: {selectedPrompt.geminiConfigModelId}
+                                    </p>
+                                </div>
+                            </DialogTitle>
+                        </DialogHeader>
+
+                        <div className="flex-1 overflow-y-auto py-6 space-y-6">
+                            {/* Metadata Cards */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <Card className="bg-gradient-to-br from-primary/5 to-transparent border-primary/20">
+                                    <CardContent className="p-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Calendar className="h-4 w-4 text-primary" />
+                                            <p className="text-xs font-medium text-muted-foreground">{t('aiCommon.createdAt', { defaultValue: 'Ngày tạo' })}</p>
+                                        </div>
+                                        <p className="text-sm font-semibold text-foreground">
+                                            {selectedPrompt.createdAt ? formatDate(selectedPrompt.createdAt) : 'N/A'}
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                                <Card className="bg-gradient-to-br from-chart-2/5 to-transparent border-chart-2/20">
+                                    <CardContent className="p-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Calendar className="h-4 w-4 text-chart-2" />
+                                            <p className="text-xs font-medium text-muted-foreground">{t('aiCommon.updatedAt', { defaultValue: 'Cập nhật lần cuối' })}</p>
+                                        </div>
+                                        <p className="text-sm font-semibold text-foreground">
+                                            {selectedPrompt.updatedAt ? formatDate(selectedPrompt.updatedAt) : 'N/A'}
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            </div>
+
+                            {/* Edit Form */}
+                            <div className="space-y-5">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                                        <Hash className="h-4 w-4 text-primary" />
+                                        {t('aiCommon.modelId', { defaultValue: 'Model ID' })}
+                                    </label>
+                                    <Input
+                                        defaultValue={selectedPrompt.geminiConfigModelId}
+                                        className="bg-background border-border text-foreground h-11"
+                                        type="number"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                                        <Brain className="h-4 w-4 text-primary" />
+                                        {t('aiPrompts.content', { defaultValue: 'Nội dung Prompt' })}
+                                    </label>
+                                    <div className="relative">
+                                        <Textarea
+                                            rows={14}
+                                            defaultValue={selectedPrompt.prompt}
+                                            className="bg-background border-border text-foreground font-mono text-sm leading-relaxed resize-none pr-20"
+                                            placeholder={t('aiPrompts.contentPlaceholder', { defaultValue: 'Nhập nội dung prompt...' })}
+                                        />
+                                        <div className="absolute bottom-3 right-3 px-2 py-1 bg-muted rounded text-xs font-medium text-muted-foreground">
+                                            {selectedPrompt.prompt.length} {t('aiCommon.chars', { defaultValue: 'ký tự' })}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <Card className="bg-gradient-to-br from-muted/50 to-muted/20 border-border/50">
+                                    <CardContent className="p-5 flex items-center justify-between">
+                                        <div className="space-y-1">
+                                            <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                                                <Sparkles className="h-4 w-4 text-primary" />
+                                                {t('aiPrompts.activeState', { defaultValue: 'Trạng thái hoạt động' })}
+                                            </label>
+                                            <p className="text-xs text-muted-foreground max-w-sm">
+                                                {selectedPrompt.isActive
+                                                    ? t('aiPrompts.activeOn', { defaultValue: 'Prompt đang được kích hoạt và có thể sử dụng trong hệ thống' })
+                                                    : t('aiPrompts.activeOff', { defaultValue: 'Prompt hiện đang tắt và không thể sử dụng' })}
+                                            </p>
+                                        </div>
+                                        <Switch defaultChecked={selectedPrompt.isActive} className="data-[state=checked]:bg-primary" />
+                                    </CardContent>
+                                </Card>
                             </div>
                         </div>
-                        <div className="flex gap-3 mt-6">
-                            <button
-                                onClick={() => setSelectedPrompt(null)}
-                                className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors"
+
+                        <div className="flex justify-between items-center gap-3 pt-4 border-t border-border">
+                            <Button
+                                variant="outline"
+                                className="text-destructive border-destructive/50 hover:bg-destructive/10 hover:border-destructive"
                             >
-                                Hủy
-                            </button>
-                            <button className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-                                Lưu thay đổi
-                            </button>
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                {t('aiCommon.deletePrompt', { defaultValue: 'Xóa prompt' })}
+                            </Button>
+                            <div className="flex gap-3">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setSelectedPrompt(null)}
+                                    className="border-border text-foreground hover:bg-muted"
+                                >
+                                    {t('aiCommon.cancel', { defaultValue: 'Hủy' })}
+                                </Button>
+                                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
+                                    <Sparkles className="h-4 w-4 mr-2" />
+                                    {t('aiCommon.saveChanges', { defaultValue: 'Lưu thay đổi' })}
+                                </Button>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </DialogContent>
+                </Dialog>
             )}
-        </div>
+        </>
     )
 }
