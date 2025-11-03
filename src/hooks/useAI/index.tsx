@@ -4,12 +4,13 @@ import geminiService from "@services/ai";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
+//--------------------------------------Config Prompts--------------------------------------//
 /**
  * Handle Gemini Config Prompts
  * @param params 
  * @returns 
  */
-export const useAIGeminiConfigPrompts = (params: IQueryRequest) => {
+export const useConfigPromptsCustom = (params: IQueryRequest) => {
     const { data, isLoading, error } = useQuery({
         queryKey: ['gemini-config-prompts', params],
         queryFn: () => geminiService.getGeminiConfigPrompts(params),
@@ -17,7 +18,27 @@ export const useAIGeminiConfigPrompts = (params: IQueryRequest) => {
     return { data: data?.data?.data, isLoading, error };
 }
 //-----------------------End-----------------------//
+//---------------------------------------------End Config Prompts---------------------------------------------//
 
+
+
+
+
+
+
+//--------------------------------------Custom AI--------------------------------------//
+/**
+ * Handle Get Config Models
+ * @returns 
+ */
+export const useGetAIConfigModels = (params: IQueryRequest) => {
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['gemini-config-models', params],
+        queryFn: () => geminiService.getConfigModels(params),
+    });
+    return { data: data?.data?.data, isLoading, error };
+}
+//-----------------------End-----------------------//
 
 
 /**
@@ -28,7 +49,7 @@ export const useCreateAIGeminiConfigModels = () => {
     const createGeminiConfigModelsMutation = useMutation({
         mutationFn: (data: ICreateGeminiConfigModelsRequest) => geminiService.createGeminiConfigModels(data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts'] });
+            queryClient.invalidateQueries({ queryKey: ['gemini-config-models'] });
             toast.success('Tạo model thành công');
         },
         onError: (error: any) => {
@@ -38,9 +59,17 @@ export const useCreateAIGeminiConfigModels = () => {
     return createGeminiConfigModelsMutation;
 }
 //-----------------------End-----------------------//
+//---------------------------------------------End Custom AI---------------------------------------------//
 
 
 
+
+
+
+
+
+
+//--------------------------------------Gemini Models--------------------------------------//
 /**
  * Handle Get Gemini Models
  * @returns 
@@ -53,9 +82,16 @@ export const useGetAIGeminiModels = () => {
     return { data: data?.data?.data, isLoading, error };
 }
 //-----------------------End-----------------------//
+//---------------------------------------------End Gemini Models---------------------------------------------//
 
 
 
+
+
+
+
+
+//--------------------------------------Config Presets--------------------------------------//
 /**
  * Handle Get Config Presets
  * @returns 
@@ -68,3 +104,4 @@ export const useGetAIGeminiConfigPresets = () => {
     return { data: data?.data?.data, isLoading, error };
 }
 //-----------------------End-----------------------//
+//---------------------------------------------End Config Presets---------------------------------------------//

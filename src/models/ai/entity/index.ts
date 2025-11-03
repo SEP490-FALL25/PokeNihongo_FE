@@ -16,7 +16,10 @@ export const GeminiConfigPromptsEntitySchema = z.object({
 
 export type GeminiConfigPromptsEntity = z.infer<typeof GeminiConfigPromptsEntitySchema>;
 //-----------------------End--------------------//
-//--------------------------------------End--------------------------------------//
+//--------------------------------------End Gemini Config Prompts--------------------------------------//
+
+
+
 
 
 
@@ -37,7 +40,10 @@ export const GeminiModelsEntitySchema = z.object({
 
 export type IGeminiModelsEntity = z.infer<typeof GeminiModelsEntitySchema>;
 //-----------------------End--------------------//
-//--------------------------------------End--------------------------------------//
+//--------------------------------------End Gemini Models--------------------------------------//
+
+
+
 
 
 //----------------------Config Presets Entity----------------------//
@@ -59,4 +65,35 @@ export const ConfigPresetsEntitySchema = z.object({
 
 export type IConfigPresetsEntity = z.infer<typeof ConfigPresetsEntitySchema>;
 //-----------------------End--------------------//
-//--------------------------------------End--------------------------------------//
+//--------------------------------------End Config Presets--------------------------------------//
+
+
+
+
+
+//----------------------Gemini Config Models Entity----------------------//
+/**
+ * Gemini Config Models Entity Schema
+ */
+export const GeminiConfigModelsEntitySchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    geminiModelId: z.number(),
+    maxTokens: z.number(),
+    jsonMode: z.boolean(),
+    systemInstruction: z.string(),
+    safetySettings: z.record(z.string(), z.string()),
+    extraParams: z.object({
+        responseMimeType: z.string(),
+    }),
+    presetId: z.number(),
+    isEnabled: z.boolean(),
+    ...byUser,
+    ...at,
+    geminiModel: GeminiModelsEntitySchema,
+    preset: ConfigPresetsEntitySchema,
+});
+
+export type IGeminiConfigModelsEntity = z.infer<typeof GeminiConfigModelsEntitySchema>;
+//-----------------------End--------------------//
+//--------------------------------------End Gemini Config Models--------------------------------------//

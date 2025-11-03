@@ -10,7 +10,7 @@ import { Plus, Search, Edit, Trash2, MoreVertical, Loader2, Brain, Sparkles, Cop
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@ui/DropdownMenu"
 import { Switch } from "@ui/Switch"
 import HeaderAdmin from "@organisms/Header/Admin"
-import { useAIGeminiConfigPrompts } from "@hooks/useAI"
+import { useConfigPromptsCustom } from "@hooks/useAI"
 import { GeminiConfigPromptsEntity } from "@models/ai/entity"
 
 export default function AIPromptManagement() {
@@ -45,7 +45,7 @@ export default function AIPromptManagement() {
     }, [currentPage, pageSize, debouncedSearchQuery, statusFilter, sortBy, sortOrder])
 
     // Fetch prompts
-    const { data, isLoading, error } = useAIGeminiConfigPrompts(queryParams)
+    const { data, isLoading, error } = useConfigPromptsCustom(queryParams)
 
     /**
      * Handle Accumulated Results
