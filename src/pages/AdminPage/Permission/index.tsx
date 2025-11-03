@@ -28,7 +28,7 @@ const PermissionManagement = () => {
     /**
      * Permission List - Query Params (FE filter)
      */
-    const [permParams, setPermParams] = useState<IQueryRequest>({ page: 1, limit: 20, sortBy: 'module' });
+    const [permParams, setPermParams] = useState<IQueryRequest>({ page: 1, limit: 15, sortBy: 'module' });
     const [moduleSearch, setModuleSearch] = useState<string>("");
     const [pathSearch, setPathSearch] = useState<string>("");
     const debouncedModule = useDebounce(moduleSearch, 400);
