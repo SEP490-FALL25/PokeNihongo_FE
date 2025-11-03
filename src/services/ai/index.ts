@@ -1,20 +1,48 @@
 import { axiosPrivate } from "@configs/axios";
+import { ICreateGeminiConfigModelsRequest } from "@models/ai/request";
 import { IQueryRequest } from "@models/common/request";
 
 const geminiService = {
     getGeminiConfigPrompts: async (params: IQueryRequest) => {
-        const queryParams = new URLSearchParams();
+        const { page = 1, limit = 10, sortBy, sortOrder, ...rest } = params || {};
+        const qsParts: string[] = [];
 
-        if (params.page) queryParams.append('currentPage', params.page.toString());
-        if (params.limit) queryParams.append('pageSize', params.limit.toString());
+        if (sortBy && sortOrder) {
+            const sortPrefix = sortOrder === 'desc' ? '-' : '';
+            qsParts.push(`sort:${sortPrefix}${sortBy}`);
+        } else if (sortBy) {
+            qsParts.push(`sort:${sortBy}`);
+        }
 
-        const queryString = queryParams.toString();
-        return await axiosPrivate.get(`/gemini-config/prompts?${queryString}`);
+        Object.entries(rest).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                if (key.endsWith('Like')) {
+                    const fieldName = key.replace('Like', '');
+                    qsParts.push(`${fieldName}:like=${encodeURIComponent(String(value))}`);
+                } else {
+                    qsParts.push(`${key}=${encodeURIComponent(String(value))}`);
+                }
+            }
+        });
+
+        const qs = qsParts.join(",");
+
+        return await axiosPrivate.get("/gemini-config/promt", {
+            params: {
+                qs,
+                currentPage: page,
+                pageSize: limit,
+            },
+        });
     },
 
     getGeminiConfigModels: async () => {
         return await axiosPrivate.get('/gemini-config/models');
-    }
+    },
+
+    createGeminiConfigModels: async (data: ICreateGeminiConfigModelsRequest) => {
+        return await axiosPrivate.post('/gemini-config/config-models', data);
+    },
 }
 
 export default geminiService;
