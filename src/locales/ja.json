@@ -42,6 +42,12 @@
         "retry": "再試行",
         "clearAll": "すべてクリア"
     },
+    "notFoundPage": {
+        "title": "ページが見つかりません",
+        "description": "申し訳ございませんが、お探しのページは存在しないか、移動された可能性があります。",
+        "goBack": "← 戻る",
+        "goToLogin": "ログインページへ"
+    },
     "navigation": {
         "dashboard": "ダッシュボード",
         "users": "ユーザー管理",

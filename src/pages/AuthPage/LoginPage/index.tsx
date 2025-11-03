@@ -8,6 +8,8 @@ import { useState } from 'react';
 import { CookiesService } from '@utils/cookies';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@constants/route';
+import { decodeJWT } from '@utils/token';
+import { COOKIES, ROLE_ID } from '@constants/common';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -31,9 +33,22 @@ const LoginPage = () => {
         try {
             setIsLoading(true);
             const res = await authService.login(data);
-            CookiesService.set('accessToken', res.data.data.accessToken);
-            toast.success('Đăng nhập thành công');
-            navigate(ROUTES.ADMIN.ROOT);
+            CookiesService.set(COOKIES.ACCESS_TOKEN, res.data.data.accessToken);
+            const decodeToken = decodeJWT();
+            console.log('decodeToken', decodeToken);
+            switch (decodeToken?.roleId) {
+                case ROLE_ID.ADMIN:
+                    toast.success('Đăng nhập thành công');
+                    navigate(ROUTES.ADMIN.ROOT);
+                    break;
+                case ROLE_ID.MANAGER:
+                    toast.success('Đăng nhập thành công');
+                    navigate(ROUTES.MANAGER.ROOT);
+                    break;
+                default:
+                    toast.error('Đăng nhập thất bại');
+                    break;
+            }
         } catch (error) {
             console.log(error);
             toast.error('Đăng nhập thất bại');

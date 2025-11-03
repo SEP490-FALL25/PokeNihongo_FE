@@ -1,6 +1,6 @@
-import { Outlet, useLocation, NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, BookOpen, Languages, BarChart3, Settings, LogOut, Menu, Trophy, Package, Brain, Calendar, Gift, LucideIcon, FileText, Layers, Store, ShieldCheck } from "lucide-react";
-import { useState } from "react";
+import { Outlet, useLocation, NavLink, useNavigate } from "react-router-dom";
+import { LayoutDashboard, Users, BarChart3, Settings, LogOut, Menu, Trophy, Package, Brain, Calendar, Gift, LucideIcon, Store, ShieldCheck } from "lucide-react";
+import { useMemo, useState } from "react";
 import { Button } from "@ui/Button";
 import { cn } from "@utils/CN";
 import { ROUTES } from "@constants/route";
@@ -10,7 +10,10 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@
 import { ChevronDown } from "lucide-react";
 import React from 'react';
 import SparklesFillIcon from "@atoms/SparklesFill";
-
+import { CookiesService } from "@utils/cookies";
+import { COOKIES, ROLE_ID } from "@constants/common";
+import { decodeJWT } from "@utils/token";
+import NotFoundPage from "@pages/NotFoundPage";
 
 interface NavigationItem {
   name: string;
@@ -21,6 +24,7 @@ interface NavigationItem {
 
 const AdminLayout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { t } = useTranslation();
 
@@ -35,31 +39,6 @@ const AdminLayout = () => {
       name: t("navigation.pokemon"),
       href: ROUTES.ADMIN.POKEMON_MANAGEMENT,
       icon: Trophy,
-    },
-    {
-      name: t("navigation.lessons"),
-      href: ROUTES.ADMIN.LESSONS,
-      icon: BookOpen,
-    },
-    {
-      name: t("navigation.questionBank"),
-      href: ROUTES.ADMIN.QUESTION_BANK,
-      icon: FileText,
-    },
-    {
-      name: t("navigation.testSets"),
-      href: ROUTES.ADMIN.TESTSET_MANAGEMENT,
-      icon: Layers,
-    },
-    {
-      name: t("navigation.test"),
-      href: ROUTES.ADMIN.TEST_MANAGEMENT,
-      icon: Book,
-    },
-    {
-      name: t("navigation.vocabulary"),
-      href: ROUTES.ADMIN.VOCABULARY,
-      icon: Languages,
     },
     {
       name: t("navigation.tournaments"),
@@ -107,6 +86,26 @@ const AdminLayout = () => {
       icon: ShieldCheck,
     }
   ];
+
+  /**
+   * Handle logout
+   */
+  const handleLogout = () => {
+    CookiesService.remove(COOKIES.ACCESS_TOKEN);
+    navigate(ROUTES.AUTH.LOGIN, { replace: true });
+  }
+  //-----------------------End--------------------//
+
+
+  /**
+   * Handle check role
+   */
+  const isAdmin = useMemo(() => decodeJWT()?.roleId === ROLE_ID.ADMIN, []);
+  if (!isAdmin) {
+    CookiesService.remove(COOKIES.ACCESS_TOKEN);
+    return <NotFoundPage />;
+  }
+  //-----------------------End--------------------//
 
   return (
     <div className="flex h-screen">
@@ -234,7 +233,7 @@ const AdminLayout = () => {
             <Settings className="h-5 w-5 flex-shrink-0" />
             {isSidebarOpen && <span>{t("navigation.settings")}</span>}
           </NavLink>
-          <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
+          <button onClick={handleLogout} className="cursor-pointer flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
             <LogOut className="h-5 w-5 flex-shrink-0" />
             {isSidebarOpen && <span>{t("common.logout")}</span>}
           </button>

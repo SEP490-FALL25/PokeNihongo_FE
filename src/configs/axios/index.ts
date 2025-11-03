@@ -1,5 +1,6 @@
 
 import { CookiesService } from '@utils/cookies';
+import { COOKIES } from '@constants/common';
 import axios, { AxiosError } from 'axios';
 
 const axiosClient = axios.create({
@@ -32,9 +33,10 @@ const axiosPrivate = axios.create({
 // Interceptors cho axiosPrivate
 axiosPrivate.interceptors.request.use(
     (config) => {
-        const token = CookiesService.get("accessToken");
+        const token = CookiesService.get(COOKIES.ACCESS_TOKEN);
         const language = localStorage.getItem('language') || 'vi';
 
+        console.log('token', token);
         // const userRole = Cookies.get('userRole');
 
         if (token) {
