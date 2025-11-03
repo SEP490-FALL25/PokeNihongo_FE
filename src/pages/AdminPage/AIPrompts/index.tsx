@@ -93,7 +93,6 @@ export default function AIPromptManagement() {
      */
     useEffect(() => {
         setCurrentPage(1)
-        setAccumulatedResults([])
     }, [debouncedSearchQuery, statusFilter])
     //------------------------End------------------------//
 
