@@ -12,6 +12,6 @@ export const useAIGeminiConfigPrompts = (params: IQueryRequest) => {
         queryKey: ['gemini-config-prompts', params],
         queryFn: () => geminiService.getGeminiConfigPrompts(params),
     });
-    return { data, isLoading, error };
+    return { data: data?.data?.data, isLoading, error };
 }
 //-----------------------End-----------------------//

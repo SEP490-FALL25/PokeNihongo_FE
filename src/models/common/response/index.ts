@@ -86,3 +86,18 @@ export const BackendResponseModel = <T extends z.ZodTypeAny>(dataModel: T) =>
     );
 export type IBackendResponse<T extends z.ZodTypeAny> = z.infer<ReturnType<typeof BackendResponseModel<T>>>;
 //----------------------End----------------------//
+
+
+/**
+ * Backend Pagination Response Model
+ * @param dataModel 
+ * @returns 
+ */
+export const BackendPaginationResponseModel = <T extends z.ZodTypeAny>(dataModel: T) =>
+    z.object({
+        statusCode: z.number().optional(),
+        message: z.string().optional(),
+        error: z.string().optional(),
+        data: PaginationDataSchema.extend({ results: dataModel }),
+    });
+//----------------------End----------------------//
