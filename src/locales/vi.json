@@ -145,7 +145,11 @@
             "saveChanges": "Lưu thay đổi",
             "saving": "Đang lưu...",
             "undo": "Hoàn tác",
-            "redo": "Làm lại"
+            "redo": "Làm lại",
+            "purpose": "Mục đích:",
+            "purposePersonalizedRecommendations": "Gợi ý cá nhân hóa",
+            "purposeSpeakingEvaluation": "Đánh giá phát âm",
+            "purposeAiKaiwa": "Chat với AI"
         },
         "errors": {
             "missingConfigData": "Không tìm thấy dữ liệu cấu hình. Vui lòng tải lại trang.",

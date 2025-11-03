@@ -145,7 +145,11 @@
             "saveChanges": "変更を保存",
             "saving": "保存中...",
             "undo": "元に戻す",
-            "redo": "やり直す"
+            "redo": "やり直す",
+            "purpose": "目的:",
+            "purposePersonalizedRecommendations": "パーソナライズされた推奨",
+            "purposeSpeakingEvaluation": "スピーキング評価",
+            "purposeAiKaiwa": "AI会話"
         },
         "errors": {
             "missingConfigData": "設定データが見つかりません。ページを再読み込みしてください。",

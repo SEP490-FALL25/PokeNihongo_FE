@@ -165,7 +165,11 @@
             "saveChanges": "Save Changes",
             "saving": "Saving...",
             "undo": "Undo",
-            "redo": "Redo"
+            "redo": "Redo",
+            "purpose": "Purpose:",
+            "purposePersonalizedRecommendations": "Personalized Recommendations",
+            "purposeSpeakingEvaluation": "Speaking Evaluation",
+            "purposeAiKaiwa": "AI Kaiwa"
         },
         "errors": {
             "missingConfigData": "Configuration data not found. Please refresh the page.",

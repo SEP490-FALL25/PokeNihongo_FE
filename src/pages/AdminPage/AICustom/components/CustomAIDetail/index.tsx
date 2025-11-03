@@ -6,6 +6,7 @@ import { Input } from '@ui/Input'
 import { Button } from '@ui/Button'
 import { Switch } from '@ui/Switch'
 import { Badge } from '@ui/Badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/Select'
 import PaginationControls from '@ui/PaginationControls'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@ui/Accordion'
 import { Skeleton } from '@ui/Skeleton'
@@ -45,6 +46,7 @@ const CustomAIDetail = () => {
         selectedSchemas: Set<string>
         selectedFields: Record<string, Set<string>>
         selectedLimits: Record<string, number | undefined>
+        selectedPurpose: string
     }
     const [history, setHistory] = useState<DraftState[]>([])
     const [historyIndex, setHistoryIndex] = useState<number>(-1)
@@ -85,23 +87,33 @@ const CustomAIDetail = () => {
         return limitsMap
     }, [entities])
 
+    const selectedPurposeFromPolicy = useMemo(() => {
+        return initialPolicy?.purpose || PURPOSE_POLICY_AI.PERSONALIZED_RECOMMENDATIONS
+    }, [initialPolicy])
+
     // Initialize draft from configData
     useEffect(() => {
         if (entities.length > 0) {
             const initialDraft: DraftState = {
                 selectedSchemas: selectedSchemasFromEntities,
                 selectedFields: selectedFieldsFromEntities,
-                selectedLimits: selectedLimitsFromEntities
+                selectedLimits: selectedLimitsFromEntities,
+                selectedPurpose: selectedPurposeFromPolicy
             }
             setHistory([initialDraft])
             setHistoryIndex(0)
         } else if (configData && entities.length === 0) {
             // Config exists but no entities - initialize empty
-            const emptyDraft: DraftState = { selectedSchemas: new Set(), selectedFields: {}, selectedLimits: {} }
+            const emptyDraft: DraftState = {
+                selectedSchemas: new Set(),
+                selectedFields: {},
+                selectedLimits: {},
+                selectedPurpose: selectedPurposeFromPolicy
+            }
             setHistory([emptyDraft])
             setHistoryIndex(0)
         }
-    }, [entities, configData, selectedSchemasFromEntities, selectedFieldsFromEntities, selectedLimitsFromEntities])
+    }, [entities, configData, selectedSchemasFromEntities, selectedFieldsFromEntities, selectedLimitsFromEntities, selectedPurposeFromPolicy])
 
     // Get current draft from history
     const currentDraft = useMemo(() => {
@@ -112,13 +124,15 @@ const CustomAIDetail = () => {
         return {
             selectedSchemas: selectedSchemasFromEntities,
             selectedFields: selectedFieldsFromEntities,
-            selectedLimits: selectedLimitsFromEntities
+            selectedLimits: selectedLimitsFromEntities,
+            selectedPurpose: selectedPurposeFromPolicy
         }
-    }, [history, historyIndex, selectedSchemasFromEntities, selectedFieldsFromEntities, selectedLimitsFromEntities])
+    }, [history, historyIndex, selectedSchemasFromEntities, selectedFieldsFromEntities, selectedLimitsFromEntities, selectedPurposeFromPolicy])
 
     const selectedSchemas = currentDraft.selectedSchemas
     const selectedFields = currentDraft.selectedFields
     const selectedLimits = currentDraft.selectedLimits
+    const selectedPurpose = currentDraft.selectedPurpose
 
     // Push new state to history
     const pushHistory = (nextDraft: DraftState) => {
@@ -178,11 +192,22 @@ const CustomAIDetail = () => {
 
     useEffect(() => { setPage(1) }, [searchQuery])
 
+    const handlePurposeChange = (value: string) => {
+        const nextDraft: DraftState = {
+            selectedSchemas: new Set(selectedSchemas),
+            selectedFields: { ...selectedFields },
+            selectedLimits: { ...selectedLimits },
+            selectedPurpose: value
+        }
+        pushHistory(nextDraft)
+    }
+
     const toggleSelectEntityAllFields = (entityName: string, checked: boolean) => {
         const nextDraft: DraftState = {
             selectedSchemas: new Set(selectedSchemas),
             selectedFields: { ...selectedFields },
-            selectedLimits: { ...selectedLimits }
+            selectedLimits: { ...selectedLimits },
+            selectedPurpose: selectedPurpose
         }
         const fields = (filteredSchemaFields[entityName] || []) as string[]
         if (checked) {
@@ -197,7 +222,8 @@ const CustomAIDetail = () => {
         const nextDraft: DraftState = {
             selectedSchemas: new Set(selectedSchemas),
             selectedFields: { ...selectedFields },
-            selectedLimits: { ...selectedLimits }
+            selectedLimits: { ...selectedLimits },
+            selectedPurpose: selectedPurpose
         }
         if (!nextDraft.selectedFields[entityName]) nextDraft.selectedFields[entityName] = new Set()
         if (checked) {
@@ -215,7 +241,8 @@ const CustomAIDetail = () => {
         const nextDraft: DraftState = {
             selectedSchemas: new Set(selectedSchemas),
             selectedFields: { ...selectedFields },
-            selectedLimits: { ...selectedLimits }
+            selectedLimits: { ...selectedLimits },
+            selectedPurpose: selectedPurpose
         }
         const numValue = value === '' ? undefined : parseInt(value, 10)
         if (isNaN(numValue as number) && value !== '') return
@@ -227,8 +254,8 @@ const CustomAIDetail = () => {
     const isDirty = useMemo(() => {
         if (history.length === 0) return false
         if (historyIndex !== history.length - 1) return true
-        const initialDraft = history[0] || { selectedSchemas: new Set(), selectedFields: {}, selectedLimits: {} }
-        const current = history[historyIndex] || { selectedSchemas: new Set(), selectedFields: {}, selectedLimits: {} }
+        const initialDraft = history[0] || { selectedSchemas: new Set(), selectedFields: {}, selectedLimits: {}, selectedPurpose: PURPOSE_POLICY_AI.PERSONALIZED_RECOMMENDATIONS }
+        const current = history[historyIndex] || { selectedSchemas: new Set(), selectedFields: {}, selectedLimits: {}, selectedPurpose: PURPOSE_POLICY_AI.PERSONALIZED_RECOMMENDATIONS }
 
         // Compare schemas
         if (initialDraft.selectedSchemas.size !== current.selectedSchemas.size) return true
@@ -252,6 +279,9 @@ const CustomAIDetail = () => {
                 if (!currentFields.has(field)) return true
             }
         }
+
+        // Compare purpose
+        if (initialDraft.selectedPurpose !== current.selectedPurpose) return true
 
         return false
     }, [history, historyIndex])
@@ -286,13 +316,12 @@ const CustomAIDetail = () => {
             }
         })
 
-        // Use initialPolicy values if exists, otherwise use defaults
-        const purpose = initialPolicy?.purpose || PURPOSE_POLICY_AI.PERSONALIZED_RECOMMENDATIONS
+        // Use maskingRules from initialPolicy if exists, otherwise use empty object
         const maskingRules = initialPolicy?.maskingRules || {}
 
         const payload = {
             policy: {
-                purpose: purpose as any,
+                purpose: current.selectedPurpose as any,
                 entities: entitiesArray,
                 maskingRules: maskingRules,
             }
@@ -307,7 +336,8 @@ const CustomAIDetail = () => {
             const savedDraft: DraftState = {
                 selectedSchemas: new Set(current.selectedSchemas),
                 selectedFields: { ...current.selectedFields },
-                selectedLimits: { ...current.selectedLimits }
+                selectedLimits: { ...current.selectedLimits },
+                selectedPurpose: current.selectedPurpose
             }
             setHistory([savedDraft])
             setHistoryIndex(0)
@@ -493,15 +523,38 @@ const CustomAIDetail = () => {
 
                             {/* Quick Actions */}
                             <div className="flex flex-wrap items-center justify-between gap-3 mt-3 pt-3 border-t border-gray-200">
-                                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-gray-200 hover:border-green-300 transition-all duration-200 shadow-sm">
-                                    <Switch
-                                        id="expand-all"
-                                        checked={expandedEntities.length === paginatedEntityKeys.length && paginatedEntityKeys.length > 0}
-                                        onCheckedChange={(val) => setExpandedEntities(val ? paginatedEntityKeys : [])}
-                                    />
-                                    <label htmlFor="expand-all" className="text-xs font-bold cursor-pointer hover:text-green-600 transition-colors select-none text-gray-700">
-                                        {t('aiCustom.schemaEntities.expandAll', { defaultValue: 'Expand All' })}
-                                    </label>
+                                <div className="flex items-center gap-3 flex-wrap">
+                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-gray-200 hover:border-green-300 transition-all duration-200 shadow-sm">
+                                        <Switch
+                                            id="expand-all"
+                                            checked={expandedEntities.length === paginatedEntityKeys.length && paginatedEntityKeys.length > 0}
+                                            onCheckedChange={(val) => setExpandedEntities(val ? paginatedEntityKeys : [])}
+                                        />
+                                        <label htmlFor="expand-all" className="text-xs font-bold cursor-pointer hover:text-green-600 transition-colors select-none text-gray-700">
+                                            {t('aiCustom.schemaEntities.expandAll', { defaultValue: 'Expand All' })}
+                                        </label>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <label htmlFor="purpose-select" className="text-xs font-bold text-gray-700 whitespace-nowrap">
+                                            {t('aiCustom.schemaEntities.purpose', { defaultValue: 'Purpose:' })}
+                                        </label>
+                                        <Select value={selectedPurpose} onValueChange={handlePurposeChange}>
+                                            <SelectTrigger id="purpose-select" className="w-64 h-9 text-xs border-gray-200 hover:border-green-400 focus:border-green-500 bg-white">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value={PURPOSE_POLICY_AI.PERSONALIZED_RECOMMENDATIONS}>
+                                                    {t('aiCustom.schemaEntities.purposePersonalizedRecommendations', { defaultValue: 'Personalized Recommendations' })}
+                                                </SelectItem>
+                                                <SelectItem value={PURPOSE_POLICY_AI.SPEAKING_EVALUATION}>
+                                                    {t('aiCustom.schemaEntities.purposeSpeakingEvaluation', { defaultValue: 'Speaking Evaluation' })}
+                                                </SelectItem>
+                                                <SelectItem value={PURPOSE_POLICY_AI.AI_KAIWA}>
+                                                    {t('aiCustom.schemaEntities.purposeAiKaiwa', { defaultValue: 'AI Kaiwa' })}
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                 </div>
 
                                 {/* Undo/Redo */}
@@ -720,7 +773,8 @@ const CustomAIDetail = () => {
                     const nextDraft: DraftState = {
                         selectedSchemas: new Set(selected),
                         selectedFields: { ...selectedFields },
-                        selectedLimits: { ...selectedLimits }
+                        selectedLimits: { ...selectedLimits },
+                        selectedPurpose: selectedPurpose
                     }
                     // Remove fields and limits for entities that are no longer selected
                     Object.keys(nextDraft.selectedFields).forEach(entityName => {
