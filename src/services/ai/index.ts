@@ -36,7 +36,11 @@ const geminiService = {
         });
     },
 
-    getGeminiConfigModels: async () => {
+    getConfigPresets: async () => {
+        return await axiosPrivate.get('/gemini-config/presets');
+    },
+
+    getGeminiModels: async () => {
         return await axiosPrivate.get('/gemini-config/models');
     },
 

@@ -17,5 +17,5 @@ export const createCreateGeminiConfigModelsSchema = (t: (key: string, opts?: any
     presetId: z.number().min(1, t('validation.presetIdRequired')),
 });
 
-export type ICreateGeminiConfigModelsRequest = z.infer<typeof createCreateGeminiConfigModelsSchema>;
+export type ICreateGeminiConfigModelsRequest = z.infer<ReturnType<typeof createCreateGeminiConfigModelsSchema>>;
 //------------------------End------------------------//

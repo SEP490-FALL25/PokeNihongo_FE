@@ -4,7 +4,7 @@ import { Button } from "@ui/Button";
 import { Input } from "@ui/Input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select";
 import { Plus, Search, Sparkles } from "lucide-react";
-import CreateConfigModel from "@hooks/useAI/components/CreateConfigModel";
+import CreateConfigModel from "@pages/AdminPage/AICustom/components/CreateConfigModel";
 import { useState } from "react";
 
 export default function CustomAIManagement() {

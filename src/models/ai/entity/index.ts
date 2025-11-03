@@ -20,11 +20,11 @@ export type GeminiConfigPromptsEntity = z.infer<typeof GeminiConfigPromptsEntity
 
 
 
-//----------------------Gemini Config Models Entity----------------------//
+//----------------------Gemini Models Entity----------------------//
 /**
- * Gemini Config Models Entity Schema
+ * Gemini Models Entity Schema
  */
-export const GeminiConfigModelsEntitySchema = z.object({
+export const GeminiModelsEntitySchema = z.object({
     id: z.number(),
     provider: z.enum(["GEMINI"]),
     key: z.string(),
@@ -35,6 +35,6 @@ export const GeminiConfigModelsEntitySchema = z.object({
     updatedAt: z.string(),
 });
 
-export type GeminiConfigModelsEntity = z.infer<typeof GeminiConfigModelsEntitySchema>;
+export type GeminiModelsEntity = z.infer<typeof GeminiModelsEntitySchema>;
 //-----------------------End--------------------//
 //--------------------------------------End--------------------------------------//

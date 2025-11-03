@@ -21,7 +21,7 @@ export const useAIGeminiConfigPrompts = (params: IQueryRequest) => {
 
 
 /**
- * 
+ * Handle Create Gemini Config Models
  */
 export const useCreateAIGeminiConfigModels = () => {
     const queryClient = useQueryClient();
@@ -36,5 +36,20 @@ export const useCreateAIGeminiConfigModels = () => {
         },
     });
     return createGeminiConfigModelsMutation;
+}
+//-----------------------End-----------------------//
+
+
+
+/**
+ * Handle Get Gemini Models
+ * @returns 
+ */
+export const useGetAIGeminiModels = () => {
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['gemini-models'],
+        queryFn: () => geminiService.getGeminiModels(),
+    });
+    return { data: data?.data?.data, isLoading, error };
 }
 //-----------------------End-----------------------//

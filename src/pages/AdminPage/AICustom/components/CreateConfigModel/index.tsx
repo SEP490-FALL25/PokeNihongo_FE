@@ -1,15 +1,15 @@
-import z from 'zod'
 import { Input } from '@ui/Input'
 import { Textarea } from '@ui/Textarea'
 import { Button } from '@ui/Button'
 import { Switch } from '@ui/Switch'
 import { Card, CardContent } from '@ui/Card'
-import { useCreateAIGeminiConfigModels } from '@hooks/useAI'
-import { createCreateGeminiConfigModelsSchema } from '@models/ai/request'
+import { useCreateAIGeminiConfigModels, useGetAIGeminiModels } from '@hooks/useAI'
+import { createCreateGeminiConfigModelsSchema, ICreateGeminiConfigModelsRequest } from '@models/ai/request'
 import { useTranslation } from 'react-i18next'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/Dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/Select'
 
 interface Props {
     showCreateDialog: boolean
@@ -19,11 +19,12 @@ interface Props {
 
 export default function CreateConfigModel({ showCreateDialog, setShowCreateDialog, onSuccess }: Props) {
     const { t } = useTranslation()
-    const schema = createCreateGeminiConfigModelsSchema(t)
-    type FormType = z.infer<typeof schema>
 
-    const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormType>({
-        resolver: zodResolver(schema),
+    /**
+     * UseForm handle form submit
+     */
+    const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<ICreateGeminiConfigModelsRequest>({
+        resolver: zodResolver(createCreateGeminiConfigModelsSchema(t)),
         defaultValues: {
             name: '',
             geminiModelId: 1,
@@ -40,14 +41,19 @@ export default function CreateConfigModel({ showCreateDialog, setShowCreateDialo
 
     const createMutation = useCreateAIGeminiConfigModels()
 
-    const onSubmit = (data: FormType) => {
-        createMutation.mutate(data as any, {
+    const onSubmit = (data: ICreateGeminiConfigModelsRequest) => {
+        createMutation.mutate(data, {
             onSuccess: () => {
                 onSuccess?.()
                 reset()
             }
         })
     }
+    //------------------------End------------------------//
+
+    const { data: geminiModels, isLoading: isLoadingGeminiModels } = useGetAIGeminiModels()
+    console.log(geminiModels);
+
 
     return (
         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
@@ -65,10 +71,31 @@ export default function CreateConfigModel({ showCreateDialog, setShowCreateDialo
                             {errors.name && <p className={`text-xs mt-1 ${errors.name ? 'block text-error' : 'hidden'}`}>{errors.name.message as string}</p>}
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-foreground">Gemini Model ID</label>
-                            <Controller control={control} name="geminiModelId" render={({ field }) => (
-                                <Input type="number" {...field} onChange={(e) => field.onChange(Number(e.target.value))} placeholder="Gemini Model ID" variant={`${errors.geminiModelId ? 'destructive' : 'default'}`} />
-                            )} />
+                            <label className="text-sm font-medium text-foreground">Gemini Model</label>
+                            <Controller
+                                control={control}
+                                name="geminiModelId"
+                                render={({ field }) => (
+                                    <Select value={String(field.value)} onValueChange={(v) => field.onChange(Number(v))}>
+                                        <SelectTrigger className={`bg-background border-border text-foreground ${errors.geminiModelId ? 'border-error' : ''}`}>
+                                            <SelectValue placeholder={isLoadingGeminiModels ? 'Đang tải...' : 'Chọn model'} />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-card border-border">
+                                            {Array.isArray(geminiModels?.results) && geminiModels.results.length > 0 ? (
+                                                geminiModels.results.map((m: any) => (
+                                                    <SelectItem key={m.id} value={String(m.id)}>
+                                                        {m.key}
+                                                    </SelectItem>
+                                                ))
+                                            ) : (
+                                                <SelectItem value={String(field.value || '')} disabled>
+                                                    {isLoadingGeminiModels ? 'Đang tải...' : 'Không có model'}
+                                                </SelectItem>
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                )}
+                            />
                             {errors.geminiModelId && <p className={`text-xs mt-1 ${errors.geminiModelId ? 'block text-error' : 'hidden'}`}>{errors.geminiModelId.message as string}</p>}
                         </div>
                         <div>
@@ -138,5 +165,3 @@ export default function CreateConfigModel({ showCreateDialog, setShowCreateDialo
         </Dialog>
     )
 }
-
-
