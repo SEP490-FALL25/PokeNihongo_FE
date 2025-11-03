@@ -3,8 +3,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Input } from '@ui/Input'
 import { Button } from '@ui/Button'
 import { Card, CardContent } from '@ui/Card'
-import { Switch } from '@ui/Switch'
-import { Badge } from '@ui/Badge'
 import { Search, Loader2, CheckCircle2 } from 'lucide-react'
 import { useGetAIModelConfigPolicySchema } from '@hooks/useAI'
 import { useTranslation } from 'react-i18next'
@@ -60,15 +58,13 @@ const ModalEntityCustomAI = ({ open, onOpenChange, onConfirm, initialSelected = 
         })
     }
 
-    const toggleSelectAll = (checked: boolean) => {
-        if (checked) {
-            setSelectedSchemas(new Set(schemas))
-        } else {
+    const toggleSelectAll = () => {
+        if (selectedSchemas.size === schemas.length) {
             setSelectedSchemas(new Set())
+        } else {
+            setSelectedSchemas(new Set(schemas))
         }
     }
-
-    const isAllSelected = schemas.length > 0 && schemas.every((s: string) => selectedSchemas.has(s))
 
     const handleConfirm = () => {
         if (onConfirm) {
@@ -85,8 +81,9 @@ const ModalEntityCustomAI = ({ open, onOpenChange, onConfirm, initialSelected = 
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="bg-white max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-                <DialogHeader>
+            <DialogContent className="bg-white max-w-4xl h-[90vh] flex flex-col overflow-hidden border-border p-0">
+                {/* Fixed Header */}
+                <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-4 border-b bg-white">
                     <DialogTitle className="text-xl font-bold">
                         {t('aiCustom.modalEntity.title', { defaultValue: 'Select Schema Entities' })}
                     </DialogTitle>
@@ -95,32 +92,30 @@ const ModalEntityCustomAI = ({ open, onOpenChange, onConfirm, initialSelected = 
                     </p>
                 </DialogHeader>
 
-                <div className="flex-1 overflow-y-auto space-y-4">
-                    {/* Search Bar */}
+                {/* Fixed Search */}
+                <div className="flex-shrink-0 px-6 py-4 border-b bg-white space-y-3">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder={t('aiCustom.modalEntity.searchPlaceholder', { defaultValue: 'Search schema entities...' })}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-10"
+                            className="pl-10 bg-background border-input"
                         />
                     </div>
 
                     {/* Select All */}
                     {schemas.length > 0 && (
-                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 border border-border">
-                            <Switch
-                                id="select-all-schemas"
-                                checked={isAllSelected}
-                                onCheckedChange={toggleSelectAll}
-                            />
-                            <label htmlFor="select-all-schemas" className="text-sm font-medium cursor-pointer">
+                        <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-muted/50 border border-border">
+                            <button type="button" onClick={toggleSelectAll} className="cursor-pointer text-sm font-medium text-primary hover:underline w-fit">
                                 {t('aiCommon.selectAll', { defaultValue: 'Select All' })} ({selectedSchemas.size} / {schemas.length})
-                            </label>
+                            </button>
                         </div>
                     )}
+                </div>
 
+                {/* Scrollable Content */}
+                <div className="flex-1 overflow-y-auto px-6 py-4 min-h-0">
                     {/* Loading State */}
                     {isLoading && (
                         <div className="flex flex-col items-center justify-center py-12">
@@ -157,38 +152,24 @@ const ModalEntityCustomAI = ({ open, onOpenChange, onConfirm, initialSelected = 
 
                     {/* Schema List */}
                     {!isLoading && !error && schemas.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
                             {schemas.map((schema: string) => {
                                 const isSelected = selectedSchemas.has(schema)
                                 return (
                                     <Card
                                         key={schema}
-                                        className={`cursor-pointer transition-all duration-200 hover:shadow-md ${isSelected
+                                        className={`cursor-pointer transition-all duration-200 hover:shadow-sm ${isSelected
                                             ? 'border-primary bg-primary/5 shadow-sm'
-                                            : 'border-border hover:border-primary/50'
+                                            : 'border-border hover:border-primary/40'
                                             }`}
                                         onClick={() => toggleSelect(schema)}
                                     >
-                                        <CardContent className="p-4">
-                                            <div className="flex items-start gap-3">
-                                                <div className="pt-1">
-                                                    <Switch
-                                                        checked={isSelected}
-                                                        onCheckedChange={() => toggleSelect(schema)}
-                                                        onClick={(e) => e.stopPropagation()}
-                                                    />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <h3 className="font-semibold text-sm text-foreground">{schema}</h3>
-                                                        {isSelected && (
-                                                            <Badge className="bg-primary text-primary-foreground text-[10px] px-1.5 py-0">
-                                                                <CheckCircle2 className="h-2.5 w-2.5 mr-1" />
-                                                                {t('aiCommon.selected', { defaultValue: 'Selected' })}
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                </div>
+                                        <CardContent className="py-3">
+                                            <div className="flex items-center gap-1.5 justify-between">
+                                                <h3 className="font-medium text-[11px] text-foreground truncate flex-1 min-w-0">{schema}</h3>
+                                                {isSelected && (
+                                                    <CheckCircle2 className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                                                )}
                                             </div>
                                         </CardContent>
                                     </Card>
@@ -198,13 +179,21 @@ const ModalEntityCustomAI = ({ open, onOpenChange, onConfirm, initialSelected = 
                     )}
                 </div>
 
-                <DialogFooter className="border-t pt-4 mt-4">
-                    <Button variant="outline" onClick={handleCancel}>
-                        {t('common.cancel', { defaultValue: 'Hủy' })}
-                    </Button>
-                    <Button onClick={handleConfirm} disabled={selectedSchemas.size === 0}>
-                        {t('common.confirm', { defaultValue: 'Xác nhận' })} ({selectedSchemas.size})
-                    </Button>
+                {/* Fixed Footer */}
+                <DialogFooter className="flex-shrink-0 px-6 py-4 border-t bg-white">
+                    <div className="flex justify-between items-center w-full gap-4">
+                        <div className="text-sm text-muted-foreground">
+                            {selectedSchemas.size} {t('aiCustom.modalEntity.selected', { defaultValue: 'selected' })}
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                            <Button variant="outline" onClick={handleCancel}>
+                                {t('common.cancel', { defaultValue: 'Hủy' })}
+                            </Button>
+                            <Button onClick={handleConfirm} disabled={selectedSchemas.size === 0} className="bg-primary text-primary-foreground hover:bg-primary/90">
+                                {t('common.confirm', { defaultValue: 'Xác nhận' })} ({selectedSchemas.size})
+                            </Button>
+                        </div>
+                    </div>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
