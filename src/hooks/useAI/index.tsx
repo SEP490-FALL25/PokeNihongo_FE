@@ -140,4 +140,41 @@ export const useGetAIModelConfigPolicySchema = (q?: string) => {
     return { data: data?.data?.data, isLoading, error };
 }
 //-----------------------End-----------------------//
+
+
+/**
+ * Handle Get Model Configs Policy Schema Fields
+ * @param entities 
+ * @returns 
+ */
+export const useGetAIModelConfigPolicySchemaFields = (entities: string[]) => {
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['gemini-model-configs-policy-schema-fields', entities],
+        queryFn: () => geminiService.getModelConfigsPolicySchemaFields(entities),
+        enabled: entities.length > 0,
+    });
+    return { data: data?.data?.data, isLoading, error };
+}
+//-----------------------End-----------------------//
+
+
+/**
+ * Handle Update Model Configs Policy Schema
+ */
+export const useUpdateModelConfigsPolicySchema = () => {
+    const queryClient = useQueryClient();
+    const mutation = useMutation({
+        mutationFn: ({ modelId, data }: { modelId: number; data: IUpdateModelConfigsPolicySchemaRequest }) => 
+            geminiService.updateModelConfigsPolicySchema(modelId, data),
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['gemini-config-model-by-id', variables.modelId] });
+            toast.success('Cập nhật policy schema thành công');
+        },
+        onError: (error: any) => {
+            toast.error(error?.response?.data?.message || 'Có lỗi xảy ra khi cập nhật policy schema');
+        },
+    });
+    return mutation;
+}
+//-----------------------End-----------------------//
 //---------------------------------------------End Model Configs Policy Schema---------------------------------------------//

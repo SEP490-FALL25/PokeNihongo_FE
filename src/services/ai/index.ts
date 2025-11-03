@@ -87,6 +87,14 @@ const geminiService = {
         });
     },
 
+    getModelConfigsPolicySchemaFields: async (entities: string[]) => {
+        return await axiosPrivate.get('/gemini-config/admin/schema/fields', {
+            params: {
+                entities,
+            },
+        });
+    },
+
     updateModelConfigsPolicySchema: async (modelId: number, data: IUpdateModelConfigsPolicySchemaRequest) => {
         return await axiosPrivate.put(`/gemini-config/admin/schema/${modelId}`, data);
     },

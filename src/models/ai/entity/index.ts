@@ -118,5 +118,12 @@ export type IGeminiConfigModelsEntity = z.infer<typeof GeminiConfigModelsEntityS
 export const ModelConfigsPolicySchemaEntitySchema = z.array(z.string());
 
 export type IModelConfigsPolicySchemaEntity = z.infer<typeof ModelConfigsPolicySchemaEntitySchema>;
+
+
+/**
+ * Model Configs Policy Schema Fields Entity Schema
+ */
+export const ModelConfigsPolicySchemaFieldsEntitySchema = z.record(z.string(), z.array(z.string()));
+export type IModelConfigsPolicySchemaFieldsEntity = z.infer<typeof ModelConfigsPolicySchemaFieldsEntitySchema>;
 //-----------------------End--------------------//
-//--------------------------------------End Model Configs Policy Schema--------------------------------------//
+//--------------------------------------End Model Configs Policy Schema Fields--------------------------------------//
