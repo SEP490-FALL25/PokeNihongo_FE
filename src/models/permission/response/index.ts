@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { PaginationMetaSchema, PaginationResponseSchema } from "@models/common/response";
+import { PaginationResponseSchema } from "@models/common/response";
 import { PermissionEntitySchema, RoleEntitySchema } from "../entity";
 
 
@@ -22,10 +22,7 @@ export const PermissionResponseSchema = z.object({
     statusCode: z.number().default(200),
     message: z.string(),
     data: z.object({
-        permissions: z.object({
-            results: z.array(PermissionEntitySchema),
-            pagination: PaginationMetaSchema,
-        }),
+        permissions: z.array(PermissionEntitySchema),
     }),
 });
 

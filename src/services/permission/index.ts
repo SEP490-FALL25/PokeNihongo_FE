@@ -18,8 +18,7 @@ const permissionService = {
         });
 
         const queryParams = new URLSearchParams();
-        if (page !== undefined) queryParams.set('currentPage', String(page));
-        if (limit !== undefined) queryParams.set('pageSize', String(limit));
+        // Remove pagination: do not send currentPage or pageSize
         if (qsParts.length) queryParams.set('qs', qsParts.join(','));
 
         return axiosPrivate.get('/roles', { params: queryParams });

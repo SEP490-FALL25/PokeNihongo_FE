@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { usePermissionList, useRoleList, useUpdatePermissionByRoleId } from "@hooks/usePermission";
 import { IQueryRequest } from "@models/common/request";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@ui/Card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@ui/Card";
 import { Input } from "@ui/Input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select";
 import PaginationControls from "@ui/PaginationControls";
@@ -15,71 +15,96 @@ import { IPermissionEntity as IPermission } from "@models/permission/entity";
 import HeaderAdmin from "@organisms/Header/Admin";
 
 const PermissionManagement = () => {
-    const [roleId, setRoleId] = useState<number>(1);
-    const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-    const [expandedModules, setExpandedModules] = useState<string[]>([]);
-
     /**
      * Role List
      */
+    const [roleId, setRoleId] = useState<number>(1);
     const [roleParams] = useState<IQueryRequest>({ page: 1, limit: 100, sortBy: 'name' });
     const { data: roleData, isLoading: roleLoading } = useRoleList(roleParams);
     const safeRoleId = useMemo(() => (roleId ?? (roleData?.results?.[0]?.id ?? null)), [roleId, roleData]);
-    //----------------------End----------------------//
+    //-----------------------End--------------------//
 
 
     /**
-     * Handle Permission List
-     * Query Params
+     * Permission List - Query Params (FE filter)
      */
-    const [permParams, setPermParams] = useState<IQueryRequest>({ page: 1, limit: 100, sortBy: 'module' });
+    const [permParams, setPermParams] = useState<IQueryRequest>({ page: 1, limit: 20, sortBy: 'module' });
     const [moduleSearch, setModuleSearch] = useState<string>("");
     const [pathSearch, setPathSearch] = useState<string>("");
     const debouncedModule = useDebounce(moduleSearch, 400);
     const debouncedPath = useDebounce(pathSearch, 400);
 
-    const permQueryParams = useMemo(() => {
-        const params: IQueryRequest = { ...permParams, sortBy: 'module' };
-        if (debouncedModule) {
-            params.moduleLike = debouncedModule;
-        }
-        if (debouncedPath) {
-            const normalizedPath = debouncedPath.replace(/^\/+/, ''); // allow inputs like "/wallet"
-            params.pathLike = normalizedPath;
-        }
-        return params;
-    }, [permParams, debouncedModule, debouncedPath]);
+
+    const permQueryParams = useMemo(() => ({ sortBy: 'module' } as IQueryRequest), []);
 
     const { data: permData, isLoading: permLoading } = usePermissionList(safeRoleId || 0, permQueryParams);
-    //----------------------End----------------------//
+
+    const permissionsList = useMemo(() => {
+        if (Array.isArray(permData)) return permData as IPermission[];
+        if (permData && Array.isArray((permData as any).permissions)) return (permData as any).permissions as IPermission[];
+        if (permData && Array.isArray((permData as any).results)) return (permData as any).results as IPermission[];
+        return [] as IPermission[];
+    }, [permData]);
+
+    // FE filtering
+    const filteredPermissions = useMemo(() => {
+        const moduleKey = (debouncedModule || '').toLowerCase().trim();
+        const pathKey = (debouncedPath || '').replace(/^\/+/, '').toLowerCase().trim();
+        return permissionsList.filter((p: IPermission) => {
+            const modOk = moduleKey ? (p.module || '').toLowerCase().includes(moduleKey) : true;
+            const pathOk = pathKey ? (p.path || '').toLowerCase().includes(pathKey) : true;
+            return modOk && pathOk;
+        });
+    }, [permissionsList, debouncedModule, debouncedPath]);
+    //-----------------------End--------------------//
 
 
+
+    /**
+     * Selection UI State
+     */
+    const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+    const [expandedModules, setExpandedModules] = useState<string[]>([]);
+    //-----------------------End--------------------//
 
     useEffect(() => {
-        if (permData?.results) {
+        if (permissionsList.length) {
             const hasPermissionIds = new Set<number>(
-                permData.results.filter((p: IPermission) => p.hasPermission).map((p: IPermission) => p.id)
+                permissionsList.filter((p: IPermission) => p.hasPermission).map((p: IPermission) => p.id)
             );
             setSelectedIds(hasPermissionIds);
         }
-    }, [permData]);
+    }, [permissionsList]);
 
 
     const groupedByModule = useMemo(() => {
         const groups: Record<string, IPermission[]> = {};
-        permData?.results?.forEach((p: IPermission) => {
+        filteredPermissions.forEach((p: IPermission) => {
             const key = p.module || 'Unknown';
             if (!groups[key]) groups[key] = [];
             groups[key].push(p);
         });
         return groups;
-    }, [permData]);
+    }, [filteredPermissions]);
 
     const moduleKeys = useMemo(() => Object.keys(groupedByModule), [groupedByModule]);
 
+    // FE pagination by modules
+    const paginatedModuleKeys = useMemo(() => {
+        const page = permParams.page ?? 1;
+        const limit = permParams.limit ?? 20;
+        const start = (page - 1) * limit;
+        const end = start + limit;
+        return moduleKeys.slice(start, end);
+    }, [moduleKeys, permParams.page, permParams.limit]);
+
     const allIdsOnPage = useMemo(() => {
-        return (permData?.results?.map((p: IPermission) => p.id) ?? []);
-    }, [permData]);
+        const ids: number[] = [];
+        paginatedModuleKeys.forEach((mk) => {
+            (groupedByModule[mk] || []).forEach((p) => ids.push(p.id));
+        });
+        return ids;
+    }, [paginatedModuleKeys, groupedByModule]);
 
     const isAllSelectedOnPage = allIdsOnPage.length > 0 && allIdsOnPage.every((id: number) => selectedIds.has(id));
 
@@ -131,13 +156,12 @@ const PermissionManagement = () => {
 
     /**
      * Handle Select Role Change
-     * @param
      */
     const handleSelectRole = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const id = Number(e.target.value);
         setRoleId(Number.isNaN(id) ? 1 : id);
     };
-    //----------------------End----------------------//
+    //-----------------------End--------------------//
 
 
     /**
@@ -147,7 +171,7 @@ const PermissionManagement = () => {
     const handleSave = () => {
         updatePermissions({ name: roleData?.results?.find((r: any) => r.id === safeRoleId)?.name || '', description: roleData?.results?.find((r: any) => r.id === safeRoleId)?.description || '', isActive: true, permissionIds: Array.from(selectedIds) });
     };
-    //----------------------End----------------------//
+    //-----------------------End--------------------//
 
     return (
         <>
@@ -287,8 +311,8 @@ const PermissionManagement = () => {
                                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-gray-200 hover:border-blue-300 transition-all duration-200 shadow-sm">
                                     <Switch
                                         id="expand-all"
-                                        checked={expandedModules.length === moduleKeys.length && moduleKeys.length > 0}
-                                        onCheckedChange={(val) => setExpandedModules(val ? moduleKeys : [])}
+                                        checked={expandedModules.length === paginatedModuleKeys.length && paginatedModuleKeys.length > 0}
+                                        onCheckedChange={(val) => setExpandedModules(val ? paginatedModuleKeys : [])}
                                     />
                                     <label htmlFor="expand-all" className="text-xs font-bold cursor-pointer hover:text-blue-600 transition-colors select-none text-gray-700">
                                         Expand All
@@ -316,7 +340,7 @@ const PermissionManagement = () => {
                                 </div>
                             ) : (
                                 <Accordion type="multiple" value={expandedModules} onValueChange={setExpandedModules} className="w-full space-y-3">
-                                    {moduleKeys.map((moduleName) => {
+                                    {paginatedModuleKeys.map((moduleName) => {
                                         const items = groupedByModule[moduleName];
                                         const isAllSelectedInModule = items.every((p: IPermission) => selectedIds.has(p.id));
 
@@ -351,7 +375,7 @@ const PermissionManagement = () => {
                                                     </div>
                                                 </AccordionTrigger>
                                                 <AccordionContent className="px-4 py-3 border-t border-gray-200 bg-gray-50">
-                                                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+                                                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 mt-3">
                                                         {items.map((p: IPermission) => (
                                                             <div
                                                                 key={p.id}
@@ -401,19 +425,17 @@ const PermissionManagement = () => {
                                 </Accordion>
                             )}
                         </CardContent>
-                        {(permData?.pagination?.totalPage ?? 0) > 1 && (
-                            <CardFooter className="border-t border-gray-200 bg-white py-3 pt-3">
-                                <PaginationControls
-                                    currentPage={permParams.page ?? 1}
-                                    totalPages={permData?.pagination?.totalPage || 1}
-                                    totalItems={permData?.pagination?.totalItem || 0}
-                                    itemsPerPage={permParams.limit ?? 10}
-                                    onPageChange={(pageNum) => setPermParams(prev => ({ ...prev, page: pageNum }))}
-                                    onItemsPerPageChange={(size) => setPermParams(prev => ({ ...prev, limit: size, page: 1 }))}
-                                    isLoading={permLoading}
-                                />
-                            </CardFooter>
-                        )}
+                        <CardFooter className="border-t border-gray-200 bg-white py-3 pt-3">
+                            <PaginationControls
+                                currentPage={permParams.page ?? 1}
+                                totalPages={Math.max(1, Math.ceil(moduleKeys.length / (permParams.limit ?? 20)))}
+                                totalItems={moduleKeys.length}
+                                itemsPerPage={permParams.limit ?? 20}
+                                onPageChange={(pageNum) => setPermParams((prev) => ({ ...prev, page: pageNum }))}
+                                onItemsPerPageChange={(size) => setPermParams((prev) => ({ ...prev, limit: size, page: 1 }))}
+                                isLoading={permLoading}
+                            />
+                        </CardFooter>
                     </Card>
                 </div>
             </div>

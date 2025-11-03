@@ -34,7 +34,7 @@ export const usePermissionList = (roleId: number, params: IQueryRequest) => {
         queryKey: ['permission-list', roleId, params, currentLanguage],
         queryFn: () => permissionService.getPermissionByRoleId(roleId, params),
     });
-    return { data: data?.data?.data.permissions, isLoading, error };
+    return { data: data?.data?.data, isLoading, error };
 };
 //----------------------End----------------------//
 
