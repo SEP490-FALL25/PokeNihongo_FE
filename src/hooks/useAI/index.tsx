@@ -117,10 +117,10 @@ export const useGetAIGeminiConfigPresets = () => {
  * Handle Get Model Configs Policy Schema
  * @returns 
  */
-export const useGetAIGeminiModelConfigsPolicySchema = () => {
+export const useGetAIModelConfigPolicySchema = (q?: string) => {
     const { data, isLoading, error } = useQuery({
-        queryKey: ['gemini-model-configs-policy-schema'],
-        queryFn: () => geminiService.getModelConfigsPolicySchema(),
+        queryKey: ['gemini-model-configs-policy-schema', q],
+        queryFn: () => geminiService.getModelConfigsPolicySchema(q),
     });
     return { data: data?.data?.data, isLoading, error };
 }

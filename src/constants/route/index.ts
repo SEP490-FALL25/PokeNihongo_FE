@@ -23,6 +23,7 @@ const ADMIN = {
     TOURNAMENT_MANAGEMENT: '/admin/tournament-management',
     AI_PROMPTS_MANAGEMENT: '/admin/ai-prompts-management',
     CUSTOM_AI_MANAGEMENT: '/admin/custom-ai-management',
+    CUSTOM_AI_MANAGEMENT_DETAIL: '/admin/custom-ai-management/:modelId',
     DAILY_QUEST_MANAGEMENT: '/admin/daily-quest-management',
     REWARD_MANAGEMENT: '/admin/reward-management',
     PERMISSION_MANAGEMENT: '/admin/permission-management',

@@ -11,9 +11,12 @@ import { useGetAIConfigModels, useGetAIGeminiModels, useGetAIGeminiConfigPresets
 import { IGeminiConfigModelsEntity } from "@models/ai/entity"
 import CreateConfigModel from "@pages/AdminPage/AICustom/components/CreateConfigModel"
 import { useTranslation } from "react-i18next"
+import { useNavigate } from "react-router-dom"
+import { ROUTES } from "@constants/route"
 
 export default function CustomAIManagement() {
     const { t } = useTranslation()
+    const navigate = useNavigate()
     const [searchQuery, setSearchQuery] = useState("")
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
     const [showCreateDialog, setShowCreateDialog] = useState(false)
@@ -330,7 +333,8 @@ export default function CustomAIManagement() {
                             <Card
                                 key={config.id}
                                 ref={index === configs.length - 1 ? lastConfigElementRef : null}
-                                className="bg-slate-50 border-border shadow-md hover:border-primary/50 hover:shadow-lg transition-all duration-200 group"
+                                className="cursor-pointer bg-slate-50 border-border shadow-md hover:border-primary/50 hover:shadow-lg transition-all duration-200 group"
+                                onClick={() => navigate(`${ROUTES.ADMIN.CUSTOM_AI_MANAGEMENT}/${config.id}`)}
                             >
                                 <CardContent className="p-6">
                                     <div className="flex items-start justify-between gap-4">
@@ -489,6 +493,7 @@ export default function CustomAIManagement() {
                     </div>
                 </div>
             )}
+
         </>
     )
 }
