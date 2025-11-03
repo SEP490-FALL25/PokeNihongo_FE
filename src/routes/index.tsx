@@ -13,6 +13,7 @@ import ShopBannerDetail from "@pages/AdminPage/ConfigShop/components/ShopBannerD
 import ConfigGacha from "@pages/AdminPage/ConfigGacha"
 import GachaBannerDetail from "@pages/AdminPage/ConfigGacha/components/GachaBannerDetail"
 import PersistToken from "@layouts/PersistToken"
+import NotFoundPage from "@pages/NotFoundPage"
 
 const AdminDashboard = lazy(() => import("@pages/AdminPage/Dashboard"))
 const PermissionManagement = lazy(() => import("@pages/AdminPage/Permission"))
@@ -78,6 +79,13 @@ const RouterComponent = () => {
                     ],
                 },
             ],
+        },
+        //#endregion
+
+        //#region 404 route
+        {
+            path: '*',
+            element: <NotFoundPage />,
         },
         //#endregion
     ])

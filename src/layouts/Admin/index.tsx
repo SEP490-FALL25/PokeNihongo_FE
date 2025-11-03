@@ -1,4 +1,4 @@
-import { Outlet, useLocation, NavLink } from "react-router-dom";
+  import { Outlet, useLocation, NavLink, useNavigate } from "react-router-dom";
 import { LayoutDashboard, Users, BarChart3, Settings, LogOut, Menu, Trophy, Package, Brain, Calendar, Gift, LucideIcon, Store, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@ui/Button";
@@ -10,6 +10,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@
 import { ChevronDown } from "lucide-react";
 import React from 'react';
 import SparklesFillIcon from "@atoms/SparklesFill";
+import { CookiesService } from "@utils/cookies";
+import { COOKIES } from "@constants/common";
 
 
 interface NavigationItem {
@@ -21,6 +23,7 @@ interface NavigationItem {
 
 const AdminLayout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { t } = useTranslation();
 
@@ -82,6 +85,15 @@ const AdminLayout = () => {
       icon: ShieldCheck,
     }
   ];
+
+  /**
+   * Handle logout
+   */
+  const handleLogout = () => {
+    CookiesService.remove(COOKIES.ACCESS_TOKEN);
+    navigate(ROUTES.AUTH.LOGIN, { replace: true });
+  }
+  //-----------------------End--------------------//
 
   return (
     <div className="flex h-screen">
@@ -209,7 +221,7 @@ const AdminLayout = () => {
             <Settings className="h-5 w-5 flex-shrink-0" />
             {isSidebarOpen && <span>{t("navigation.settings")}</span>}
           </NavLink>
-          <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
+          <button onClick={handleLogout} className="cursor-pointer flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
             <LogOut className="h-5 w-5 flex-shrink-0" />
             {isSidebarOpen && <span>{t("common.logout")}</span>}
           </button>

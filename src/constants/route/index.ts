@@ -10,6 +10,7 @@ const AUTH = {
 
 const PUBLIC = {
     HOME: '/',
+    NOT_FOUND: '/404',
 }
 
 const ADMIN = {

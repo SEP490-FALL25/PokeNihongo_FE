@@ -1,4 +1,4 @@
-import { Outlet, useLocation, NavLink } from "react-router-dom";
+import { Outlet, useLocation, NavLink, useNavigate } from "react-router-dom";
 import { BookOpen, Languages, LogOut, Menu, FileText, Layers, Book, Settings } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@ui/Button";
@@ -6,6 +6,8 @@ import { cn } from "@utils/CN";
 import { ROUTES } from "@constants/route";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../../components/Atoms/LanguageSwitcher";
+import { CookiesService } from "@utils/cookies";
+import { COOKIES } from "@constants/common";
 
 interface NavigationItem {
     name: string;
@@ -15,6 +17,7 @@ interface NavigationItem {
 
 const ManagerLayout = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const { t } = useTranslation();
 
@@ -45,6 +48,15 @@ const ManagerLayout = () => {
             icon: Languages,
         },
     ];
+
+    /**
+     * Handle logout
+     */
+    const handleLogout = () => {
+        CookiesService.remove(COOKIES.ACCESS_TOKEN);
+        navigate(ROUTES.AUTH.LOGIN, { replace: true });
+    }
+    //-----------------------End--------------------//
 
     return (
         <div className="flex h-screen">
@@ -116,7 +128,7 @@ const ManagerLayout = () => {
                         <Settings className="h-5 w-5 flex-shrink-0" />
                         {isSidebarOpen && <span>{t("navigation.settings")}</span>}
                     </NavLink>
-                    <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
+                    <button onClick={handleLogout} className="cursor-pointer flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
                         <LogOut className="h-5 w-5 flex-shrink-0" />
                         {isSidebarOpen && <span>{t("common.logout")}</span>}
                     </button>
