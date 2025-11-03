@@ -11,7 +11,11 @@ const Switch = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SwitchPrimitives.Root
     className={cn(
-      "peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-gray-200 transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:border-primary data-[state=unchecked]:bg-gray-100 data-[state=unchecked]:border-gray-200 hover:data-[state=checked]:bg-primary-dark hover:data-[state=unchecked]:bg-gray-100/80",
+      "peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50",
+      // unchecked styles
+      "data-[state=unchecked]:bg-gray-200 data-[state=unchecked]:border-gray-200 hover:data-[state=unchecked]:bg-gray-200/80",
+      // checked styles
+      "data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500 hover:data-[state=checked]:bg-emerald-600",
       className
     )}
     {...props}
@@ -19,7 +23,10 @@ const Switch = React.forwardRef<
   >
     <SwitchPrimitives.Thumb
       className={cn(
-        "pointer-events-none block h-5 w-5 rounded-full bg-background shadow-md ring-0 transition-all duration-200 ease-in-out data-[state=checked]:translate-x-5 data-[state=checked]:bg-white data-[state=unchecked]:translate-x-0 data-[state=unchecked]:bg-primary-dark"
+        "pointer-events-none block h-5 w-5 rounded-full shadow-md ring-0 transition-all duration-200 ease-in-out",
+        // motion and colors
+        "data-[state=unchecked]:translate-x-0 data-[state=unchecked]:bg-white",
+        "data-[state=checked]:translate-x-5 data-[state=checked]:bg-white"
       )}
     />
   </SwitchPrimitives.Root>

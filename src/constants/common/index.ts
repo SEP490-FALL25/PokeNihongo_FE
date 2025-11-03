@@ -3,7 +3,9 @@ const COOKIES = {
 };
 
 const ROLE = {
-    ADMIN: 'admin',
+    ADMIN: 'ADMIN',
+    MANAGER: 'MANAGER',
+    LEANER: 'LEANER',
 };
 
 export { COOKIES, ROLE };

@@ -1,5 +1,5 @@
 import { Outlet, useLocation, NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, BookOpen, Languages, BarChart3, Settings, LogOut, Menu, Trophy, Package, Brain, Calendar, Gift, LucideIcon, FileText, Layers, Store, Book } from "lucide-react";
+import { LayoutDashboard, Users, BookOpen, Languages, BarChart3, Settings, LogOut, Menu, Trophy, Package, Brain, Calendar, Gift, LucideIcon, FileText, Layers, Store, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@ui/Button";
 import { cn } from "@utils/CN";
@@ -101,6 +101,11 @@ const AdminLayout = () => {
       href: ROUTES.ADMIN.CONFIG_GACHA,
       icon: SparklesFillIcon,
     },
+    {
+      name: t("navigation.permissionManagement"),
+      href: ROUTES.ADMIN.PERMISSION_MANAGEMENT,
+      icon: ShieldCheck,
+    }
   ];
 
   return (
