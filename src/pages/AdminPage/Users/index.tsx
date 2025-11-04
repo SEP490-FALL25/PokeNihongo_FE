@@ -4,7 +4,6 @@ import { Button } from "@ui/Button"
 import { Input } from "@ui/Input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@ui/Table"
 import { Badge } from "@ui/Badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@ui/Dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select"
 import { Search, Plus, Edit, Trash2, MoreVertical } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@ui/DropdownMenu"
@@ -13,11 +12,12 @@ import { useUserList } from "@hooks/useUser"
 import { IUser } from "@models/user/entity"
 import PaginationControls from "@ui/PaginationControls"
 import SortableTableHeader from "@ui/SortableTableHeader"
+import AddUserModal from "./components/AddUserModal"
 
 const UsersManagement = () => {
     const [searchQuery, setSearchQuery] = useState("")
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
-    const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+    const [isAddDialogOpen, setIsAddDialogOpen] = useState<boolean>(false)
     const [currentPage, setCurrentPage] = useState(1)
     const [pageSize, setPageSize] = useState(15)
     const [statusFilter, setStatusFilter] = useState<string>("all")
@@ -175,64 +175,13 @@ const UsersManagement = () => {
                     <CardHeader>
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-foreground">Danh sách người dùng</CardTitle>
-                            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                                <DialogTrigger asChild>
-                                    <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-                                        <Plus className="h-4 w-4 mr-2" />
-                                        Thêm người dùng
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="bg-card border-border">
-                                    <DialogHeader>
-                                        <DialogTitle className="text-foreground">Thêm người dùng mới</DialogTitle>
-                                    </DialogHeader>
-                                    <div className="space-y-4 py-4">
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-foreground">Họ và tên</label>
-                                            <Input placeholder="Nhập họ và tên" className="bg-background border-border text-foreground" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-foreground">Email</label>
-                                            <Input
-                                                type="email"
-                                                placeholder="Nhập email"
-                                                className="bg-background border-border text-foreground"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-foreground">Vai trò</label>
-                                            <Select>
-                                                <SelectTrigger className="bg-background border-border text-foreground">
-                                                    <SelectValue placeholder="Chọn vai trò" />
-                                                </SelectTrigger>
-                                                <SelectContent className="bg-card border-border">
-                                                    <SelectItem value="student">Học viên</SelectItem>
-                                                    <SelectItem value="instructor">Giảng viên</SelectItem>
-                                                    <SelectItem value="admin">Quản trị viên</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-foreground">Mật khẩu</label>
-                                            <Input
-                                                type="password"
-                                                placeholder="Nhập mật khẩu"
-                                                className="bg-background border-border text-foreground"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-end gap-3">
-                                        <Button
-                                            variant="outline"
-                                            onClick={() => setIsAddDialogOpen(false)}
-                                            className="border-border text-foreground"
-                                        >
-                                            Hủy
-                                        </Button>
-                                        <Button className="bg-primary text-primary-foreground hover:bg-primary/90">Thêm</Button>
-                                    </div>
-                                </DialogContent>
-                            </Dialog>
+                            <Button
+                                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                                onClick={() => setIsAddDialogOpen(true)}
+                            >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Thêm người dùng
+                            </Button>
                         </div>
                         <div className="mt-4 space-y-4">
                             <div className="flex gap-4">
@@ -399,6 +348,12 @@ const UsersManagement = () => {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Add User Modal */}
+            <AddUserModal
+                isAddDialogOpen={isAddDialogOpen}
+                setIsAddDialogOpen={setIsAddDialogOpen}
+            />
         </>
     )
 }

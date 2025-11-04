@@ -10,3 +10,15 @@ export const LoginFormDataRequest = z.object({
 });
 export type ILoginFormDataRequest = z.infer<typeof LoginFormDataRequest>;
 //-----------------End-Login-Request-----------------//
+
+
+/**
+ * Create User Request
+ */
+export const CreateUserRequest = z.object({
+    email: z.string().email(),
+    name: z.string(),
+    roleId: z.number(),
+});
+export type ICreateUserRequest = z.infer<typeof CreateUserRequest>;
+//----------------------End----------------------//
