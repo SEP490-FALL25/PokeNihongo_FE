@@ -1,5 +1,6 @@
 import { axiosPrivate } from "@configs/axios";
 import { IQueryRequest } from "@models/common/request";
+import { ICreateUserRequest } from "@models/user/request";
 
 const userService = {
     getUserList: async (params: IQueryRequest) => {
@@ -7,7 +8,7 @@ const userService = {
         const qsParts: string[] = [];
 
         if (sortBy && sortOrder) {
-            const sortPrefix = sortOrder === 'desc' ? '-' : '';
+            const sortPrefix = sortOrder === 'asc' ? '-' : '';
             qsParts.push(`sort:${sortPrefix}${sortBy}`);
         } else if (sortBy) {
             qsParts.push(`sort:${sortBy}`);
@@ -33,6 +34,10 @@ const userService = {
                 pageSize: limit,
             },
         });
+    },
+
+    createUser: async (data: ICreateUserRequest) => {
+        return await axiosPrivate.post("/user", data);
     },
 }
 
