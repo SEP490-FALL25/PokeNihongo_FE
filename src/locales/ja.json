@@ -134,6 +134,12 @@
             "selected": "選択済み"
         },
         "selectEntities": "エンティティを選択",
+        "deleteDialog": {
+            "title": "削除の確認",
+            "message": "この設定を削除してもよろしいですか？この操作は元に戻せません。",
+            "deleteButton": "削除",
+            "deleting": "削除中..."
+        },
         "schemaEntities": {
             "title": "スキーマエンティティ & フィールド",
             "description": "スキーマエンティティを検索して選択して設定",

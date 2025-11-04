@@ -4,8 +4,7 @@ import { Badge } from "@ui/Badge"
 import { Button } from "@ui/Button"
 import { Input } from "@ui/Input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select"
-import { Plus, Search, Edit, Trash2, MoreVertical, Loader2, Brain, Sparkles, Eye, Calendar, Hash, Settings, Code, CheckCircle2, XCircle } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@ui/DropdownMenu"
+import { Plus, Search, Trash2, Loader2, Brain, Sparkles, Calendar, Hash, Settings, Code, CheckCircle2, XCircle } from "lucide-react"
 import HeaderAdmin from "@organisms/Header/Admin"
 import { useGetAIConfigModels, useGetAIGeminiModels, useGetAIGeminiConfigPresets } from "@hooks/useAI"
 import { IGeminiConfigModelsEntity } from "@models/ai/entity"
@@ -13,6 +12,7 @@ import CreateConfigModel from "@pages/AdminPage/AICustom/components/CreateConfig
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { ROUTES } from "@constants/route"
+import DeleteCustomDialog from "./components/DeleteConfirmAICustom"
 
 export default function CustomAIManagement() {
     const { t } = useTranslation()
@@ -156,6 +156,13 @@ export default function CustomAIManagement() {
             setSortOrder("desc")
         }
     }
+
+
+    /**
+     * Handle Delete Config
+     */
+    const [configIdToDelete, setConfigIdToDelete] = useState<number | null>(null)
+    //------------------------End------------------------//
 
     return (
         <>
@@ -337,7 +344,7 @@ export default function CustomAIManagement() {
                                 onClick={() => navigate(`${ROUTES.ADMIN.CUSTOM_AI_MANAGEMENT}/${config.id}`)}
                             >
                                 <CardContent className="p-6">
-                                    <div className="flex items-start justify-between gap-4">
+                                    <div className="relative flex items-start justify-between gap-4">
                                         {/* Left Content */}
                                         <div className="flex-1 min-w-0 space-y-4">
                                             {/* Header */}
@@ -410,40 +417,14 @@ export default function CustomAIManagement() {
                                         </div>
 
                                         {/* Right Actions */}
-                                        <div className="flex flex-col gap-2">
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-9 w-9 hover:bg-primary/10 hover:text-primary"
-                                                onClick={() => setSelectedConfig(config)}
-                                                title={t('aiCommon.viewDetail', { defaultValue: 'Xem chi tiết' }) as string}
-                                            >
-                                                <Eye className="h-4 w-4" />
-                                            </Button>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-9 w-9"
-                                                    >
-                                                        <MoreVertical className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="bg-card border-border w-48">
-                                                    <DropdownMenuItem
-                                                        className="text-foreground hover:bg-muted cursor-pointer"
-                                                        onClick={() => setSelectedConfig(config)}
-                                                    >
-                                                        <Edit className="h-4 w-4 mr-2" />
-                                                        {t('aiCommon.edit', { defaultValue: 'Chỉnh sửa' })}
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem className="text-destructive hover:bg-destructive/10 cursor-pointer">
-                                                        <Trash2 className="h-4 w-4 mr-2" />
-                                                        {t('aiCommon.delete', { defaultValue: 'Xóa' })}
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                        <div className="absolute top-0 right-0 flex gap-2">
+                                            <Trash2
+                                                className="h-8 w-8 mr-2 text-red-500 hover:text-red-600 hover:bg-red-100 rounded-full p-2 cursor-pointer transition-colors"
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    setConfigIdToDelete(config.id)
+                                                }}
+                                            />
                                         </div>
                                     </div>
                                 </CardContent>
@@ -494,6 +475,13 @@ export default function CustomAIManagement() {
                 </div>
             )}
 
+            {/* Delete Config Dialog */}
+            {configIdToDelete && (
+                <DeleteCustomDialog
+                    configId={configIdToDelete}
+                    setConfigIdToDelete={setConfigIdToDelete}
+                />
+            )}
         </>
     )
 }
