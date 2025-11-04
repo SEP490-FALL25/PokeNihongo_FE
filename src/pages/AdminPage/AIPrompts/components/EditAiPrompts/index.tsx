@@ -2,7 +2,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/Dialog'
 import { Brain, Calendar, Hash, Sparkles, Trash2, Loader2 } from 'lucide-react'
 import { Badge } from '@ui/Badge'
 import { Card, CardContent } from '@ui/Card'
-import { Input } from '@ui/Input'
 import { Textarea } from '@ui/Textarea'
 import { Switch } from '@ui/Switch'
 import { Button } from '@ui/Button'
@@ -11,9 +10,14 @@ import { GeminiConfigPromptsEntity } from '@models/ai/entity'
 import { formatDate } from '@utils/date'
 import { getStatusBadgeColor } from '@atoms/BadgeStatusColor'
 import { getStatusLabel } from '@atoms/StatusLabel'
-import { useGetConfigCustomPromptsById, useUpdateConfigCustomPrompts } from '@hooks/useAI'
-import { useState, useEffect } from 'react'
+import { useGetConfigCustomPromptsById, useUpdateConfigCustomPrompts, useGetAIGeminiModels, useGetAIConfigModels } from '@hooks/useAI'
+import { useEffect, useMemo } from 'react'
 import { Skeleton } from '@ui/Skeleton'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/Select'
+import { toast } from 'react-toastify'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { updateGeminiConfigPromptsSchema, IUpdateGeminiConfigPromptsRequest } from '@models/ai/request'
 
 interface EditAiPromptsProps {
     selectedPrompt: GeminiConfigPromptsEntity | null
@@ -24,57 +28,103 @@ const EditAiPrompts = ({ selectedPrompt, setSelectedPrompt }: EditAiPromptsProps
     const { t } = useTranslation()
     const promptId = selectedPrompt?.id
 
-    // Fetch prompt detail by id (only fetch if we have a valid id)
+    /**
+     * Handle Get Config Custom Prompts By Id
+     */
     const { data: promptData, isLoading: isLoadingPrompt, error: promptError } = useGetConfigCustomPromptsById(
         promptId || 0
     )
+    //-----------------------End-----------------------//
 
-    // Use data from hook if available, otherwise fallback to prop
-    // Only use hook data if we actually fetched with a valid id
     const prompt = (promptId && promptData) ? promptData : selectedPrompt
     const isLoading = promptId ? isLoadingPrompt : false
 
-    // Form state
-    const [formData, setFormData] = useState({
-        geminiConfigModelId: prompt?.geminiConfigModelId || 0,
-        prompt: prompt?.prompt || '',
-        isActive: prompt?.isActive || false,
+    /**
+     * Handle Get Gemini Models
+     * @returns 
+     */
+    const { data: geminiModels } = useGetAIGeminiModels()
+    const { data: configModelsData } = useGetAIConfigModels({ page: 1, limit: 1000 })
+
+    // Find config model and gemini model for display
+    const configModel = useMemo(() => {
+        if (!prompt?.geminiConfigModelId || !configModelsData?.results) return null
+        return configModelsData.results.find((cm: any) => cm.id === prompt.geminiConfigModelId)
+    }, [prompt?.geminiConfigModelId, configModelsData])
+
+    const geminiModelName = useMemo(() => {
+        if (configModel?.geminiModel) {
+            return configModel.geminiModel.displayName || configModel.geminiModel.key
+        }
+        if (configModel?.geminiModelId && geminiModels) {
+            const model = geminiModels.find((m: any) => m.id === configModel.geminiModelId)
+            return model?.displayName || model?.key || `ID ${configModel.geminiModelId}`
+        }
+        return prompt?.geminiConfigModelId ? `Config Model ID: ${prompt.geminiConfigModelId}` : 'N/A'
+    }, [configModel, geminiModels, prompt?.geminiConfigModelId])
+    //-----------------------End-----------------------//
+
+    /**
+     * Handle Form with react-hook-form
+     */
+    const {
+        control,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+        reset,
+        watch,
+    } = useForm<IUpdateGeminiConfigPromptsRequest>({
+        resolver: zodResolver(updateGeminiConfigPromptsSchema(t)),
+        defaultValues: {
+            geminiConfigModelId: prompt?.geminiConfigModelId || 0,
+            prompt: prompt?.prompt || '',
+            isActive: prompt?.isActive || false,
+        },
+        mode: 'onChange',
     })
 
-    // Update form data when prompt data changes
+    // Watch prompt length for character count
+    const promptValue = watch('prompt')
+
+    // Update form when prompt data changes
     useEffect(() => {
         if (prompt) {
-            setFormData({
+            reset({
                 geminiConfigModelId: prompt.geminiConfigModelId,
                 prompt: prompt.prompt,
                 isActive: prompt.isActive,
             })
         }
-    }, [prompt])
+    }, [prompt, reset])
+    //-----------------------End-----------------------//
 
-    // Update mutation
+    /**
+     * Handle Update Config Custom Prompts
+     * @returns 
+     */
     const updateMutation = useUpdateConfigCustomPrompts()
 
-    const handleSubmit = async () => {
+    const onSubmit = async (data: IUpdateGeminiConfigPromptsRequest) => {
         if (!promptId) return
 
         try {
             await updateMutation.mutateAsync({
                 id: promptId,
-                data: formData,
+                data,
             })
             setSelectedPrompt(null)
-        } catch (error) {
-            // Error is handled by the hook
+        } catch (error: any) {
             console.error('Failed to update prompt:', error)
+            toast.error(error?.response?.data?.message || t('aiCommon.errorUpdating', { defaultValue: 'Lỗi khi cập nhật prompt' }))
         }
     }
+    //-----------------------End-----------------------//
 
     const handleClose = () => {
         setSelectedPrompt(null)
         // Reset form when closing
         if (prompt) {
-            setFormData({
+            reset({
                 geminiConfigModelId: prompt.geminiConfigModelId,
                 prompt: prompt.prompt,
                 isActive: prompt.isActive,
@@ -117,7 +167,7 @@ const EditAiPrompts = ({ selectedPrompt, setSelectedPrompt }: EditAiPromptsProps
                                     </div>
                                     <p className="text-sm font-normal text-muted-foreground mt-1 flex items-center gap-1.5">
                                         <Hash className="h-3.5 w-3.5" />
-                                        {t('aiCommon.modelId', { defaultValue: 'Model ID' })}: {prompt.geminiConfigModelId}
+                                        {t('aiCommon.modelId', { defaultValue: 'Model ID' })}: {geminiModelName} {prompt.geminiConfigModelId && `(${prompt.geminiConfigModelId})`}
                                     </p>
                                 </>
                             ) : null}
@@ -148,7 +198,7 @@ const EditAiPrompts = ({ selectedPrompt, setSelectedPrompt }: EditAiPromptsProps
                         </Card>
                     </div>
                 ) : prompt ? (
-                    <div className="flex-1 overflow-y-auto py-6 space-y-6">
+                    <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto py-6 space-y-6">
                         {/* Metadata Cards */}
                         <div className="grid grid-cols-2 gap-4">
                             <Card className="bg-gradient-to-br from-primary/5 to-transparent border-primary/20">
@@ -184,19 +234,43 @@ const EditAiPrompts = ({ selectedPrompt, setSelectedPrompt }: EditAiPromptsProps
                             <div className="space-y-2">
                                 <label className="text-sm font-semibold text-foreground flex items-center gap-2">
                                     <Hash className="h-4 w-4 text-primary" />
-                                    {t('aiCommon.modelId', { defaultValue: 'Model ID' })}
+                                    {t('aiCommon.modelId', { defaultValue: 'Config Model' })}
                                 </label>
-                                <Input
-                                    value={formData.geminiConfigModelId}
-                                    onChange={(e) =>
-                                        setFormData({
-                                            ...formData,
-                                            geminiConfigModelId: parseInt(e.target.value) || 0,
-                                        })
-                                    }
-                                    className="bg-background border-border text-foreground h-11"
-                                    type="number"
+                                <Controller
+                                    control={control}
+                                    name="geminiConfigModelId"
+                                    render={({ field }) => (
+                                        <Select
+                                            value={String(field.value)}
+                                            onValueChange={(value) => field.onChange(parseInt(value) || 0)}
+                                        >
+                                            <SelectTrigger className={`bg-background border-border text-foreground h-11 ${errors.geminiConfigModelId ? 'border-destructive' : ''}`}>
+                                                <SelectValue placeholder={t('aiCommon.selectModel', { defaultValue: 'Chọn config model' })} />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-card border-border">
+                                                {configModelsData?.results && Array.isArray(configModelsData.results) && configModelsData.results.length > 0 ? (
+                                                    configModelsData.results.map((cm: any) => {
+                                                        const modelName = cm.geminiModel?.displayName || cm.geminiModel?.key || `ID ${cm.geminiModelId}`
+                                                        return (
+                                                            <SelectItem key={cm.id} value={String(cm.id)}>
+                                                                {cm.name} - {modelName}
+                                                            </SelectItem>
+                                                        )
+                                                    })
+                                                ) : (
+                                                    <SelectItem value={String(field.value)} disabled>
+                                                        {t('aiCommon.noModels', { defaultValue: 'Không có model' })}
+                                                    </SelectItem>
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                    )}
                                 />
+                                {errors.geminiConfigModelId && (
+                                    <p className="text-sm text-destructive mt-1">
+                                        {errors.geminiConfigModelId.message as string}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="space-y-2">
@@ -204,25 +278,30 @@ const EditAiPrompts = ({ selectedPrompt, setSelectedPrompt }: EditAiPromptsProps
                                     <Brain className="h-4 w-4 text-primary" />
                                     {t('aiPrompts.content', { defaultValue: 'Nội dung Prompt' })}
                                 </label>
-                                <div className="relative">
-                                    <Textarea
-                                        rows={14}
-                                        value={formData.prompt}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                prompt: e.target.value,
-                                            })
-                                        }
-                                        className="bg-background border-border text-foreground font-mono text-sm leading-relaxed resize-none pr-20"
-                                        placeholder={t('aiPrompts.contentPlaceholder', {
-                                            defaultValue: 'Nhập nội dung prompt...',
-                                        })}
-                                    />
-                                    <div className="absolute bottom-3 right-3 px-2 py-1 bg-muted rounded text-xs font-medium text-muted-foreground">
-                                        {formData.prompt.length} {t('aiCommon.chars', { defaultValue: 'ký tự' })}
-                                    </div>
-                                </div>
+                                <Controller
+                                    control={control}
+                                    name="prompt"
+                                    render={({ field }) => (
+                                        <div className="relative">
+                                            <Textarea
+                                                rows={14}
+                                                {...field}
+                                                className={`bg-background border-border text-foreground font-mono text-sm leading-relaxed resize-none pr-20 ${errors.prompt ? 'border-destructive' : ''}`}
+                                                placeholder={t('aiPrompts.contentPlaceholder', {
+                                                    defaultValue: 'Nhập nội dung prompt...',
+                                                })}
+                                            />
+                                            <div className="absolute bottom-3 right-3 px-2 py-1 bg-muted rounded text-xs font-medium text-muted-foreground">
+                                                {promptValue?.length || 0} {t('aiCommon.chars', { defaultValue: 'ký tự' })}
+                                            </div>
+                                        </div>
+                                    )}
+                                />
+                                {errors.prompt && (
+                                    <p className="text-sm text-destructive mt-1">
+                                        {errors.prompt.message as string}
+                                    </p>
+                                )}
                             </div>
 
                             <Card className="bg-gradient-to-br from-muted/50 to-muted/20 border-border/50">
@@ -233,7 +312,7 @@ const EditAiPrompts = ({ selectedPrompt, setSelectedPrompt }: EditAiPromptsProps
                                             {t('aiPrompts.activeState', { defaultValue: 'Trạng thái hoạt động' })}
                                         </label>
                                         <p className="text-xs text-muted-foreground max-w-sm">
-                                            {formData.isActive
+                                            {watch('isActive')
                                                 ? t('aiPrompts.activeOn', {
                                                     defaultValue:
                                                         'Prompt đang được kích hoạt và có thể sử dụng trong hệ thống',
@@ -243,59 +322,62 @@ const EditAiPrompts = ({ selectedPrompt, setSelectedPrompt }: EditAiPromptsProps
                                                 })}
                                         </p>
                                     </div>
-                                    <Switch
-                                        checked={formData.isActive}
-                                        onCheckedChange={(checked) =>
-                                            setFormData({
-                                                ...formData,
-                                                isActive: checked,
-                                            })
-                                        }
-                                        className="data-[state=checked]:bg-primary"
+                                    <Controller
+                                        control={control}
+                                        name="isActive"
+                                        render={({ field }) => (
+                                            <Switch
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                                className="data-[state=checked]:bg-primary"
+                                            />
+                                        )}
                                     />
                                 </CardContent>
                             </Card>
                         </div>
-                    </div>
-                ) : null}
 
-                <div className="flex justify-between items-center gap-3 pt-4 border-t border-border">
-                    <Button
-                        variant="outline"
-                        className="text-destructive border-destructive/50 hover:bg-destructive/10 hover:border-destructive"
-                        disabled={isLoading || updateMutation.isPending}
-                    >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        {t('aiCommon.deletePrompt', { defaultValue: 'Xóa prompt' })}
-                    </Button>
-                    <div className="flex gap-3">
-                        <Button
-                            variant="outline"
-                            onClick={handleClose}
-                            className="border-border text-foreground hover:bg-muted"
-                            disabled={updateMutation.isPending}
-                        >
-                            {t('aiCommon.cancel', { defaultValue: 'Hủy' })}
-                        </Button>
-                        <Button
-                            onClick={handleSubmit}
-                            className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
-                            disabled={isLoading || updateMutation.isPending || !prompt}
-                        >
-                            {updateMutation.isPending ? (
-                                <>
-                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                    {t('aiCommon.saving', { defaultValue: 'Đang lưu...' })}
-                                </>
-                            ) : (
-                                <>
-                                    <Sparkles className="h-4 w-4 mr-2" />
-                                    {t('aiCommon.saveChanges', { defaultValue: 'Lưu thay đổi' })}
-                                </>
-                            )}
-                        </Button>
-                    </div>
-                </div>
+                        <div className="flex justify-between items-center gap-3 pt-4 border-t border-border">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className="text-destructive border-destructive/50 hover:bg-destructive/10 hover:border-destructive"
+                                disabled={isLoading || isSubmitting || updateMutation.isPending}
+                            >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                {t('aiCommon.deletePrompt', { defaultValue: 'Xóa prompt' })}
+                            </Button>
+                            <div className="flex gap-3">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={handleClose}
+                                    className="border-border text-foreground hover:bg-muted"
+                                    disabled={isSubmitting || updateMutation.isPending}
+                                >
+                                    {t('aiCommon.cancel', { defaultValue: 'Hủy' })}
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+                                    disabled={isLoading || isSubmitting || updateMutation.isPending || !prompt}
+                                >
+                                    {isSubmitting || updateMutation.isPending ? (
+                                        <>
+                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                            {t('aiCommon.saving', { defaultValue: 'Đang lưu...' })}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Sparkles className="h-4 w-4 mr-2" />
+                                            {t('aiCommon.saveChanges', { defaultValue: 'Lưu thay đổi' })}
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
+                        </div>
+                    </form>
+                ) : null}
             </DialogContent>
         </Dialog>
     )

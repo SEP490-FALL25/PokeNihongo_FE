@@ -1,13 +1,11 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card"
 import { Badge } from "@ui/Badge"
-import { Button } from "@ui/Button"
 import { Input } from "@ui/Input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select"
-import { Search, Edit, Trash2, MoreVertical, Loader2, Brain, Sparkles, Copy, Eye, Calendar, Hash } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@ui/DropdownMenu"
+import { Search, Trash2, Loader2, Brain, Sparkles, Calendar, Hash } from "lucide-react"
 import HeaderAdmin from "@organisms/Header/Admin"
-import { useConfigPromptsCustom } from "@hooks/useAI"
+import { useConfigPromptsCustom, useGetAIGeminiModels, useGetAIConfigModels } from "@hooks/useAI"
 import { GeminiConfigPromptsEntity } from "@models/ai/entity"
 import { useTranslation } from "react-i18next"
 import AddAiPrompts from "./components/AddAiPrompts"
@@ -52,6 +50,24 @@ export default function AIPromptManagement() {
 
     const { data, isLoading, error } = useConfigPromptsCustom(queryParams)
     //------------------------End------------------------//
+
+    // Get Gemini Models and Config Models for mapping
+    const { data: geminiModels } = useGetAIGeminiModels()
+    const { data: configModelsData } = useGetAIConfigModels({ page: 1, limit: 1000 })
+
+    // Helper function to get model name by config model id
+    const getModelName = useCallback((configModelId: number) => {
+        if (!configModelsData?.results) return `ID ${configModelId}`
+        const configModel = configModelsData.results.find((cm: any) => cm.id === configModelId)
+        if (configModel?.geminiModel) {
+            return configModel.geminiModel.displayName || configModel.geminiModel.key || `ID ${configModelId}`
+        }
+        if (configModel?.geminiModelId && geminiModels) {
+            const model = geminiModels.find((m: any) => m.id === configModel.geminiModelId)
+            return model?.displayName || model?.key || `ID ${configModelId}`
+        }
+        return `ID ${configModelId}`
+    }, [configModelsData, geminiModels])
 
     /**
      * Handle Accumulated Results
@@ -227,10 +243,11 @@ export default function AIPromptManagement() {
                             <Card
                                 key={prompt.id}
                                 ref={index === prompts.length - 1 ? lastPromptElementRef : null}
-                                className="bg-card border-border hover:border-primary/50 hover:shadow-lg transition-all duration-200 group"
+                                className="bg-card border-border hover:border-primary/50 hover:shadow-lg transition-all duration-200 group cursor-pointer"
+                                onClick={() => setSelectedPrompt(prompt)}
                             >
                                 <CardContent className="p-6">
-                                    <div className="flex items-start justify-between gap-4">
+                                    <div className="relative flex items-start justify-between gap-4">
                                         {/* Left Content */}
                                         <div className="flex-1 min-w-0 space-y-4">
                                             {/* Header */}
@@ -249,7 +266,7 @@ export default function AIPromptManagement() {
                                                     <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                                         <div className="flex items-center gap-1">
                                                             <Hash className="h-3 w-3" />
-                                                            <span>{t('aiCommon.modelId', { defaultValue: 'Model ID' })}: {prompt.geminiConfigModelId}</span>
+                                                            <span>{t('aiCommon.modelId', { defaultValue: 'Model ID' })}: {getModelName(prompt.geminiConfigModelId)} ({prompt.geminiConfigModelId})</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -277,35 +294,8 @@ export default function AIPromptManagement() {
                                         </div>
 
                                         {/* Right Actions */}
-                                        <div className="flex gap-2">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-9 w-9"
-                                                    >
-                                                        <MoreVertical className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="bg-card border-border w-48">
-                                                    <DropdownMenuItem
-                                                        className="text-foreground hover:bg-muted cursor-pointer"
-                                                        onClick={() => setSelectedPrompt(prompt)}
-                                                    >
-                                                        <Edit className="h-4 w-4 mr-2" />
-                                                        {t('aiCommon.edit', { defaultValue: 'Chỉnh sửa' })}
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem className="text-foreground hover:bg-muted cursor-pointer">
-                                                        <Copy className="h-4 w-4 mr-2" />
-                                                        {t('aiCommon.copy', { defaultValue: 'Sao chép' })}
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem className="text-destructive hover:bg-destructive/10 cursor-pointer">
-                                                        <Trash2 className="h-4 w-4 mr-2" />
-                                                        {t('aiCommon.delete', { defaultValue: 'Xóa' })}
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                        <div className="absolute top-0 right-0 flex gap-2">
+                                            <Trash2 className="h-8 w-8 mr-2 text-red-500 hover:text-red-600 hover:bg-red-100 rounded-full p-2 cursor-pointer" />
                                         </div>
                                     </div>
                                 </CardContent>
