@@ -840,6 +840,41 @@
         "rewardTargetBADGE": "Badge"
     },
     "users": {
+        "title": "User Management",
+        "description": "Manage all users in the system",
+        "totalUsers": "Total Users",
+        "currentPage": "Current Page",
+        "resultsPerPage": "Results/Page",
+        "displaying": "Displaying",
+        "listTitle": "User List",
+        "addUser": "Add User",
+        "searchPlaceholder": "Search by email...",
+        "status": "Status",
+        "allStatuses": "All Statuses",
+        "role": "Role",
+        "allRoles": "All Roles",
+        "statuses": {
+            "ACTIVE": "Active",
+            "INACTIVE": "Inactive",
+            "BANNED": "Banned"
+        },
+        "roles": {
+            "admin": "Administrator",
+            "instructor": "Instructor",
+            "student": "Student"
+        },
+        "table": {
+            "id": "ID",
+            "fullName": "Full Name",
+            "email": "Email",
+            "exp": "EXP",
+            "createdAt": "Created At"
+        },
+        "loading": "Loading...",
+        "error": "An error occurred while loading data",
+        "noUsers": "No users found",
+        "edit": "Edit",
+        "delete": "Delete",
         "addUserModal": {
             "title": "Add New User",
             "fullName": "Full Name",

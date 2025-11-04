@@ -801,6 +801,41 @@
         "rewardTargetBADGE": "バッジ"
     },
     "users": {
+        "title": "ユーザー管理",
+        "description": "システム内のすべてのユーザーを管理",
+        "totalUsers": "総ユーザー数",
+        "currentPage": "現在のページ",
+        "resultsPerPage": "結果/ページ",
+        "displaying": "表示中",
+        "listTitle": "ユーザー一覧",
+        "addUser": "ユーザーを追加",
+        "searchPlaceholder": "メールアドレスで検索...",
+        "status": "ステータス",
+        "allStatuses": "すべてのステータス",
+        "role": "役割",
+        "allRoles": "すべての役割",
+        "statuses": {
+            "ACTIVE": "アクティブ",
+            "INACTIVE": "非アクティブ",
+            "BANNED": "禁止"
+        },
+        "roles": {
+            "admin": "管理者",
+            "instructor": "講師",
+            "student": "学習者"
+        },
+        "table": {
+            "id": "ID",
+            "fullName": "氏名",
+            "email": "メールアドレス",
+            "exp": "EXP",
+            "createdAt": "作成日"
+        },
+        "loading": "読み込み中...",
+        "error": "データの読み込み中にエラーが発生しました",
+        "noUsers": "ユーザーが見つかりません",
+        "edit": "編集",
+        "delete": "削除",
         "addUserModal": {
             "title": "新しいユーザーを追加",
             "fullName": "氏名",

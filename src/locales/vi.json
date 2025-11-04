@@ -809,6 +809,41 @@
         "rewardTargetBADGE": "Huy hiệu"
     },
     "users": {
+        "title": "Quản lý người dùng",
+        "description": "Quản lý tất cả người dùng trong hệ thống",
+        "totalUsers": "Tổng người dùng",
+        "currentPage": "Trang hiện tại",
+        "resultsPerPage": "Kết quả/trang",
+        "displaying": "Đang hiển thị",
+        "listTitle": "Danh sách người dùng",
+        "addUser": "Thêm người dùng",
+        "searchPlaceholder": "Tìm kiếm theo email...",
+        "status": "Trạng thái",
+        "allStatuses": "Tất cả trạng thái",
+        "role": "Vai trò",
+        "allRoles": "Tất cả vai trò",
+        "statuses": {
+            "ACTIVE": "Hoạt động",
+            "INACTIVE": "Không hoạt động",
+            "BANNED": "Bị cấm"
+        },
+        "roles": {
+            "admin": "Quản trị viên",
+            "instructor": "Giảng viên",
+            "student": "Học viên"
+        },
+        "table": {
+            "id": "ID",
+            "fullName": "Họ và tên",
+            "email": "Email",
+            "exp": "EXP",
+            "createdAt": "Ngày tạo"
+        },
+        "loading": "Đang tải...",
+        "error": "Có lỗi xảy ra khi tải dữ liệu",
+        "noUsers": "Không tìm thấy người dùng",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa",
         "addUserModal": {
             "title": "Thêm người dùng mới",
             "fullName": "Họ và tên",
