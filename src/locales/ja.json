@@ -800,6 +800,28 @@
         "rewardTargetPOKEMON": "ポケモン",
         "rewardTargetBADGE": "バッジ"
     },
+    "users": {
+        "addUserModal": {
+            "title": "新しいユーザーを追加",
+            "fullName": "氏名",
+            "fullNamePlaceholder": "氏名を入力",
+            "email": "メールアドレス",
+            "emailPlaceholder": "メールアドレスを入力",
+            "role": "役割",
+            "selectRole": "役割を選択",
+            "roles": {
+                "admin": "管理者",
+                "instructor": "講師",
+                "student": "学習者"
+            },
+            "password": "パスワード",
+            "passwordPlaceholder": "パスワードを入力（任意、最低6文字）",
+            "passwordHint": "空欄のままにすると、システムが自動的にパスワードを生成します",
+            "creating": "作成中...",
+            "add": "追加",
+            "addUser": "ユーザーを追加"
+        }
+    },
     "questionBank": {
         "title": "問題バンク管理",
         "subtitle": "レッスン用の問題を管理・整理",

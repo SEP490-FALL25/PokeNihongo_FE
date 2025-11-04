@@ -839,6 +839,28 @@
         "rewardTargetPOKEMON": "Pokemon",
         "rewardTargetBADGE": "Badge"
     },
+    "users": {
+        "addUserModal": {
+            "title": "Add New User",
+            "fullName": "Full Name",
+            "fullNamePlaceholder": "Enter full name",
+            "email": "Email",
+            "emailPlaceholder": "Enter email",
+            "role": "Role",
+            "selectRole": "Select role",
+            "roles": {
+                "admin": "Administrator",
+                "instructor": "Instructor",
+                "student": "Student"
+            },
+            "password": "Password",
+            "passwordPlaceholder": "Enter password (optional, minimum 6 characters)",
+            "passwordHint": "If left empty, the system will automatically generate a password",
+            "creating": "Creating...",
+            "add": "Add",
+            "addUser": "Add User"
+        }
+    },
     "questionBank": {
         "title": "Question Bank Management",
         "subtitle": "Manage and organize questions for lessons",

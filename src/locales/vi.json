@@ -808,6 +808,28 @@
         "rewardTargetPOKEMON": "Pokemon",
         "rewardTargetBADGE": "Huy hiệu"
     },
+    "users": {
+        "addUserModal": {
+            "title": "Thêm người dùng mới",
+            "fullName": "Họ và tên",
+            "fullNamePlaceholder": "Nhập họ và tên",
+            "email": "Email",
+            "emailPlaceholder": "Nhập email",
+            "role": "Vai trò",
+            "selectRole": "Chọn vai trò",
+            "roles": {
+                "admin": "Quản trị viên",
+                "instructor": "Giảng viên",
+                "student": "Học viên"
+            },
+            "password": "Mật khẩu",
+            "passwordPlaceholder": "Nhập mật khẩu (tùy chọn, tối thiểu 6 ký tự)",
+            "passwordHint": "Nếu để trống, hệ thống sẽ tự động tạo mật khẩu",
+            "creating": "Đang tạo...",
+            "add": "Thêm",
+            "addUser": "Thêm người dùng"
+        }
+    },
     "questionBank": {
         "title": "Quản lý Ngân hàng Câu hỏi",
         "subtitle": "Quản lý và tổ chức các câu hỏi cho bài học",
