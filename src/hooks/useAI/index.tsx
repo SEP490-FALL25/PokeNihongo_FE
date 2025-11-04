@@ -42,16 +42,37 @@ export const useUpdateConfigCustomPrompts = () => {
     const queryClient = useQueryClient();
     const updateConfigCustomPromptsMutation = useMutation({
         mutationFn: ({ id, data }: { id: number; data: IUpdateGeminiConfigPromptsRequest }) => geminiService.updateConfigCustomPrompts(id, data),
-        onSuccess: (_, variables) => {
+        onSuccess: (data: any, variables: any) => {
             queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts'] });
             queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts-by-id', variables.id] });
-            toast.success('Cập nhật config custom prompts thành công');
+            toast.success(data?.message || 'Cập nhật config custom prompts thành công');
         },
         onError: (error: any) => {
             toast.error(error?.response?.data?.message || 'Có lỗi xảy ra khi cập nhật config custom prompts');
         },
     });
     return updateConfigCustomPromptsMutation;
+}
+//-----------------------End-----------------------//
+
+
+/**
+ * Handle Delete Config Custom Prompts
+ */
+export const useDeleteConfigCustomPrompts = () => {
+    const queryClient = useQueryClient();
+    const deleteConfigCustomPromptsMutation = useMutation({
+        mutationFn: (id: number) => geminiService.deleteConfigCustomPrompts(id),
+        onSuccess: (data: any, variables: any) => {
+            queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts'] });
+            queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts-by-id', variables.id] });
+            toast.success(data?.message || 'Xóa config custom prompts thành công');
+        },
+        onError: (error: any) => {
+            toast.error(error?.response?.data?.message || 'Có lỗi xảy ra khi xóa config custom prompts');
+        },
+    });
+    return deleteConfigCustomPromptsMutation;
 }
 //-----------------------End-----------------------//
 //---------------------------------------------End Config Prompts---------------------------------------------//

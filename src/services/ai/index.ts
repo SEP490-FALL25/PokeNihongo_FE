@@ -44,6 +44,10 @@ const geminiService = {
         return await axiosPrivate.put(`/gemini-config/promt/${id}`, data);
     },
 
+    deleteConfigCustomPrompts: async (id: number) => {
+        return await axiosPrivate.delete(`/gemini-config/promt/${id}`);
+    },
+
     getConfigPresets: async () => {
         return await axiosPrivate.get('/gemini-config/presets');
     },

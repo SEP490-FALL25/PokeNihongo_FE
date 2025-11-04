@@ -14,13 +14,21 @@ import { getStatusLabel } from "@atoms/StatusLabel"
 import { formatDate } from "@utils/date"
 import EditAiPrompts from "./components/EditAiPrompts"
 import { Skeleton } from "@ui/Skeleton"
+import DeleteConfirmAiPrompts from "./components/DeleteConfirmAiPrompts"
 
 export default function AIPromptManagement() {
     const { t } = useTranslation()
     const [searchQuery, setSearchQuery] = useState("")
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
-    const [showAddDialog, setShowAddDialog] = useState(false)
+    const [showAddDialog, setShowAddDialog] = useState<boolean>(false)
     const [selectedPrompt, setSelectedPrompt] = useState<GeminiConfigPromptsEntity | null>(null)
+
+    /**
+     * Handle Delete Prompt
+     */
+    const [promptIdToDelete, setPromptIdToDelete] = useState<number | null>(null)
+    //------------------------End------------------------//
+
 
     /**
      * Handle config prompts hook
@@ -56,7 +64,10 @@ export default function AIPromptManagement() {
     const { data: geminiModels } = useGetAIGeminiModels()
     const { data: configModelsData } = useGetAIConfigModels({ page: 1, limit: 1000 })
 
-    // Helper function to get model name by config model id
+
+    /**
+     * Handle Get Model Name
+     */
     const getModelName = useCallback((configModelId: number) => {
         if (!configModelsData?.results) return `ID ${configModelId}`
         const configModel = configModelsData.results.find((cm: any) => cm.id === configModelId)
@@ -69,6 +80,8 @@ export default function AIPromptManagement() {
         }
         return `ID ${configModelId}`
     }, [configModelsData, geminiModels])
+    //------------------------End------------------------//
+
 
     /**
      * Handle Accumulated Results
@@ -324,7 +337,13 @@ export default function AIPromptManagement() {
 
                                         {/* Right Actions */}
                                         <div className="absolute top-0 right-0 flex gap-2">
-                                            <Trash2 className="h-8 w-8 mr-2 text-red-500 hover:text-red-600 hover:bg-red-100 rounded-full p-2 cursor-pointer" />
+                                            <Trash2
+                                                className="h-8 w-8 mr-2 text-red-500 hover:text-red-600 hover:bg-red-100 rounded-full p-2 cursor-pointer transition-colors"
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    setPromptIdToDelete(prompt.id)
+                                                }}
+                                            />
                                         </div>
                                     </div>
                                 </CardContent>
@@ -357,6 +376,12 @@ export default function AIPromptManagement() {
             {selectedPrompt && (
                 <EditAiPrompts selectedPrompt={selectedPrompt} setSelectedPrompt={setSelectedPrompt} />
             )}
+
+            {/* Delete Confirmation Dialog */}
+            <DeleteConfirmAiPrompts
+                promptIdToDelete={promptIdToDelete}
+                setPromptIdToDelete={setPromptIdToDelete}
+            />
         </>
     )
 }
