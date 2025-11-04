@@ -95,7 +95,11 @@
         "search": "Tìm kiếm",
         "selectAll": "Chọn tất cả",
         "loadingMore": "Đang tải thêm cấu hình...",
-        "loadedAllCount": "✓ Đã hiển thị tất cả {{count}} cấu hình"
+        "loadedAllCount": "✓ Đã hiển thị tất cả {{count}} cấu hình",
+        "modelId": "Config Model",
+        "selectModel": "Chọn config model",
+        "noModels": "Không có model",
+        "saving": "Đang lưu..."
     },
     "aiCustom": {
         "title": "Config AI - Custom AI",
@@ -724,7 +728,9 @@
         "maxTokensMax": "Số token tối đa không được vượt quá {{max}}",
         "systemInstructionRequired": "System instruction là bắt buộc",
         "responseMimeTypeRequired": "Response MIME type là bắt buộc",
-        "presetIdRequired": "Preset là bắt buộc"
+        "presetIdRequired": "Preset là bắt buộc",
+        "geminiConfigModelIdRequired": "Vui lòng chọn Model ID hợp lệ",
+        "promptRequired": "Vui lòng nhập nội dung prompt"
     },
     "conditionTypes": {
         "DAILY_LOGIN": "Đăng nhập",

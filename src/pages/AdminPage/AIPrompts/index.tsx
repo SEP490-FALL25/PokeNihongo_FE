@@ -1,13 +1,11 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card"
 import { Badge } from "@ui/Badge"
-import { Button } from "@ui/Button"
 import { Input } from "@ui/Input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select"
-import { Search, Edit, Trash2, MoreVertical, Loader2, Brain, Sparkles, Copy, Eye, Calendar, Hash } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@ui/DropdownMenu"
+import { Search, Trash2, Loader2, Brain, Sparkles, Calendar, Hash } from "lucide-react"
 import HeaderAdmin from "@organisms/Header/Admin"
-import { useConfigPromptsCustom } from "@hooks/useAI"
+import { useConfigPromptsCustom, useGetAIGeminiModels, useGetAIConfigModels } from "@hooks/useAI"
 import { GeminiConfigPromptsEntity } from "@models/ai/entity"
 import { useTranslation } from "react-i18next"
 import AddAiPrompts from "./components/AddAiPrompts"
@@ -15,13 +13,22 @@ import { getStatusBadgeColor } from "@atoms/BadgeStatusColor"
 import { getStatusLabel } from "@atoms/StatusLabel"
 import { formatDate } from "@utils/date"
 import EditAiPrompts from "./components/EditAiPrompts"
+import { Skeleton } from "@ui/Skeleton"
+import DeleteConfirmAiPrompts from "./components/DeleteConfirmAiPrompts"
 
 export default function AIPromptManagement() {
     const { t } = useTranslation()
     const [searchQuery, setSearchQuery] = useState("")
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
-    const [showAddDialog, setShowAddDialog] = useState(false)
+    const [showAddDialog, setShowAddDialog] = useState<boolean>(false)
     const [selectedPrompt, setSelectedPrompt] = useState<GeminiConfigPromptsEntity | null>(null)
+
+    /**
+     * Handle Delete Prompt
+     */
+    const [promptIdToDelete, setPromptIdToDelete] = useState<number | null>(null)
+    //------------------------End------------------------//
+
 
     /**
      * Handle config prompts hook
@@ -52,6 +59,29 @@ export default function AIPromptManagement() {
 
     const { data, isLoading, error } = useConfigPromptsCustom(queryParams)
     //------------------------End------------------------//
+
+    // Get Gemini Models and Config Models for mapping
+    const { data: geminiModels } = useGetAIGeminiModels()
+    const { data: configModelsData } = useGetAIConfigModels({ page: 1, limit: 1000 })
+
+
+    /**
+     * Handle Get Model Name
+     */
+    const getModelName = useCallback((configModelId: number) => {
+        if (!configModelsData?.results) return `ID ${configModelId}`
+        const configModel = configModelsData.results.find((cm: any) => cm.id === configModelId)
+        if (configModel?.geminiModel) {
+            return configModel.geminiModel.displayName || configModel.geminiModel.key || `ID ${configModelId}`
+        }
+        if (configModel?.geminiModelId && geminiModels) {
+            const model = geminiModels.find((m: any) => m.id === configModel.geminiModelId)
+            return model?.displayName || model?.key || `ID ${configModelId}`
+        }
+        return `ID ${configModelId}`
+    }, [configModelsData, geminiModels])
+    //------------------------End------------------------//
+
 
     /**
      * Handle Accumulated Results
@@ -203,9 +233,37 @@ export default function AIPromptManagement() {
 
                 {/* Prompts Grid */}
                 {isLoading && currentPage === 1 && accumulatedResults.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-16">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-                        <p className="text-muted-foreground">{t('aiCommon.loading', { defaultValue: 'Đang tải dữ liệu...' })}</p>
+                    <div className="space-y-4">
+                        {Array.from({ length: 3 }).map((_, index) => (
+                            <Card key={`skeleton-${index}`} className="bg-card border-border">
+                                <CardContent className="p-6">
+                                    <div className="space-y-4">
+                                        {/* Header Skeleton */}
+                                        <div className="flex items-start gap-3">
+                                            <Skeleton className="h-12 w-12 rounded-xl" />
+                                            <div className="flex-1 space-y-2">
+                                                <div className="flex items-center gap-2">
+                                                    <Skeleton className="h-6 w-32" />
+                                                    <Skeleton className="h-5 w-20 rounded-full" />
+                                                </div>
+                                                <Skeleton className="h-4 w-48" />
+                                            </div>
+                                        </div>
+                                        {/* Prompt Content Skeleton */}
+                                        <div className="bg-muted/40 rounded-lg p-4 border border-border/50 space-y-2">
+                                            <Skeleton className="h-4 w-full" />
+                                            <Skeleton className="h-4 w-full" />
+                                            <Skeleton className="h-4 w-3/4" />
+                                        </div>
+                                        {/* Footer Metadata Skeleton */}
+                                        <div className="flex items-center gap-4">
+                                            <Skeleton className="h-4 w-32" />
+                                            <Skeleton className="h-4 w-32" />
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
                     </div>
                 ) : error ? (
                     <Card className="bg-card border-border border-destructive/50">
@@ -227,10 +285,11 @@ export default function AIPromptManagement() {
                             <Card
                                 key={prompt.id}
                                 ref={index === prompts.length - 1 ? lastPromptElementRef : null}
-                                className="bg-card border-border hover:border-primary/50 hover:shadow-lg transition-all duration-200 group"
+                                className="bg-card border-border hover:border-primary/50 hover:shadow-lg transition-all duration-200 group cursor-pointer"
+                                onClick={() => setSelectedPrompt(prompt)}
                             >
                                 <CardContent className="p-6">
-                                    <div className="flex items-start justify-between gap-4">
+                                    <div className="relative flex items-start justify-between gap-4">
                                         {/* Left Content */}
                                         <div className="flex-1 min-w-0 space-y-4">
                                             {/* Header */}
@@ -249,7 +308,7 @@ export default function AIPromptManagement() {
                                                     <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                                         <div className="flex items-center gap-1">
                                                             <Hash className="h-3 w-3" />
-                                                            <span>{t('aiCommon.modelId', { defaultValue: 'Model ID' })}: {prompt.geminiConfigModelId}</span>
+                                                            <span>{t('aiCommon.modelId', { defaultValue: 'Model ID' })}: {getModelName(prompt.geminiConfigModelId)} ({prompt.geminiConfigModelId})</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -277,44 +336,14 @@ export default function AIPromptManagement() {
                                         </div>
 
                                         {/* Right Actions */}
-                                        <div className="flex flex-col gap-2">
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-9 w-9 hover:bg-primary/10 hover:text-primary"
-                                                onClick={() => setSelectedPrompt(prompt)}
-                                                title={t('aiCommon.viewDetail', { defaultValue: 'Xem chi tiết' }) as string}
-                                            >
-                                                <Eye className="h-4 w-4" />
-                                            </Button>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-9 w-9"
-                                                    >
-                                                        <MoreVertical className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="bg-card border-border w-48">
-                                                    <DropdownMenuItem
-                                                        className="text-foreground hover:bg-muted cursor-pointer"
-                                                        onClick={() => setSelectedPrompt(prompt)}
-                                                    >
-                                                        <Edit className="h-4 w-4 mr-2" />
-                                                        {t('aiCommon.edit', { defaultValue: 'Chỉnh sửa' })}
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem className="text-foreground hover:bg-muted cursor-pointer">
-                                                        <Copy className="h-4 w-4 mr-2" />
-                                                        {t('aiCommon.copy', { defaultValue: 'Sao chép' })}
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem className="text-destructive hover:bg-destructive/10 cursor-pointer">
-                                                        <Trash2 className="h-4 w-4 mr-2" />
-                                                        {t('aiCommon.delete', { defaultValue: 'Xóa' })}
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                        <div className="absolute top-0 right-0 flex gap-2">
+                                            <Trash2
+                                                className="h-8 w-8 mr-2 text-red-500 hover:text-red-600 hover:bg-red-100 rounded-full p-2 cursor-pointer transition-colors"
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    setPromptIdToDelete(prompt.id)
+                                                }}
+                                            />
                                         </div>
                                     </div>
                                 </CardContent>
@@ -347,6 +376,12 @@ export default function AIPromptManagement() {
             {selectedPrompt && (
                 <EditAiPrompts selectedPrompt={selectedPrompt} setSelectedPrompt={setSelectedPrompt} />
             )}
+
+            {/* Delete Confirmation Dialog */}
+            <DeleteConfirmAiPrompts
+                promptIdToDelete={promptIdToDelete}
+                setPromptIdToDelete={setPromptIdToDelete}
+            />
         </>
     )
 }

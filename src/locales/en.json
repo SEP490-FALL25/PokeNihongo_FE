@@ -115,7 +115,11 @@
         "search": "Search",
         "selectAll": "Select All",
         "loadingMore": "Loading more configs...",
-        "loadedAllCount": "✓ Displayed all {{count}} configs"
+        "loadedAllCount": "✓ Displayed all {{count}} configs",
+        "modelId": "Config Model",
+        "selectModel": "Select config model",
+        "noModels": "No models",
+        "saving": "Saving..."
     },
     "aiCustom": {
         "title": "Config AI - Custom AI",
@@ -755,7 +759,9 @@
         "endDateRequired": "End date is required",
         "minRequired": "Minimum quantity is required",
         "maxRequired": "Maximum quantity is required",
-        "precreateBeforeEndDaysRequired": "Pre-create days before end date is required"
+        "precreateBeforeEndDaysRequired": "Pre-create days before end date is required",
+        "geminiConfigModelIdRequired": "Please provide a valid Model ID",
+        "promptRequired": "Please enter a prompt"
     },
     "conditionTypes": {
         "DAILY_LOGIN": "Daily Login",
