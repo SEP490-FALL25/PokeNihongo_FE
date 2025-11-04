@@ -120,9 +120,13 @@ const EditAiPrompts = ({ selectedPrompt, setSelectedPrompt }: EditAiPromptsProps
     }
     //-----------------------End-----------------------//
 
+
+    /**
+     * Handle Close Dialog
+     */
     const handleClose = () => {
         setSelectedPrompt(null)
-        // Reset form when closing
+
         if (prompt) {
             reset({
                 geminiConfigModelId: prompt.geminiConfigModelId,
@@ -131,6 +135,7 @@ const EditAiPrompts = ({ selectedPrompt, setSelectedPrompt }: EditAiPromptsProps
             })
         }
     }
+    //------------------------End------------------------//
 
     if (!selectedPrompt && !promptId) {
         return null

@@ -36,6 +36,26 @@ export const useGetConfigCustomPromptsById = (id: number) => {
 
 
 /**
+ * Handle Create Config Custom Prompts
+ */
+export const useCreateConfigCustomPrompts = () => {
+    const queryClient = useQueryClient();
+    const createConfigCustomPromptsMutation = useMutation({
+        mutationFn: (data: IUpdateGeminiConfigPromptsRequest) => geminiService.createConfigCustomPrompts(data),
+        onSuccess: (data: any) => {
+            queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts'] });
+            toast.success(data?.message || 'Tạo config custom prompts thành công');
+        },
+        onError: (error: any) => {
+            toast.error(error?.response?.data?.message || 'Có lỗi xảy ra khi tạo config custom prompts');
+        },
+    });
+    return createConfigCustomPromptsMutation;
+}
+//-----------------------End-----------------------//
+
+
+/**
  * Handle Update Config Custom Prompts
  */
 export const useUpdateConfigCustomPrompts = () => {

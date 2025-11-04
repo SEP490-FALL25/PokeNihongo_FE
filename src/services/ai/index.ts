@@ -40,6 +40,10 @@ const geminiService = {
         return await axiosPrivate.get(`/gemini-config/promt/${id}`);
     },
 
+    createConfigCustomPrompts: async (data: IUpdateGeminiConfigPromptsRequest) => {
+        return await axiosPrivate.post('/gemini-config/promt', data);
+    },
+
     updateConfigCustomPrompts: async (id: number, data: IUpdateGeminiConfigPromptsRequest) => {
         return await axiosPrivate.put(`/gemini-config/promt/${id}`, data);
     },

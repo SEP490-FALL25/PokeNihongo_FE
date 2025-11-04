@@ -115,7 +115,11 @@
         "search": "Search",
         "selectAll": "Select All",
         "loadingMore": "Loading more configs...",
-        "loadedAllCount": "✓ Displayed all {{count}} configs"
+        "loadedAllCount": "✓ Displayed all {{count}} configs",
+        "modelId": "Config Model",
+        "selectModel": "Select config model",
+        "noModels": "No models",
+        "saving": "Saving..."
     },
     "aiCustom": {
         "title": "Config AI - Custom AI",

@@ -95,7 +95,11 @@
         "search": "Tìm kiếm",
         "selectAll": "Chọn tất cả",
         "loadingMore": "Đang tải thêm cấu hình...",
-        "loadedAllCount": "✓ Đã hiển thị tất cả {{count}} cấu hình"
+        "loadedAllCount": "✓ Đã hiển thị tất cả {{count}} cấu hình",
+        "modelId": "Config Model",
+        "selectModel": "Chọn config model",
+        "noModels": "Không có model",
+        "saving": "Đang lưu..."
     },
     "aiCustom": {
         "title": "Config AI - Custom AI",
