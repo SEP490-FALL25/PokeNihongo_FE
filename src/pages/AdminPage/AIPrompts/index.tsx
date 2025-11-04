@@ -13,6 +13,7 @@ import { getStatusBadgeColor } from "@atoms/BadgeStatusColor"
 import { getStatusLabel } from "@atoms/StatusLabel"
 import { formatDate } from "@utils/date"
 import EditAiPrompts from "./components/EditAiPrompts"
+import { Skeleton } from "@ui/Skeleton"
 
 export default function AIPromptManagement() {
     const { t } = useTranslation()
@@ -219,9 +220,37 @@ export default function AIPromptManagement() {
 
                 {/* Prompts Grid */}
                 {isLoading && currentPage === 1 && accumulatedResults.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-16">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-                        <p className="text-muted-foreground">{t('aiCommon.loading', { defaultValue: 'Đang tải dữ liệu...' })}</p>
+                    <div className="space-y-4">
+                        {Array.from({ length: 3 }).map((_, index) => (
+                            <Card key={`skeleton-${index}`} className="bg-card border-border">
+                                <CardContent className="p-6">
+                                    <div className="space-y-4">
+                                        {/* Header Skeleton */}
+                                        <div className="flex items-start gap-3">
+                                            <Skeleton className="h-12 w-12 rounded-xl" />
+                                            <div className="flex-1 space-y-2">
+                                                <div className="flex items-center gap-2">
+                                                    <Skeleton className="h-6 w-32" />
+                                                    <Skeleton className="h-5 w-20 rounded-full" />
+                                                </div>
+                                                <Skeleton className="h-4 w-48" />
+                                            </div>
+                                        </div>
+                                        {/* Prompt Content Skeleton */}
+                                        <div className="bg-muted/40 rounded-lg p-4 border border-border/50 space-y-2">
+                                            <Skeleton className="h-4 w-full" />
+                                            <Skeleton className="h-4 w-full" />
+                                            <Skeleton className="h-4 w-3/4" />
+                                        </div>
+                                        {/* Footer Metadata Skeleton */}
+                                        <div className="flex items-center gap-4">
+                                            <Skeleton className="h-4 w-32" />
+                                            <Skeleton className="h-4 w-32" />
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
                     </div>
                 ) : error ? (
                     <Card className="bg-card border-border border-destructive/50">

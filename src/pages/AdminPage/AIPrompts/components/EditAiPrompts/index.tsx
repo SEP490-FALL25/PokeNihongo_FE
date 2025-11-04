@@ -138,8 +138,8 @@ const EditAiPrompts = ({ selectedPrompt, setSelectedPrompt }: EditAiPromptsProps
 
     return (
         <Dialog open={!!selectedPrompt} onOpenChange={handleClose}>
-            <DialogContent className="bg-white border-border max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-                <DialogHeader className="border-b border-border pb-4 space-y-3">
+            <DialogContent className="bg-white border-border max-w-4xl h-[90vh] overflow-hidden flex flex-col p-0">
+                <DialogHeader className="border-b border-border pb-4 px-6 pt-6 space-y-3 flex-shrink-0">
                     <DialogTitle className="text-foreground flex items-center gap-3">
                         <div className="p-2.5 bg-gradient-to-br from-primary/20 to-primary/5 rounded-xl">
                             <Brain className="h-6 w-6 text-primary" />
@@ -176,7 +176,7 @@ const EditAiPrompts = ({ selectedPrompt, setSelectedPrompt }: EditAiPromptsProps
                 </DialogHeader>
 
                 {isLoading ? (
-                    <div className="flex-1 overflow-y-auto py-6 space-y-6">
+                    <div className="flex-1 overflow-y-auto py-6 px-6 space-y-6" style={{ minHeight: 0 }}>
                         <div className="grid grid-cols-2 gap-4">
                             <Skeleton className="h-20 w-full" />
                             <Skeleton className="h-20 w-full" />
@@ -188,7 +188,7 @@ const EditAiPrompts = ({ selectedPrompt, setSelectedPrompt }: EditAiPromptsProps
                         </div>
                     </div>
                 ) : promptError ? (
-                    <div className="flex-1 overflow-y-auto py-6 flex items-center justify-center">
+                    <div className="flex-1 overflow-y-auto py-6 px-6 flex items-center justify-center" style={{ minHeight: 0 }}>
                         <Card className="w-full">
                             <CardContent className="p-6 text-center">
                                 <p className="text-destructive">
@@ -198,7 +198,7 @@ const EditAiPrompts = ({ selectedPrompt, setSelectedPrompt }: EditAiPromptsProps
                         </Card>
                     </div>
                 ) : prompt ? (
-                    <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto py-6 space-y-6">
+                    <form id="edit-prompt-form" onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto py-6 px-6 space-y-6" style={{ minHeight: 0 }}>
                         {/* Metadata Cards */}
                         <div className="grid grid-cols-2 gap-4">
                             <Card className="bg-gradient-to-br from-primary/5 to-transparent border-primary/20">
@@ -336,48 +336,51 @@ const EditAiPrompts = ({ selectedPrompt, setSelectedPrompt }: EditAiPromptsProps
                                 </CardContent>
                             </Card>
                         </div>
+                    </form>
+                ) : null}
 
-                        <div className="flex justify-between items-center gap-3 pt-4 border-t border-border">
+                {prompt && !isLoading && !promptError && (
+                    <div className="flex justify-between items-center gap-3 pt-4 pb-6 px-6 border-t border-border flex-shrink-0">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="text-destructive border-destructive/50 hover:bg-destructive/10 hover:border-destructive"
+                            disabled={isLoading || isSubmitting || updateMutation.isPending}
+                        >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            {t('aiCommon.deletePrompt', { defaultValue: 'Xóa prompt' })}
+                        </Button>
+                        <div className="flex gap-3">
                             <Button
                                 type="button"
                                 variant="outline"
-                                className="text-destructive border-destructive/50 hover:bg-destructive/10 hover:border-destructive"
-                                disabled={isLoading || isSubmitting || updateMutation.isPending}
+                                onClick={handleClose}
+                                className="border-border text-foreground hover:bg-muted"
+                                disabled={isSubmitting || updateMutation.isPending}
                             >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                {t('aiCommon.deletePrompt', { defaultValue: 'Xóa prompt' })}
+                                {t('aiCommon.cancel', { defaultValue: 'Hủy' })}
                             </Button>
-                            <div className="flex gap-3">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={handleClose}
-                                    className="border-border text-foreground hover:bg-muted"
-                                    disabled={isSubmitting || updateMutation.isPending}
-                                >
-                                    {t('aiCommon.cancel', { defaultValue: 'Hủy' })}
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
-                                    disabled={isLoading || isSubmitting || updateMutation.isPending || !prompt}
-                                >
-                                    {isSubmitting || updateMutation.isPending ? (
-                                        <>
-                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                            {t('aiCommon.saving', { defaultValue: 'Đang lưu...' })}
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Sparkles className="h-4 w-4 mr-2" />
-                                            {t('aiCommon.saveChanges', { defaultValue: 'Lưu thay đổi' })}
-                                        </>
-                                    )}
-                                </Button>
-                            </div>
+                            <Button
+                                type="submit"
+                                form="edit-prompt-form"
+                                className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+                                disabled={isLoading || isSubmitting || updateMutation.isPending || !prompt}
+                            >
+                                {isSubmitting || updateMutation.isPending ? (
+                                    <>
+                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                        {t('aiCommon.saving', { defaultValue: 'Đang lưu...' })}
+                                    </>
+                                ) : (
+                                    <>
+                                        <Sparkles className="h-4 w-4 mr-2" />
+                                        {t('aiCommon.saveChanges', { defaultValue: 'Lưu thay đổi' })}
+                                    </>
+                                )}
+                            </Button>
                         </div>
-                    </form>
-                ) : null}
+                    </div>
+                )}
             </DialogContent>
         </Dialog>
     )
