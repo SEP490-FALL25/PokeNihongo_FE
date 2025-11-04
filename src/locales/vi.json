@@ -724,7 +724,9 @@
         "maxTokensMax": "Số token tối đa không được vượt quá {{max}}",
         "systemInstructionRequired": "System instruction là bắt buộc",
         "responseMimeTypeRequired": "Response MIME type là bắt buộc",
-        "presetIdRequired": "Preset là bắt buộc"
+        "presetIdRequired": "Preset là bắt buộc",
+        "geminiConfigModelIdRequired": "Vui lòng chọn Model ID hợp lệ",
+        "promptRequired": "Vui lòng nhập nội dung prompt"
     },
     "conditionTypes": {
         "DAILY_LOGIN": "Đăng nhập",

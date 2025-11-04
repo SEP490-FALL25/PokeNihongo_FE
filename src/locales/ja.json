@@ -716,7 +716,9 @@
         "endDateRequired": "終了日は必須です",
         "minRequired": "最小数量は必須です",
         "maxRequired": "最大数量は必須です",
-        "precreateBeforeEndDaysRequired": "終了日までの事前作成日数は必須です"
+        "precreateBeforeEndDaysRequired": "終了日までの事前作成日数は必須です",
+        "geminiConfigModelIdRequired": "有効なモデルIDを入力してください",
+        "promptRequired": "プロンプトを入力してください"
     },
     "conditionTypes": {
         "DAILY_LOGIN": "ログイン",

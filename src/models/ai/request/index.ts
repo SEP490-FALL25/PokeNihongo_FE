@@ -2,6 +2,20 @@ import { AI_POLICY_SCOPE, PURPOSE_POLICY_AI } from "@constants/ai";
 import { z } from "zod";
 
 /**
+ * Update Gemini Config Prompts Request Schema
+ * @param t 
+ * @returns 
+ */
+export const updateGeminiConfigPromptsSchema = (t: (key: string, opts?: any) => string) => z.object({
+    geminiConfigModelId: z.number().min(1, t('validation.geminiConfigModelIdRequired')),
+    prompt: z.string().min(1, t('validation.promptRequired')),
+    isActive: z.boolean(),
+});
+export type IUpdateGeminiConfigPromptsRequest = z.infer<ReturnType<typeof updateGeminiConfigPromptsSchema>>;
+//------------------------End------------------------//
+
+
+/**
  * Create Gemini Config Models Request Schema
  */
 export const createCreateGeminiConfigModelsSchema = (t: (key: string, opts?: any) => string) => z.object({

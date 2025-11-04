@@ -1,4 +1,4 @@
-import { ICreateGeminiConfigModelsRequest, IUpdateModelConfigsPolicySchemaRequest } from "@models/ai/request";
+import { ICreateGeminiConfigModelsRequest, IUpdateGeminiConfigPromptsRequest, IUpdateModelConfigsPolicySchemaRequest } from "@models/ai/request";
 import { IQueryRequest } from "@models/common/request";
 import geminiService from "@services/ai";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -13,9 +13,45 @@ import { toast } from "react-toastify";
 export const useConfigPromptsCustom = (params: IQueryRequest) => {
     const { data, isLoading, error } = useQuery({
         queryKey: ['gemini-config-prompts', params],
-        queryFn: () => geminiService.getGeminiConfigPrompts(params),
+        queryFn: () => geminiService.getConfigCustomPrompts(params),
     });
     return { data: data?.data?.data, isLoading, error };
+}
+//-----------------------End-----------------------//
+
+
+/**
+ * Handle Get Config Custom Prompts By Id
+ * @param id 
+ * @returns 
+ */
+export const useGetConfigCustomPromptsById = (id: number) => {
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['gemini-config-prompts-by-id', id],
+        queryFn: () => geminiService.getConfigCustomPromptsById(id),
+    });
+    return { data: data?.data?.data, isLoading, error };
+}
+//-----------------------End-----------------------//
+
+
+/**
+ * Handle Update Config Custom Prompts
+ */
+export const useUpdateConfigCustomPrompts = () => {
+    const queryClient = useQueryClient();
+    const updateConfigCustomPromptsMutation = useMutation({
+        mutationFn: ({ id, data }: { id: number; data: IUpdateGeminiConfigPromptsRequest }) => geminiService.updateConfigCustomPrompts(id, data),
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts'] });
+            queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts-by-id', variables.id] });
+            toast.success('Cập nhật config custom prompts thành công');
+        },
+        onError: (error: any) => {
+            toast.error(error?.response?.data?.message || 'Có lỗi xảy ra khi cập nhật config custom prompts');
+        },
+    });
+    return updateConfigCustomPromptsMutation;
 }
 //-----------------------End-----------------------//
 //---------------------------------------------End Config Prompts---------------------------------------------//

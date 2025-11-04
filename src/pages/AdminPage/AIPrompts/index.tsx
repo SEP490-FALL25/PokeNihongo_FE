@@ -277,16 +277,7 @@ export default function AIPromptManagement() {
                                         </div>
 
                                         {/* Right Actions */}
-                                        <div className="flex flex-col gap-2">
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-9 w-9 hover:bg-primary/10 hover:text-primary"
-                                                onClick={() => setSelectedPrompt(prompt)}
-                                                title={t('aiCommon.viewDetail', { defaultValue: 'Xem chi tiết' }) as string}
-                                            >
-                                                <Eye className="h-4 w-4" />
-                                            </Button>
+                                        <div className="flex gap-2">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button

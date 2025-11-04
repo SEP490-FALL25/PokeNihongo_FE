@@ -1,9 +1,9 @@
 import { axiosPrivate } from "@configs/axios";
-import { ICreateGeminiConfigModelsRequest, IUpdateModelConfigsPolicySchemaRequest } from "@models/ai/request";
+import { ICreateGeminiConfigModelsRequest, IUpdateGeminiConfigPromptsRequest, IUpdateModelConfigsPolicySchemaRequest } from "@models/ai/request";
 import { IQueryRequest } from "@models/common/request";
 
 const geminiService = {
-    getGeminiConfigPrompts: async (params: IQueryRequest) => {
+    getConfigCustomPrompts: async (params: IQueryRequest) => {
         const { page = 1, limit = 10, sortBy, sortOrder, ...rest } = params || {};
         const qsParts: string[] = [];
 
@@ -34,6 +34,14 @@ const geminiService = {
                 pageSize: limit,
             },
         });
+    },
+
+    getConfigCustomPromptsById: async (id: number) => {
+        return await axiosPrivate.get(`/gemini-config/promt/${id}`);
+    },
+
+    updateConfigCustomPrompts: async (id: number, data: IUpdateGeminiConfigPromptsRequest) => {
+        return await axiosPrivate.put(`/gemini-config/promt/${id}`, data);
     },
 
     getConfigPresets: async () => {
