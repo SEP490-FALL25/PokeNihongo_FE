@@ -151,6 +151,27 @@ export const useCreateAIGeminiConfigModels = () => {
     return createGeminiConfigModelsMutation;
 }
 //-----------------------End-----------------------//
+
+
+/**
+ * Handle Delete AI Config Model
+ */
+export const useDeleteAIConfigModel = () => {
+    const queryClient = useQueryClient();
+    const deleteConfigModelMutation = useMutation({
+        mutationFn: (id: number) => geminiService.deleteConfigModel(id),
+        onSuccess: (data: any, variables: any) => {
+            queryClient.invalidateQueries({ queryKey: ['gemini-config-models'] });
+            queryClient.invalidateQueries({ queryKey: ['gemini-config-model-by-id', variables.id] });
+            toast.success(data?.message || 'Xóa model thành công');
+        },
+        onError: (error: any) => {
+            toast.error(error?.response?.data?.message || 'Có lỗi xảy ra khi xóa model');
+        },
+    });
+    return deleteConfigModelMutation;
+}
+//-----------------------End-----------------------//
 //---------------------------------------------End Custom AI---------------------------------------------//
 
 

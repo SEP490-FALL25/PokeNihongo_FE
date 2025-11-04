@@ -97,6 +97,10 @@ const geminiService = {
         return await axiosPrivate.get(`/gemini-config/config-models/${id}`);
     },
 
+    deleteConfigModel: async (id: number) => {
+        return await axiosPrivate.delete(`/gemini-config/config-models/${id}`);
+    },
+
     getModelConfigsPolicySchema: async (q?: string) => {
         return await axiosPrivate.get('/gemini-config/admin/schema', {
             params: q ? { q } : undefined,

@@ -134,6 +134,12 @@
             "selected": "đã chọn"
         },
         "selectEntities": "Chọn Entities",
+        "deleteDialog": {
+            "title": "Xác nhận xóa",
+            "message": "Bạn có chắc chắn muốn xóa config này? Hành động này không thể hoàn tác.",
+            "deleteButton": "Xóa",
+            "deleting": "Đang xóa..."
+        },
         "schemaEntities": {
             "title": "Schema Entities & Fields",
             "description": "Tìm kiếm và chọn schema entities để cấu hình",
