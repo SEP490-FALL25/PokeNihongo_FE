@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import testSetService from "@services/testSet";
-import { TestSetListRequest, TestSetCreateRequest, TestSetQuestionBankLinkMultipleRequest } from "@models/testSet/request";
+import { TestSetListRequest, TestSetCreateRequest, TestSetQuestionBankLinkMultipleRequest, TestSetUpsertWithQuestionBanksRequest } from "@models/testSet/request";
 import { selectCurrentLanguage } from "@redux/features/language/selector";
 import { useSelector } from "react-redux";
 import { AxiosError } from "axios";
@@ -311,4 +311,50 @@ export const useDeleteLinkedQuestionBanksFromTestSet = () => {
   });
 
   return deleteLinkedQuestionBanksMutation;
+};
+
+/**
+ * Hook for upserting test set with question banks (for speaking tests)
+ * @returns mutation object with upsertTestSetWithQuestionBanks function
+ */
+export const useUpsertTestSetWithQuestionBanks = () => {
+  const queryClient = useQueryClient();
+
+  const upsertMutation = useMutation({
+    mutationFn: (data: TestSetUpsertWithQuestionBanksRequest) =>
+      testSetService.upsertTestSetWithQuestionBanks(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["testset-list"] });
+      queryClient.invalidateQueries({ queryKey: ["testset-linked-question-banks"] });
+    },
+    onError: (error: unknown) => {
+      console.error("Error upserting test set with question banks:", error);
+      const apiError = error as ApiError;
+      if (apiError?.response?.status === 422) {
+        const raw = (apiError?.response?.data as unknown as { message?: unknown })?.message;
+        if (Array.isArray(raw)) {
+          const parts = raw.map((item) => {
+            if (typeof item === 'string') return item;
+            if (item && typeof item === 'object') {
+              const msg = (item as { message?: string }).message || 'Dữ liệu không hợp lệ';
+              const path = (item as { path?: string }).path;
+              return path ? `${path}: ${msg}` : msg;
+            }
+            return String(item);
+          });
+          toast.error(`Lỗi validation:\n${parts.join("\n")}`);
+        } else if (typeof raw === 'string') {
+          toast.error(raw);
+        } else {
+          toast.error("Lỗi validation");
+        }
+      } else {
+        toast.error(
+          getErrorMessage(error, "Có lỗi xảy ra khi lưu test set")
+        );
+      }
+    },
+  });
+
+  return upsertMutation;
 };
