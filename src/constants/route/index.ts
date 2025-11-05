@@ -38,6 +38,8 @@ const MANAGER = {
     VOCABULARY: '/manager/vocabulary',
     QUESTION_BANK: '/manager/question-bank',
     TESTSET_MANAGEMENT: '/manager/testset-management',
+    TESTSET_SPEAKING_MANAGEMENT: '/manager/testset-speaking',
+    TESTSET_SPEAKING_MANAGEMENT_EDIT: '/manager/testset-speaking/:id',
     TEST_MANAGEMENT: '/manager/test-management',
     SETTINGS: '/manager/settings',
 };

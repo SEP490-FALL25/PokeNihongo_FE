@@ -1,6 +1,6 @@
 import { axiosPrivate } from "@configs/axios";
 import { QuestionType } from "@constants/questionBank";
-import { TestSetListRequest, TestSetCreateRequest, TestSetQuestionBankLinkMultipleRequest } from "@models/testSet/request";
+import { TestSetListRequest, TestSetCreateRequest, TestSetQuestionBankLinkMultipleRequest, TestSetUpsertWithQuestionBanksRequest } from "@models/testSet/request";
 import { TestSetListResponseType, TestSetCreateResponseType } from "@models/testSet/response";
 
 const testSetService = {
@@ -22,6 +22,13 @@ const testSetService = {
     const url = queryString ? `/testset?${queryString}` : '/testset';
     
     const response = await axiosPrivate.get(url);
+    return response.data;
+  },
+  // Get a single test set including all question banks and full translations
+  getTestSetWithQuestionBanksFull: async (
+    id: number
+  ): Promise<Record<string, unknown>> => {
+    const response = await axiosPrivate.get(`/testset/${id}/with-question-banks-full`);
     return response.data;
   },
   createTestSetWithMeanings: async (
@@ -61,6 +68,13 @@ const testSetService = {
       '/testset-questionbank/delete-many',
       { data: { ids } }
     );
+    return response.data;
+  },
+  // Upsert test set with question banks (for speaking tests)
+  upsertTestSetWithQuestionBanks: async (
+    body: TestSetUpsertWithQuestionBanksRequest
+  ): Promise<TestSetCreateResponseType> => {
+    const response = await axiosPrivate.post('/testset/upsert-with-question-banks', body);
     return response.data;
   },
 };

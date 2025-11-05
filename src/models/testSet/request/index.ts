@@ -39,3 +39,48 @@ export const TestSetQuestionBankLinkMultipleSchema = z.object({
 });
 
 export type TestSetQuestionBankLinkMultipleRequest = z.infer<typeof TestSetQuestionBankLinkMultipleSchema>;
+
+// QuestionBank for speaking test
+export const QuestionBankForSpeakingSchema = z.object({
+  id: z.number().optional(),
+  questionJp: z.string(),
+  questionType: z.enum(['VOCABULARY', 'GRAMMAR', 'KANJI', 'LISTENING', 'READING', 'SPEAKING', 'GENERAL']),
+  audioUrl: z.string().optional().nullable(),
+  role: z.enum(['A', 'B']),
+  pronunciation: z.string().optional().nullable(),
+  levelN: z.number(),
+  meanings: z.array(
+    z.object({
+      translations: z.object({
+        vi: z.string(),
+        en: z.string().optional(),
+        ja: z.string().optional(),
+      }),
+    })
+  ).optional(),
+});
+
+export type QuestionBankForSpeaking = z.infer<typeof QuestionBankForSpeakingSchema>;
+
+// Upsert TestSet with QuestionBanks
+export const TestSetUpsertWithQuestionBanksSchema = z.object({
+  id: z.number().optional(),
+  meanings: z.array(
+    z.object({
+      field: z.enum(['name', 'description']),
+      translations: z.object({
+        vi: z.string(),
+        en: z.string().optional(),
+        ja: z.string().optional(),
+      }),
+    })
+  ),
+  audioUrl: z.string().optional().nullable(),
+  price: z.number().nullable().optional(),
+  levelN: z.number(),
+  testType: z.enum(['VOCABULARY', 'GRAMMAR', 'KANJI', 'LISTENING', 'READING', 'SPEAKING', 'GENERAL']),
+  status: z.enum(['DRAFT', 'ACTIVE', 'INACTIVE']),
+  questionBanks: z.array(QuestionBankForSpeakingSchema).optional(),
+});
+
+export type TestSetUpsertWithQuestionBanksRequest = z.infer<typeof TestSetUpsertWithQuestionBanksSchema>;

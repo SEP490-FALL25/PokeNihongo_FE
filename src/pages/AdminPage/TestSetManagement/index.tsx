@@ -36,8 +36,10 @@ import FilterSection from "./components/FilterSection";
 import TestSetCard from "./components/TestSetCard";
 import { extractText, getTranslation } from "./utils/helpers";
 import { TestSetEntity } from "@models/testSet/entity";
+import { useNavigate } from "react-router-dom";
 
 const TestSetManagement: React.FC = () => {
+  const navigate = useNavigate();
   // Helper function to extract error message from axios error response
   const getErrorMessage = (error: unknown, defaultMessage: string): string => {
     if (error instanceof AxiosError) {
@@ -85,18 +87,18 @@ const TestSetManagement: React.FC = () => {
     levelN: (q as { levelN?: number }).levelN ?? 0,
   }));
   const [form, setForm] = useState({
-    nameVi: "Đề thi từ vựng N3 - Phần 1",
-    nameEn: "N3 Vocabulary Test - Part 1",
+    nameVi: "Đề thi từ vựng N5 - Phần 1",
+    nameEn: "N5 Vocabulary Test - Part 1",
     descriptionVi:
-      "Bộ đề thi từ vựng N3 bao gồm 50 câu hỏi về từ vựng cơ bản trong tiếng Nhật",
+      "Bộ đề thi từ vựng N5 bao gồm 50 câu hỏi về từ vựng cơ bản trong tiếng Nhật",
     descriptionEn:
-      "N3 vocabulary test with 50 basic vocabulary questions in Japanese",
+      "N5 vocabulary test with 50 basic vocabulary questions in Japanese",
     content:
       "２月１４日は、日本ではバレンタインデーです。キリスト教の特別な日ですが、日本では、女の人が好きな人にチョコレートなどのプレゼントをする日になりました。世界にも同じような日があります。ブラジルでは、６月１２日が「恋人の日」と呼ばれる日です。その日は、男の人も女の人もプレゼントを用意して、恋人におくります。 ブラジルでは、日本のようにチョコレートではなく、写真立てに写真を入れて、プレゼントするそうです。",
     audioUrl:
-      "https://storage.googleapis.com/pokenihongo-audio/testset-n3-vocab-instruction.mp3",
+      "https://storage.googleapis.com/pokenihongo-audio/testset-n5-vocab-instruction.mp3",
     price: 0,
-    levelN: 3,
+    levelN: 5,
     testType: "VOCABULARY" as TestSetCreateRequest["testType"],
     status: "DRAFT" as TestSetCreateRequest["status"],
   });
@@ -414,7 +416,15 @@ const TestSetManagement: React.FC = () => {
       <div className="p-8 mt-24">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Quản lý Test Set</h2>
-          <Button onClick={openCreate}>Thêm mới</Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline"
+              onClick={() => navigate('/manager/testset-speaking')}
+            >
+              Thêm Speaking Test
+            </Button>
+            <Button onClick={openCreate}>Thêm mới</Button>
+          </div>
         </div>
 
         <FilterSection
@@ -452,7 +462,13 @@ const TestSetManagement: React.FC = () => {
                     key={t.id}
                     testSet={t as unknown as TestSetEntity}
                     extractText={extractText}
-                    onClick={() => openEdit(t.id)}
+                    onClick={() => {
+                      if (t.testType === "SPEAKING") {
+                        navigate(`/manager/testset-speaking/${t.id}`);
+                      } else {
+                        openEdit(t.id);
+                      }
+                    }}
                   />
                 ))}
               </div>

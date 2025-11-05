@@ -31,6 +31,7 @@ const DailyQuestManagement = lazy(() => import("@pages/AdminPage/DailyQuest"))
 const RewardManagement = lazy(() => import("@pages/AdminPage/Reward"))
 const QuestionBankManagement = lazy(() => import("@pages/AdminPage/QuestionBank"))
 const TestSetManagement = lazy(() => import("@pages/AdminPage/TestSetManagement"))
+const SpeakingTestSetManagement = lazy(() => import("@pages/AdminPage/SpeakingTestSetPage"))
 const TestManagement = lazy(() => import("@pages/AdminPage/TestManagement"))
 const RouterComponent = () => {
     const router = createBrowserRouter([
@@ -78,6 +79,8 @@ const RouterComponent = () => {
                                 { path: ROUTES.MANAGER.VOCABULARY, element: <VocabularyManagement /> },
                                 { path: ROUTES.MANAGER.QUESTION_BANK, element: <QuestionBankManagement /> },
                                 { path: ROUTES.MANAGER.TESTSET_MANAGEMENT, element: <TestSetManagement /> },
+                                { path: ROUTES.MANAGER.TESTSET_SPEAKING_MANAGEMENT, element: <SpeakingTestSetManagement /> },
+                                { path: ROUTES.MANAGER.TESTSET_SPEAKING_MANAGEMENT_EDIT, element: <SpeakingTestSetManagement /> },
                                 { path: ROUTES.MANAGER.TEST_MANAGEMENT, element: <TestManagement /> },
                             ],
                         },
