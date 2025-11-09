@@ -54,8 +54,8 @@ export const useCreateAnswer = () => {
   const queryClient = useQueryClient();
 
   const createAnswerMutation = useMutation({
-    mutationFn: (data: ICreateAnswerRequest) =>
-      answerService.createMultipleAnswers({ questionId: data.questionId, answers: [data] }),
+    mutationFn: ({ questionBankId, answer }: { questionBankId: number; answer: ICreateAnswerRequest }) =>
+      answerService.createMultipleAnswers({ questionBankId, answers: [answer] }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["question-bank-list"] });
       queryClient.invalidateQueries({ queryKey: ["answer-list"] });

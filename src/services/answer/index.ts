@@ -47,7 +47,7 @@ const answerService = {
   },
 
   createMultipleAnswers: async (
-    data: { questionId: number; answers: ICreateAnswerRequest[] }
+    data: { questionBankId: number; answers: ICreateAnswerRequest[] }
   ): Promise<{ data: AnswerEntityType[] }> => {
     return axiosPrivate.post("/answers/multiple", data);
   },
@@ -65,3 +65,4 @@ const answerService = {
 };
 
 export default answerService;
+

@@ -804,10 +804,13 @@ export const useQuestionBank = (
         } else {
           // Create new answer
           return createAnswerMutation.mutateAsync({
-            answerJp: answer.answerJp,
-            isCorrect: answer.isCorrect,
-            questionId: editingQuestion.id,
-            translations: answer.translations,
+            questionBankId: editingQuestion.id,
+            answer: {
+              answerJp: answer.answerJp,
+              isCorrect: answer.isCorrect,
+              questionId: editingQuestion.id,
+              translations: answer.translations,
+            },
           });
         }
       });
