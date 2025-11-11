@@ -15,7 +15,6 @@ import { validateCreateLesson, useFormValidation, commonValidationRules } from '
 import {
     BookOpen,
     Clock,
-    Hash,
     Globe,
     Gift,
     Layers,
@@ -40,7 +39,7 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
         estimatedTimeMinutes: 45,
         isPublished: false,
         version: '1.0.0',
-        lessonCategoryId: 1,
+        lessonCategoryId: 1, // Will be auto-calculated from levelJlpt
         rewardId: 1,
         translations: {
             meaning: [
@@ -50,15 +49,19 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
         }
     });
 
+    // Map levelJlpt to lessonCategoryId: 5→1, 4→2, 3→3, 2→4, 1→5
+    const getLessonCategoryIdFromLevel = (levelJlpt: number): number => {
+        return 6 - levelJlpt;
+    };
+
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    // Initialize validation rules
+    // Initialize validation rules (lessonCategoryId will be auto-calculated, so no validation needed)
     const validationRules = {
         titleJp: commonValidationRules.titleJp,
         levelJlpt: commonValidationRules.levelJlpt,
         estimatedTimeMinutes: commonValidationRules.estimatedTimeMinutes,
         version: commonValidationRules.version,
-        lessonCategoryId: commonValidationRules.lessonCategoryId,
         rewardId: commonValidationRules.rewardId,
     };
 
@@ -69,9 +72,9 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
             ...prev,
             [field]: value
         }));
-        
+
         // Mark field as touched for validation
-        
+
         // Clear error when user starts typing
         if (errors[field]) {
             setErrors(prev => ({
@@ -91,9 +94,9 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
                 )
             }
         }));
-        
+
         // Mark translation field as touched for validation
-        
+
         // Clear error when user starts typing
         if (errors[`translation_${index}`]) {
             setErrors(prev => ({
@@ -118,7 +121,12 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
     };
 
     const validateForm = () => {
-        const newErrors = validateCreateLesson(formData);
+        // Auto-calculate lessonCategoryId before validation
+        const dataToValidate = {
+            ...formData,
+            lessonCategoryId: getLessonCategoryIdFromLevel(formData.levelJlpt)
+        };
+        const newErrors = validateCreateLesson(dataToValidate);
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -129,8 +137,10 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
             return;
         }
 
+        // Auto-calculate lessonCategoryId from levelJlpt
         const submitData = {
             ...formData,
+            lessonCategoryId: getLessonCategoryIdFromLevel(formData.levelJlpt),
             isPublished: isPublish
         };
 
@@ -206,7 +216,7 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
                                                         placeholder="vi, en, ja..."
                                                         value={translation.language_code}
                                                         onChange={(e) => handleTranslationChange(index, 'language_code', e.target.value)}
-                                                        onBlur={() => {}}
+                                                        onBlur={() => { }}
                                                         className="bg-background border-border text-foreground h-10"
                                                     />
                                                 </div>
@@ -215,7 +225,7 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
                                                         placeholder={index === 0 ? "Cách chào hỏi cơ bản" : "Basic Greetings"}
                                                         value={translation.value}
                                                         onChange={(e) => handleTranslationChange(index, 'value', e.target.value)}
-                                                        onBlur={() => {}}
+                                                        onBlur={() => { }}
                                                         className="bg-background border-border text-foreground h-10"
                                                     />
                                                 </div>
@@ -243,104 +253,56 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* Cấp độ JLPT */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                                            <Badge variant="outline" className="text-xs">JLPT</Badge>
-                                            {t('createLesson.level')} *
-                                        </label>
-                                        <Select value={formData.levelJlpt.toString()} onValueChange={(value) => handleInputChange('levelJlpt', parseInt(value))}>
-                                            <SelectTrigger 
-                                                className="bg-background border-border text-foreground h-11"
-                                                onBlur={() => handleBlur('levelJlpt')}
-                                            >
-                                                <SelectValue placeholder={t('createLesson.selectLevel')} />
-                                            </SelectTrigger>
-                                            <SelectContent className="bg-card border-border">
-                                                <SelectItem value="5">
-                                                    <div className="flex items-center gap-2">
-                                                        <Badge variant="secondary" className="text-xs">N5</Badge>
-                                                        <span>Bắt đầu</span>
-                                                    </div>
-                                                </SelectItem>
-                                                <SelectItem value="4">
-                                                    <div className="flex items-center gap-2">
-                                                        <Badge variant="secondary" className="text-xs">N4</Badge>
-                                                        <span>Cơ bản</span>
-                                                    </div>
-                                                </SelectItem>
-                                                <SelectItem value="3">
-                                                    <div className="flex items-center gap-2">
-                                                        <Badge variant="secondary" className="text-xs">N3</Badge>
-                                                        <span>Trung cấp</span>
-                                                    </div>
-                                                </SelectItem>
-                                                <SelectItem value="2">
-                                                    <div className="flex items-center gap-2">
-                                                        <Badge variant="secondary" className="text-xs">N2</Badge>
-                                                        <span>Trung thượng</span>
-                                                    </div>
-                                                </SelectItem>
-                                                <SelectItem value="1">
-                                                    <div className="flex items-center gap-2">
-                                                        <Badge variant="secondary" className="text-xs">N1</Badge>
-                                                        <span>Cao cấp</span>
-                                                    </div>
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        {errors.levelJlpt && <p className="text-sm text-red-500 flex items-center gap-1">
-                                            <X className="h-3 w-3" />
-                                            {errors.levelJlpt}
-                                        </p>}
-                                    </div>
-
-                                    {/* Danh mục bài học */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                                            <Hash className="h-4 w-4 text-primary" />
-                                            Danh mục *
-                                        </label>
-                                        <Select value={formData.lessonCategoryId.toString()} onValueChange={(value) => handleInputChange('lessonCategoryId', parseInt(value))}>
-                                            <SelectTrigger 
-                                                className="bg-background border-border text-foreground h-11"
-                                                onBlur={() => handleBlur('lessonCategoryId')}
-                                            >
-                                                <SelectValue placeholder="Chọn danh mục" />
-                                            </SelectTrigger>
-                                            <SelectContent className="bg-card border-border">
-                                                <SelectItem value="1">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-lg">あ</span>
-                                                        <span>Chữ cái</span>
-                                                    </div>
-                                                </SelectItem>
-                                                <SelectItem value="2">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-lg">漢</span>
-                                                        <span>Kanji</span>
-                                                    </div>
-                                                </SelectItem>
-                                                <SelectItem value="3">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-lg">文</span>
-                                                        <span>Ngữ pháp</span>
-                                                    </div>
-                                                </SelectItem>
-                                                <SelectItem value="4">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-lg">話</span>
-                                                        <span>Hội thoại</span>
-                                                    </div>
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        {errors.lessonCategoryId && <p className="text-sm text-red-500 flex items-center gap-1">
-                                            <X className="h-3 w-3" />
-                                            {errors.lessonCategoryId}
-                                        </p>}
-                                    </div>
+                                {/* Cấp độ JLPT */}
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                                        <Badge variant="outline" className="text-xs">JLPT</Badge>
+                                        {t('createLesson.level')} *
+                                    </label>
+                                    <Select value={formData.levelJlpt.toString()} onValueChange={(value) => handleInputChange('levelJlpt', parseInt(value))}>
+                                        <SelectTrigger
+                                            className="bg-background border-border text-foreground h-11"
+                                            onBlur={() => handleBlur('levelJlpt')}
+                                        >
+                                            <SelectValue placeholder={t('createLesson.selectLevel')} />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-card border-border">
+                                            <SelectItem value="5">
+                                                <div className="flex items-center gap-2">
+                                                    <Badge variant="secondary" className="text-xs">N5</Badge>
+                                                    <span>Bắt đầu</span>
+                                                </div>
+                                            </SelectItem>
+                                            <SelectItem value="4">
+                                                <div className="flex items-center gap-2">
+                                                    <Badge variant="secondary" className="text-xs">N4</Badge>
+                                                    <span>Cơ bản</span>
+                                                </div>
+                                            </SelectItem>
+                                            <SelectItem value="3">
+                                                <div className="flex items-center gap-2">
+                                                    <Badge variant="secondary" className="text-xs">N3</Badge>
+                                                    <span>Trung cấp</span>
+                                                </div>
+                                            </SelectItem>
+                                            <SelectItem value="2">
+                                                <div className="flex items-center gap-2">
+                                                    <Badge variant="secondary" className="text-xs">N2</Badge>
+                                                    <span>Trung thượng</span>
+                                                </div>
+                                            </SelectItem>
+                                            <SelectItem value="1">
+                                                <div className="flex items-center gap-2">
+                                                    <Badge variant="secondary" className="text-xs">N1</Badge>
+                                                    <span>Cao cấp</span>
+                                                </div>
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    {errors.levelJlpt && <p className="text-sm text-red-500 flex items-center gap-1">
+                                        <X className="h-3 w-3" />
+                                        {errors.levelJlpt}
+                                    </p>}
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
