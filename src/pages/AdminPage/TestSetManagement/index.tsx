@@ -19,9 +19,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@ui/Select";
-import { Card, CardContent, CardHeader } from "@ui/Card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@ui/Card";
 import { Skeleton } from "@ui/Skeleton";
-import { X } from "lucide-react";
+import { Badge } from "@ui/Badge";
+import { FileText, Plus, Loader2, Sparkles, CheckCircle2, Clock, Target, Mic, X } from "lucide-react";
 import HeaderAdmin from "@organisms/Header/Admin";
 import PaginationControls from "@ui/PaginationControls";
 import { Checkbox } from "@ui/Checkbox";
@@ -413,85 +414,114 @@ const TestSetManagement: React.FC = () => {
         description="Quản lý các bộ đề thi"
       />
 
-      <div className="p-8 mt-24">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Quản lý Test Set</h2>
-          <div className="flex gap-2">
-            <Button 
-              variant="outline"
-              onClick={() => navigate('/manager/testset-speaking')}
-            >
-              Thêm Speaking Test
-            </Button>
-            <Button onClick={openCreate}>Thêm mới</Button>
-          </div>
-        </div>
-
-        <FilterSection
-          filters={filters}
-          onSearchChange={handleSearch}
-          onLevelChange={handleFilterByLevel}
-          onTestTypeChange={handleFilterByTestType}
-          onStatusChange={handleFilterByStatus}
-        />
-
-        <div className="mt-4">
-          {isLoading ? (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Card key={i} className="bg-white">
-                  <CardHeader>
-                    <Skeleton className="h-5 w-2/3" />
-                  </CardHeader>
-                  <CardContent>
-                    <Skeleton className="h-4 w-full mb-2" />
-                    <Skeleton className="h-4 w-2/3" />
-                  </CardContent>
-                </Card>
-              ))}
+      <div className="p-8 mt-24 space-y-8">
+        <Card className="bg-gradient-to-br from-card via-card to-card/95 border-border shadow-md">
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <FileText className="w-5 h-5 text-primary" />
+                </div>
+                <CardTitle className="text-xl font-bold text-foreground">Quản lý Test Set</CardTitle>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline"
+                  onClick={() => navigate('/manager/testset-speaking')}
+                  className="border-border text-foreground hover:bg-primary/10 hover:border-primary/50 hover:text-primary transition-all shadow-sm"
+                >
+                  <Mic className="h-4 w-4 mr-2" />
+                  Thêm Speaking Test
+                </Button>
+                <Button 
+                  onClick={openCreate}
+                  className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 shadow-lg"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Thêm mới
+                </Button>
+              </div>
             </div>
-          ) : testSets.length === 0 ? (
-            <div className="text-center text-gray-500 py-16">
-              Không có test set
-            </div>
-          ) : (
-            <>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {testSets.map((t) => (
-                  <TestSetCard
-                    key={t.id}
-                    testSet={t as unknown as TestSetEntity}
-                    extractText={extractText}
-                    onClick={() => {
-                      if (t.testType === "SPEAKING") {
-                        navigate(`/manager/testset-speaking/${t.id}`);
-                      } else {
-                        openEdit(t.id);
-                      }
-                    }}
-                  />
+            <FilterSection
+              filters={filters}
+              onSearchChange={handleSearch}
+              onLevelChange={handleFilterByLevel}
+              onTestTypeChange={handleFilterByTestType}
+              onStatusChange={handleFilterByStatus}
+            />
+          </CardHeader>
+
+          <CardContent>
+            {isLoading ? (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Card key={i} className="bg-gradient-to-br from-card via-card to-card/95 border-border shadow-md">
+                    <CardHeader>
+                      <div className="flex items-center gap-2 mb-3">
+                        <Skeleton className="h-8 w-8 rounded-lg" />
+                        <Skeleton className="h-6 w-3/4" />
+                      </div>
+                      <Skeleton className="h-6 w-24 rounded-full" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3 p-4 bg-muted/20 rounded-lg">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-2/3" />
+                      </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
-              <div className="flex justify-end mt-6">
-                {pagination && (
-                  <PaginationControls
-                    currentPage={pagination.current || 1}
-                    totalPages={pagination.totalPage || 0}
-                    totalItems={pagination.totalItem || 0}
-                    itemsPerPage={pagination.pageSize || 10}
-                    onPageChange={(nextPage: number) =>
-                      handlePageChange(nextPage)
-                    }
-                    onItemsPerPageChange={(size: number) =>
-                      handlePageSizeChange(size)
-                    }
-                    isLoading={isLoading}
-                  />
-                )}
+            ) : testSets.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16">
+                <div className="p-3 bg-muted rounded-full mb-4">
+                  <FileText className="w-8 h-8 text-muted-foreground" />
+                </div>
+                <p className="text-muted-foreground font-medium text-lg">
+                  Không có test set
+                </p>
               </div>
-            </>
-          )}
-        </div>
+            ) : (
+              <>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {testSets.map((t) => (
+                    <TestSetCard
+                      key={t.id}
+                      testSet={t as unknown as TestSetEntity}
+                      extractText={extractText}
+                      onClick={() => {
+                        if (t.testType === "SPEAKING") {
+                          navigate(`/manager/testset-speaking/${t.id}`);
+                        } else {
+                          openEdit(t.id);
+                        }
+                      }}
+                    />
+                  ))}
+                </div>
+                {pagination && pagination.totalPage > 0 && (
+                  <Card className="bg-card border-border shadow-md mt-6">
+                    <CardContent className="pt-4">
+                      <PaginationControls
+                        currentPage={pagination.current || 1}
+                        totalPages={pagination.totalPage || 0}
+                        totalItems={pagination.totalItem || 0}
+                        itemsPerPage={pagination.pageSize || 10}
+                        onPageChange={(nextPage: number) =>
+                          handlePageChange(nextPage)
+                        }
+                        onItemsPerPageChange={(size: number) =>
+                          handlePageSizeChange(size)
+                        }
+                        isLoading={isLoading}
+                      />
+                    </CardContent>
+                  </Card>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
 
         <Dialog
           open={isDialogOpen}
