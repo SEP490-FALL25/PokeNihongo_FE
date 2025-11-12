@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card";
 import { Badge } from "@ui/Badge";
+import { FileText, Tag, Hash } from "lucide-react";
 
 interface TestSetCardProps {
   testSet: {
@@ -23,48 +24,68 @@ const TestSetCard: React.FC<TestSetCardProps> = ({
 }) => {
   return (
     <Card
-      className="hover:border-primary/40 transition-colors cursor-pointer"
+      className="group relative overflow-hidden bg-gradient-to-br from-card via-card to-card/95 border-border hover:border-primary/50 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer"
       onClick={onClick}
     >
-      <CardHeader>
-        <div className="flex items-start justify-between">
+      {/* Decorative gradient overlay */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/5 via-transparent to-transparent rounded-full -mr-32 -mt-32 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      
+      <CardHeader className="relative">
+        <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <CardTitle className="text-lg">
-              {extractText(
-                (testSet as unknown as Record<string, unknown>).name,
-                "vi"
-              )}
-            </CardTitle>
-            <p className="text-sm text-gray-600 line-clamp-2">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <FileText className="w-4 h-4 text-primary" />
+              </div>
+              <CardTitle className="text-lg font-bold text-foreground line-clamp-2">
+                {extractText(
+                  (testSet as unknown as Record<string, unknown>).name,
+                  "vi"
+                )}
+              </CardTitle>
+            </div>
+            <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
               {extractText(
                 (testSet as unknown as Record<string, unknown>).description,
                 "vi"
               )}
             </p>
-          </div>
-          <div className="flex gap-2">
-            <Badge variant="outline">N{testSet.levelN}</Badge>
-            <Badge
-              className={
-                testSet.status === "ACTIVE"
-                  ? "bg-green-100 text-green-800"
-                  : testSet.status === "DRAFT"
-                  ? "bg-yellow-100 text-yellow-800"
-                  : "bg-gray-100 text-gray-800"
-              }
-            >
-              {testSet.status}
-            </Badge>
+            <div className="flex gap-2 flex-wrap">
+              <Badge className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-600 border-blue-500/30 shadow-sm font-medium">
+                N{testSet.levelN}
+              </Badge>
+              <Badge
+                className={`shadow-sm font-medium ${
+                  testSet.status === "ACTIVE"
+                    ? "bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-600 border-green-500/30"
+                    : testSet.status === "DRAFT"
+                    ? "bg-gradient-to-r from-yellow-500/20 to-amber-500/20 text-yellow-600 border-yellow-500/30"
+                    : "bg-gradient-to-r from-gray-500/20 to-gray-600/20 text-gray-600 border-gray-500/30"
+                }`}
+              >
+                {testSet.status}
+              </Badge>
+            </div>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="text-sm text-gray-700 mb-3 line-clamp-3">
-          {testSet.content}
-        </div>
-        <div className="flex items-center justify-between text-sm text-gray-600">
-          <div>{testSet.testType}</div>
-          <div>#{testSet.id}</div>
+      <CardContent className="relative">
+        <div className="space-y-3 text-sm mb-4 p-4 bg-muted/20 rounded-lg border border-border/50">
+          <div className="text-foreground line-clamp-3">
+            {testSet.content}
+          </div>
+          <div className="flex items-center justify-between pt-2 border-t border-border/50">
+            <span className="text-muted-foreground font-medium flex items-center gap-2">
+              <Tag className="h-4 w-4" />
+              Loại:
+            </span>
+            <span className="text-foreground font-bold">
+              {testSet.testType}
+            </span>
+          </div>
+          <div className="text-xs text-muted-foreground mt-2 pt-2 border-t border-border/50">
+            ID: {testSet.id}
+          </div>
         </div>
       </CardContent>
     </Card>

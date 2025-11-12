@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card";
 import { Badge } from "@ui/Badge";
-import { DollarSign } from "lucide-react";
+import { DollarSign, FileText, Clock, Tag } from "lucide-react";
 
 interface TestCardProps {
   test: {
@@ -24,57 +24,76 @@ const TestCard: React.FC<TestCardProps> = ({
 }) => {
   return (
     <Card
-      className="hover:border-primary/40 transition-colors cursor-pointer"
+      className="group relative overflow-hidden bg-gradient-to-br from-card via-card to-card/95 border-border hover:border-primary/50 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer"
       onClick={onClick}
     >
-      <CardHeader>
-        <div className="flex items-start justify-between">
+      {/* Decorative gradient overlay */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/5 via-transparent to-transparent rounded-full -mr-32 -mt-32 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      
+      <CardHeader className="relative">
+        <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <CardTitle className="text-lg">
-              {extractText(
-                (test as unknown as Record<string, unknown>).name,
-                "vi"
-              )}
-            </CardTitle>
-            <p className="text-sm text-gray-600 line-clamp-2">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <FileText className="w-4 h-4 text-primary" />
+              </div>
+              <CardTitle className="text-lg font-bold text-foreground line-clamp-2">
+                {extractText(
+                  (test as unknown as Record<string, unknown>).name,
+                  "vi"
+                )}
+              </CardTitle>
+            </div>
+            <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
               {extractText(
                 (test as unknown as Record<string, unknown>).description,
                 "vi"
               )}
             </p>
-          </div>
-          <div className="flex gap-2">
-            <Badge variant="outline">N{test.levelN ?? 0}</Badge>
-            <Badge
-              className={
-                test.status === "ACTIVE"
-                  ? "bg-green-100 text-green-800"
-                  : test.status === "DRAFT"
-                  ? "bg-yellow-100 text-yellow-800"
-                  : "bg-gray-100 text-gray-800"
-              }
-            >
-              {test.status}
-            </Badge>
+            <div className="flex gap-2 flex-wrap">
+              <Badge className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-600 border-blue-500/30 shadow-sm font-medium">
+                N{test.levelN ?? 0}
+              </Badge>
+              <Badge
+                className={`shadow-sm font-medium ${
+                  test.status === "ACTIVE"
+                    ? "bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-600 border-green-500/30"
+                    : test.status === "DRAFT"
+                    ? "bg-gradient-to-r from-yellow-500/20 to-amber-500/20 text-yellow-600 border-yellow-500/30"
+                    : "bg-gradient-to-r from-gray-500/20 to-gray-600/20 text-gray-600 border-gray-500/30"
+                }`}
+              >
+                {test.status}
+              </Badge>
+            </div>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="text-sm text-gray-700 mb-3 line-clamp-3">
-          {extractText(
-            (test as unknown as Record<string, unknown>).description,
-            "vi"
-          )}
-        </div>
-        <div className="flex items-center justify-between text-sm text-gray-600">
-          <div className="flex items-center gap-1">
-            <DollarSign className="h-4 w-4" />
-            {test.price
-              ? `${test.price.toLocaleString()} ₫`
-              : "Miễn phí"}
+      <CardContent className="relative">
+        <div className="space-y-3 text-sm mb-4 p-4 bg-muted/20 rounded-lg border border-border/50">
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground font-medium flex items-center gap-2">
+              <DollarSign className="h-4 w-4" />
+              Giá:
+            </span>
+            <span className="text-foreground font-bold">
+              {test.price
+                ? `${test.price.toLocaleString()} ₫`
+                : "Miễn phí"}
+            </span>
           </div>
-          <div>{test.testType.toUpperCase()}</div>
-          <div>#{test.id}</div>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground font-medium flex items-center gap-2">
+              <Tag className="h-4 w-4" />
+              Loại:
+            </span>
+            <span className="text-foreground font-bold">
+              {test.testType.toUpperCase()}
+            </span>
+          </div>
+          <div className="text-xs text-muted-foreground mt-2 pt-2 border-t border-border/50">
+            ID: {test.id}
+          </div>
         </div>
       </CardContent>
     </Card>

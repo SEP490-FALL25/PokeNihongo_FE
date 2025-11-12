@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@ui/Card";
 import { Button } from "@ui/Button";
+import { Input } from "@ui/Input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@ui/Table";
-import { Plus, Edit, Trash2, MoreVertical } from "lucide-react";
+import { Badge } from "@ui/Badge";
+import { Plus, Edit, Trash2, MoreVertical, Gift, Sparkles, Loader2, Search } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@ui/DropdownMenu";
 import HeaderAdmin from "@organisms/Header/Admin";
 import { toast } from "react-toastify";
@@ -127,52 +130,101 @@ const RewardManagement = () => {
     return (
         <>
             <HeaderAdmin title={t('reward.title')} description={t('reward.description')} />
-            <div className="mt-24 p-8">
-                <Card className="bg-card border-border">
-                    <CardHeader>
-                        <div className="flex items-center justify-between">
-                            <CardTitle className="text-foreground">{t('reward.title')}</CardTitle>
-                            <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={openAddDialog}>
+            <div className="mt-24 p-8 space-y-8">
+                {/* Stats Cards */}
+                <div className="grid gap-6 md:grid-cols-4">
+                    <Card className="relative overflow-hidden bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-full -mr-16 -mt-16" />
+                        <CardHeader className="pb-3 relative">
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="text-sm font-semibold text-foreground/90">Tổng phần thưởng</CardTitle>
+                                <div className="p-2 bg-purple-500/10 rounded-lg text-purple-500">
+                                    <Gift className="w-5 h-5" />
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="relative">
+                            <div className="text-4xl font-bold text-foreground mb-1">
+                                {rewardList?.pagination?.totalItem || 0}
+                            </div>
+                            <div className="h-1 w-16 bg-gradient-to-r from-transparent via-current to-transparent opacity-20 mt-2" />
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Rewards Table */}
+                <Card className="bg-gradient-to-br from-card via-card to-card/95 border-border shadow-md">
+                    <CardHeader className="pb-4">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-primary/10 rounded-lg">
+                                    <Gift className="w-5 h-5 text-primary" />
+                                </div>
+                                <CardTitle className="text-xl font-bold text-foreground">{t('reward.title')}</CardTitle>
+                            </div>
+                            <Button 
+                                className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 shadow-lg"
+                                onClick={openAddDialog}
+                            >
                                 <Plus className="h-4 w-4 mr-2" />
                                 {t('reward.addReward')}
                             </Button>
                         </div>
-                    </CardHeader>
 
-                    {/* Filter Panel */}
-                    <FilterPanel
-                        searchValue={searchQuery}
-                        onSearchChange={setSearchQuery}
-                        searchPlaceholder={t('reward.searchPlaceholder')}
-                        filters={[
-                            {
-                                key: "rewardType",
-                                value: typeFilter,
-                                onChange: setTypeFilter,
-                                options: typeOptions,
-                                placeholder: t('reward.filterByType'),
-                                label: t('reward.rewardType')
-                            },
-                            {
-                                key: "rewardTarget",
-                                value: targetFilter,
-                                onChange: setTargetFilter,
-                                options: targetOptions,
-                                placeholder: t('reward.filterByTarget'),
-                                label: t('reward.rewardTarget')
-                            }
-                        ]}
-                        onClearAll={handleClearAllFilters}
-                        showClearButton={true}
-                    />
+                        {/* Filter Panel */}
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="flex-1 relative">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+                                <Input
+                                    placeholder={t('reward.searchPlaceholder')}
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="pl-10 bg-background border-border text-foreground h-11 shadow-sm focus:shadow-md transition-shadow"
+                                />
+                            </div>
+                            <Select
+                                value={typeFilter}
+                                onValueChange={setTypeFilter}
+                            >
+                                <SelectTrigger className="w-full sm:w-[180px] bg-background border-border text-foreground h-11 shadow-sm">
+                                    <SelectValue placeholder={t('reward.filterByType')} />
+                                </SelectTrigger>
+                                <SelectContent className="bg-card border-border">
+                                    {typeOptions.map((option) => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <Select
+                                value={targetFilter}
+                                onValueChange={setTargetFilter}
+                            >
+                                <SelectTrigger className="w-full sm:w-[180px] bg-background border-border text-foreground h-11 shadow-sm">
+                                    <SelectValue placeholder={t('reward.filterByTarget')} />
+                                </SelectTrigger>
+                                <SelectContent className="bg-card border-border">
+                                    {targetOptions.map((option) => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </CardHeader>
 
                     <CardContent>
                         {isLoading ? (
-                            <TableSkeleton rows={itemsPerPage} columns={5} />
+                            <div className="flex flex-col items-center justify-center py-12">
+                                <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+                                <p className="text-muted-foreground">{t('common.loading')}</p>
+                            </div>
                         ) : (
                             <Table>
                                 <TableHeader>
-                                    <TableRow className="border-border hover:bg-muted/50">
+                                    <TableRow className="border-border hover:bg-muted/30">
                                         <SortableTableHeader
                                             title={t('reward.name')}
                                             sortKey="nameTranslation"
@@ -207,14 +259,18 @@ const RewardManagement = () => {
                                 <TableBody>
                                     {rewardList?.results && rewardList.results.length > 0 ? (
                                         rewardList.results.map((reward: IRewardEntityType) => (
-                                            <TableRow key={reward.id} className="border-border hover:bg-muted/50">
-                                                <TableCell className="font-medium text-foreground">{reward.nameTranslation}</TableCell>
-                                                <TableCell className="text-muted-foreground">
-                                                    {getRewardTypeLabel(reward.rewardType)}
+                                            <TableRow key={reward.id} className="border-border hover:bg-muted/30 transition-colors group">
+                                                <TableCell className="font-semibold text-foreground">{reward.nameTranslation}</TableCell>
+                                                <TableCell>
+                                                    <Badge className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-600 border-blue-500/30 shadow-sm font-medium">
+                                                        {getRewardTypeLabel(reward.rewardType)}
+                                                    </Badge>
                                                 </TableCell>
-                                                <TableCell className="text-foreground">{reward.rewardItem}</TableCell>
-                                                <TableCell className="text-foreground">
-                                                    {getRewardTargetLabel(reward.rewardTarget)}
+                                                <TableCell className="text-foreground font-medium">{reward.rewardItem}</TableCell>
+                                                <TableCell>
+                                                    <Badge className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-600 border-green-500/30 shadow-sm font-medium">
+                                                        {getRewardTargetLabel(reward.rewardTarget)}
+                                                    </Badge>
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     <DropdownMenu>
@@ -222,21 +278,21 @@ const RewardManagement = () => {
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                className="text-muted-foreground hover:text-foreground"
+                                                                className="text-muted-foreground hover:text-foreground hover:bg-primary/10 transition-all"
                                                             >
                                                                 <MoreVertical className="h-4 w-4" />
                                                             </Button>
                                                         </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end" className="bg-card border-border">
+                                                        <DropdownMenuContent align="end" className="bg-card border-border shadow-lg">
                                                             <DropdownMenuItem
-                                                                className="text-foreground hover:bg-muted cursor-pointer"
+                                                                className="text-foreground hover:bg-primary/10 cursor-pointer transition-colors"
                                                                 onClick={() => handleEdit(reward)}
                                                             >
                                                                 <Edit className="h-4 w-4 mr-2" />
                                                                 {t('common.edit')}
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem
-                                                                className="text-destructive hover:bg-destructive/10 cursor-pointer"
+                                                                className="text-destructive hover:bg-destructive/10 cursor-pointer transition-colors"
                                                                 onClick={() => handleDelete(reward.id)}
                                                             >
                                                                 <Trash2 className="h-4 w-4 mr-2" />
@@ -249,8 +305,13 @@ const RewardManagement = () => {
                                         ))
                                     ) : (
                                         <TableRow>
-                                            <TableCell colSpan={5} className="text-center text-muted-foreground">
-                                                {t('reward.noRewardsFound')}
+                                            <TableCell colSpan={5} className="text-center py-12">
+                                                <div className="flex flex-col items-center justify-center gap-4">
+                                                    <div className="p-3 bg-muted rounded-full">
+                                                        <Gift className="w-8 h-8 text-muted-foreground" />
+                                                    </div>
+                                                    <p className="text-muted-foreground font-medium">{t('reward.noRewardsFound')}</p>
+                                                </div>
                                             </TableCell>
                                         </TableRow>
                                     )}
@@ -258,7 +319,7 @@ const RewardManagement = () => {
                             </Table>
                         )}
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter className="border-t border-border bg-muted/30">
                         <PaginationControls
                             currentPage={currentPage}
                             totalPages={rewardList?.pagination?.totalPage || 1}

@@ -9,6 +9,7 @@ import { QUESTION_TYPE_LABELS, JLPT_LEVEL_LABELS } from "@constants/questionBank
 import PaginationControls from "@ui/PaginationControls";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@ui/Card";
 import HeaderAdmin from "@organisms/Header/Admin";
+import { FileQuestion } from "lucide-react";
 import StatsCards from "./components/StatsCards";
 import FiltersBar from "./components/FiltersBar";
 import QuestionsTable from "./components/QuestionsTable";
@@ -65,17 +66,22 @@ const QuestionBankManagement: React.FC = () => {
         title={t("questionBank.title")}
         description={t("questionBank.subtitle")}
       />
-      <div className="p-8 mt-24">
+      <div className="p-8 mt-24 space-y-8">
         {/* Statistics Cards */}
         <StatsCards questions={questions} totalItems={pagination.totalItem} />
 
         {/* Questions List Card */}
-        <Card className="bg-white shadow-lg">
-          <CardHeader className="pb-0">
-            <div className="flex items-center justify-between mt-2">
-              <CardTitle className="text-2xl font-bold text-gray-800">
-                Danh sách câu hỏi
-              </CardTitle>
+        <Card className="bg-gradient-to-br from-card via-card to-card/95 border-border shadow-md">
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <FileQuestion className="w-5 h-5 text-primary" />
+                </div>
+                <CardTitle className="text-xl font-bold text-foreground">
+                  Danh sách câu hỏi
+                </CardTitle>
+              </div>
             </div>
 
             <FiltersBar
@@ -108,7 +114,7 @@ const QuestionBankManagement: React.FC = () => {
             />
           </CardContent>
 
-          <CardFooter>
+          <CardFooter className="border-t border-border bg-muted/30">
             <PaginationControls
               currentPage={pagination.current}
               totalPages={pagination.totalPage}

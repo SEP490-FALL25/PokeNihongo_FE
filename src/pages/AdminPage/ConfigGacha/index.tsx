@@ -6,7 +6,7 @@ import { Skeleton } from "@ui/Skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select";
 import HeaderAdmin from "@organisms/Header/Admin";
 import PaginationControls from "@ui/PaginationControls";
-import { Plus, Calendar, X, Coins, Star } from "lucide-react";
+import { Plus, Calendar, X, Coins, Star, Sparkles, Gift, Loader2, Clock, CheckCircle2 } from "lucide-react";
 import { useGachaBannerList } from "@hooks/useGacha";
 import { useTranslation } from "react-i18next";
 import CustomDatePicker from "@ui/DatePicker";
@@ -96,26 +96,26 @@ export default function ConfigGacha() {
         <>
             <HeaderAdmin title={t('configGacha.title')} description={t('configGacha.description')} />
 
-            <div className="p-8 mt-24">
-                <Card className="bg-card border-border">
-                    <CardHeader>
-                        <div className="flex items-center justify-between">
-                            <CardTitle className="text-foreground">{t('configGacha.bannerList')}</CardTitle>
-                            <div className="flex items-center gap-2">
-                                <Button
-                                    className="bg-primary text-primary-foreground hover:bg-primary/90"
-                                    onClick={() => setIsCreateDialogOpen(true)}
-                                >
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    {t('configGacha.createBanner')}
-                                </Button>
+            <div className="p-8 mt-24 space-y-8">
+                <Card className="bg-gradient-to-br from-card via-card to-card/95 border-border shadow-md">
+                    <CardHeader className="pb-4">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-primary/10 rounded-lg">
+                                    <Gift className="w-5 h-5 text-primary" />
+                                </div>
+                                <CardTitle className="text-xl font-bold text-foreground">{t('configGacha.bannerList')}</CardTitle>
                             </div>
+                            <Button
+                                className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 shadow-lg"
+                                onClick={() => setIsCreateDialogOpen(true)}
+                            >
+                                <Plus className="h-4 w-4 mr-2" />
+                                {t('configGacha.createBanner')}
+                            </Button>
                         </div>
-                    </CardHeader>
-
-                    <CardContent>
                         {/* Filters */}
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-6">
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                             <div>
                                 <label className="text-sm font-medium text-foreground mb-2 block">
                                     {t('configGacha.filterStartDate')}
@@ -147,7 +147,7 @@ export default function ConfigGacha() {
                                     {t('configGacha.filterStatus')}
                                 </label>
                                 <Select value={filterStatus} onValueChange={setFilterStatus}>
-                                    <SelectTrigger className="bg-background border-input">
+                                    <SelectTrigger className="bg-background border-border text-foreground h-11 shadow-sm">
                                         <SelectValue placeholder={t('configGacha.selectStatus')} />
                                     </SelectTrigger>
                                     <SelectContent className="bg-card border-border">
@@ -161,55 +161,72 @@ export default function ConfigGacha() {
                             </div>
                         </div>
                         {hasActiveFilters && (
-                            <div className="mb-4 flex items-center gap-2">
+                            <div className="mt-4 flex items-center gap-2">
                                 <Button
                                     variant="outline"
                                     size="sm"
                                     onClick={handleClearFilters}
-                                    className="bg-muted hover:bg-muted/80"
+                                    className="border-border text-foreground hover:bg-muted/80 shadow-sm"
                                 >
                                     <X className="h-4 w-4 mr-1" />
                                     {t('configGacha.clearFilters')}
                                 </Button>
                             </div>
                         )}
+                    </CardHeader>
+
+                    <CardContent>
                         {isBannersLoading ? (
                             <BannersSkeleton />
                         ) : bannersData?.data?.results?.length ? (
-                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                                 {bannersData.data.results.map((banner: any) => (
                                     <Card
                                         key={banner.id}
-                                        className="bg-muted/50 border-border hover:border-primary/50 transition-colors cursor-pointer"
+                                        className="group relative overflow-hidden bg-gradient-to-br from-card via-card to-card/95 border-border hover:border-primary/50 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer"
                                         onClick={() => handleViewBanner(banner.id)}
                                     >
-                                        <CardHeader>
+                                        {/* Decorative gradient overlay */}
+                                        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/5 via-transparent to-transparent rounded-full -mr-32 -mt-32 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                        
+                                        <CardHeader className="relative">
                                             <div className="flex items-start justify-between">
                                                 <div className="flex-1">
-                                                    <CardTitle className="text-lg text-foreground mb-2">
-                                                        {banner.nameTranslation}
-                                                    </CardTitle>
-                                                    <div className="flex items-center gap-2 mb-2">
+                                                    <div className="flex items-center gap-2 mb-3">
+                                                        <div className="p-2 bg-primary/10 rounded-lg">
+                                                            <Gift className="w-4 h-4 text-primary" />
+                                                        </div>
+                                                        <CardTitle className="text-lg font-bold text-foreground line-clamp-2">
+                                                            {banner.nameTranslation}
+                                                        </CardTitle>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 mb-3">
                                                         {getStatusBadge(banner.status)}
                                                     </div>
                                                 </div>
                                             </div>
                                         </CardHeader>
-                                        <CardContent>
-                                            <div className="space-y-2 text-sm text-muted-foreground">
+                                        <CardContent className="relative">
+                                            <div className="space-y-3 text-sm p-4 bg-muted/20 rounded-lg border border-border/50">
                                                 <div className="flex items-center gap-2">
-                                                    <Calendar className="h-4 w-4" />
-                                                    <span>{formatDate(banner.startDate)} - {formatDate(banner.endDate)}</span>
+                                                    <Clock className="h-4 w-4 text-muted-foreground" />
+                                                    <span className="text-muted-foreground font-medium">
+                                                        {formatDate(banner.startDate)} - {formatDate(banner.endDate)}
+                                                    </span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <Coins className="h-4 w-4" />
-                                                    <span>{t('configGacha.costRoll')}: {banner.costRoll}</span>
+                                                    <Coins className="h-4 w-4 text-yellow-500" />
+                                                    <span className="text-foreground font-bold">
+                                                        {t('configGacha.costRoll')}: {banner.costRoll}
+                                                    </span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <Star className="h-4 w-4" />
-                                                    <span>{t('configGacha.hardPity')}: {banner.hardPity5Star}</span>
+                                                    <Star className="h-4 w-4 text-yellow-500" />
+                                                    <span className="text-foreground font-bold">
+                                                        {t('configGacha.hardPity')}: {banner.hardPity5Star}
+                                                    </span>
                                                 </div>
-                                                <div className="text-xs text-foreground/60 mt-2">
+                                                <div className="text-xs text-muted-foreground mt-2 pt-2 border-t border-border/50">
                                                     ID: {banner.id}
                                                 </div>
                                             </div>
@@ -218,13 +235,18 @@ export default function ConfigGacha() {
                                 ))}
                             </div>
                         ) : (
-                            <div className="text-center text-muted-foreground py-12">
-                                {t('configGacha.noBannersFound')}
+                            <div className="flex flex-col items-center justify-center py-16">
+                                <div className="p-3 bg-muted rounded-full mb-4">
+                                    <Gift className="w-8 h-8 text-muted-foreground" />
+                                </div>
+                                <p className="text-muted-foreground font-medium text-lg">
+                                    {t('configGacha.noBannersFound')}
+                                </p>
                             </div>
                         )}
                     </CardContent>
 
-                    <CardFooter className="justify-between">
+                    <CardFooter className="border-t border-border bg-muted/30">
                         <PaginationControls
                             currentPage={currentPage}
                             totalPages={bannersData?.data?.pagination?.totalPage || 1}
@@ -245,20 +267,22 @@ export default function ConfigGacha() {
 
 function BannersSkeleton() {
     return (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, index) => (
-                <Card key={`skeleton-${index}`} className="bg-muted/50 border-border">
+                <Card key={`skeleton-${index}`} className="bg-gradient-to-br from-card via-card to-card/95 border-border shadow-md">
                     <CardHeader>
-                        <div className="space-y-2">
+                        <div className="flex items-center gap-2 mb-3">
+                            <Skeleton className="h-8 w-8 rounded-lg" />
                             <Skeleton className="h-6 w-3/4" />
-                            <Skeleton className="h-4 w-24" />
                         </div>
+                        <Skeleton className="h-6 w-24 rounded-full" />
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-2">
+                        <div className="space-y-3 p-4 bg-muted/20 rounded-lg">
                             <Skeleton className="h-4 w-full" />
                             <Skeleton className="h-4 w-full" />
                             <Skeleton className="h-4 w-32" />
+                            <Skeleton className="h-3 w-16 mt-2" />
                         </div>
                     </CardContent>
                 </Card>
