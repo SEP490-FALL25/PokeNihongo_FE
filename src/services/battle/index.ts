@@ -57,6 +57,10 @@ const battleService = {
         return response.data;
     },
 
+    getBattleLeaderBoardSeasonDetail: async (leaderboardSeasonId: number) => {
+        return await axiosPrivate.get(`/leaderboard-season/${leaderboardSeasonId}`);
+    },
+
     createBattleLeaderBoardSeason: async (data: ICreateBattleLeaderBoardSeasonRequest) => {
         return await axiosPrivate.post('/leaderboard-season', data);
     },

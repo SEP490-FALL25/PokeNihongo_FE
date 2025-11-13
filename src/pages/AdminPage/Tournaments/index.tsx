@@ -503,7 +503,7 @@ export default function TournamentManagement() {
                         {/* Pagination */}
                         {pagination && pagination.totalPage > 0 && (
                             <Card className="bg-card border-border shadow-md">
-                                <CardFooter className="border-t border-border py-4">
+                                <CardFooter className="py-4">
                                     <PaginationControls
                                         currentPage={pagination.current}
                                         totalPages={pagination.totalPage}
