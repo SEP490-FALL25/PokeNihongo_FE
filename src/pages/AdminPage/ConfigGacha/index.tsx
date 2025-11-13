@@ -6,7 +6,7 @@ import { Skeleton } from "@ui/Skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select";
 import HeaderAdmin from "@organisms/Header/Admin";
 import PaginationControls from "@ui/PaginationControls";
-import { Plus, Calendar, X, Coins, Star, Sparkles, Gift, Loader2, Clock, CheckCircle2 } from "lucide-react";
+import { Plus, X, Coins, Star, Gift, Clock } from "lucide-react";
 import { useGachaBannerList } from "@hooks/useGacha";
 import { useTranslation } from "react-i18next";
 import CustomDatePicker from "@ui/DatePicker";
@@ -188,7 +188,7 @@ export default function ConfigGacha() {
                                     >
                                         {/* Decorative gradient overlay */}
                                         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/5 via-transparent to-transparent rounded-full -mr-32 -mt-32 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                                        
+
                                         <CardHeader className="relative">
                                             <div className="flex items-start justify-between">
                                                 <div className="flex-1">

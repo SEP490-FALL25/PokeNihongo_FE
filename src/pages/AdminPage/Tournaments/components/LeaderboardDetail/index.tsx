@@ -1,10 +1,12 @@
 import { useGetBattleLeaderBoardSeasonDetail } from "@hooks/useBattle"
 import { Badge } from "@ui/Badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card"
-import { Calendar, CheckCircle2, Clock, Gift, Languages, Loader2, RefreshCcw, Trophy, XCircle } from "lucide-react"
+import { Award, Calendar, CheckCircle2, Clock, Gift, Languages, Loader2, RefreshCcw, Trophy, XCircle } from "lucide-react"
 import { useParams } from "react-router-dom"
 import { formatDateOnly, formatDateTime } from "@utils/date"
 import { BATTLE_STATUS_CONFIG, getStatusBadgeColor, getStatusText } from "@atoms/BadgeStatusColor"
+import HeaderAdmin from "@organisms/Header/Admin"
+import { useTranslation } from "react-i18next"
 
 const renderRewardValue = (value: unknown) => {
     if (value === null || value === undefined) return "—"
@@ -16,8 +18,92 @@ interface LeaderboardDetailProps {
 }
 
 export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDetailProps) {
+    const { t } = useTranslation();
     const { tournamentId } = useParams<{ tournamentId?: string }>()
     const resolvedId = leaderboardSeasonId ?? (tournamentId ? Number(tournamentId) : undefined)
+
+    const messages = {
+        invalidSeason: t('tournaments.detail.messages.invalidSeason'),
+        loading: t('tournaments.detail.messages.loading'),
+        loadError: t('tournaments.detail.messages.loadError'),
+        noData: t('tournaments.detail.messages.noData'),
+        noTimeline: t('tournaments.detail.messages.noTimeline'),
+        noRewardStats: t('tournaments.detail.messages.noRewardStats'),
+        noRewards: t('tournaments.detail.messages.noRewards'),
+        noRewardRange: t('tournaments.detail.messages.noRewardRange'),
+        noTranslations: t('tournaments.detail.messages.noTranslations'),
+    }
+
+    const commonTexts = {
+        yes: t('tournaments.detail.common.yes'),
+        no: t('tournaments.detail.common.no'),
+        notAvailable: t('tournaments.detail.common.notAvailable'),
+    }
+
+    const summaryLabels = {
+        rankGroups: t('tournaments.detail.summary.rankGroups'),
+        rewardBuckets: t('tournaments.detail.summary.rewardBuckets'),
+        rewardItems: t('tournaments.detail.summary.rewardItems'),
+        duration: t('tournaments.detail.summary.duration'),
+        openStatus: {
+            label: t('tournaments.detail.summary.openStatus.label'),
+            opened: t('tournaments.detail.summary.openStatus.opened'),
+            closed: t('tournaments.detail.summary.openStatus.closed'),
+        },
+    }
+
+    const timelineLabels = {
+        title: t('tournaments.detail.timeline.title'),
+        start: t('tournaments.detail.timeline.start'),
+        end: t('tournaments.detail.timeline.end'),
+        created: t('tournaments.detail.timeline.created'),
+        updated: t('tournaments.detail.timeline.updated'),
+    }
+
+    const overviewLabels = {
+        duration: t('tournaments.detail.overview.duration'),
+        createdAt: t('tournaments.detail.overview.createdAt'),
+        updatedAt: t('tournaments.detail.overview.updatedAt'),
+        createdBy: t('tournaments.detail.overview.createdBy'),
+        updatedBy: t('tournaments.detail.overview.updatedBy'),
+    }
+
+    const metadataLabels = {
+        title: t('tournaments.detail.metadata.title'),
+        seasonId: t('tournaments.detail.metadata.seasonId'),
+        seasonKey: t('tournaments.detail.metadata.seasonKey'),
+        enablePrecreate: t('tournaments.detail.metadata.enablePrecreate'),
+        precreateDays: t('tournaments.detail.metadata.precreateDays'),
+        randomAgain: t('tournaments.detail.metadata.randomAgain'),
+        hasOpened: t('tournaments.detail.metadata.hasOpened'),
+    }
+
+    const rewardOverviewLabels = {
+        title: t('tournaments.detail.rewardOverview.title'),
+        rankGroups: t('tournaments.detail.rewardOverview.rankGroups'),
+        rewardItems: t('tournaments.detail.rewardOverview.rewardItems'),
+        typeCount: (count: number) => t('tournaments.detail.rewardOverview.typeCount', { count }),
+    }
+
+    const translationLabels = {
+        title: t('tournaments.detail.translations.title'),
+        empty: messages.noTranslations,
+        language: t('tournaments.detail.translations.language'),
+        value: t('tournaments.detail.translations.value'),
+    }
+
+    const rewardsLabels = {
+        title: t('tournaments.detail.rewards.title'),
+        empty: messages.noRewardStats,
+        groupCount: (count: number) => t('tournaments.detail.rewards.groupCount', { count }),
+        rewardCount: (count: number) => t('tournaments.detail.rewards.rewardCount', { count }),
+        table: {
+            type: t('tournaments.detail.rewards.table.type'),
+            target: t('tournaments.detail.rewards.table.target'),
+            value: t('tournaments.detail.rewards.table.value'),
+            note: t('tournaments.detail.rewards.table.note'),
+        },
+    }
 
     if (resolvedId === undefined || Number.isNaN(resolvedId)) {
         return (
@@ -25,7 +111,7 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
                 <CardContent className="py-8">
                     <div className="flex flex-col items-center gap-3 text-muted-foreground">
                         <Trophy className="w-8 h-8" />
-                        <p className="font-medium">Không tìm thấy thông tin mùa giải hợp lệ.</p>
+                        <p className="font-medium">{messages.invalidSeason}</p>
                     </div>
                 </CardContent>
             </Card>
@@ -39,7 +125,7 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
             <Card className="bg-card border-border shadow-md">
                 <CardContent className="py-10 flex flex-col items-center gap-4">
                     <Loader2 className="w-10 h-10 animate-spin text-primary" />
-                    <p className="text-muted-foreground">Đang tải chi tiết mùa giải...</p>
+                    <p className="text-muted-foreground">{messages.loading}</p>
                 </CardContent>
             </Card>
         )
@@ -51,7 +137,7 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
                 <CardContent className="py-8">
                     <div className="flex flex-col items-center gap-3 text-destructive">
                         <Trophy className="w-8 h-8" />
-                        <p className="font-medium">Không thể tải chi tiết mùa giải. Vui lòng thử lại sau.</p>
+                        <p className="font-medium">{messages.loadError}</p>
                     </div>
                 </CardContent>
             </Card>
@@ -64,7 +150,7 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
                 <CardContent className="py-8">
                     <div className="flex flex-col items-center gap-3 text-muted-foreground">
                         <Trophy className="w-8 h-8" />
-                        <p className="font-medium">Không có dữ liệu mùa giải.</p>
+                        <p className="font-medium">{messages.noData}</p>
                     </div>
                 </CardContent>
             </Card>
@@ -76,155 +162,538 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
         ? [...season.seasonRankRewards].sort((a, b) => a.order - b.order)
         : []
 
-    return (
-        <div className="space-y-6">
+    const rankGroupsMap = sortedRewards.reduce((acc, reward) => {
+        const group = acc.get(reward.rankName) ?? []
+        group.push(reward)
+        acc.set(reward.rankName, group)
+        return acc
+    }, new Map<string, typeof sortedRewards>())
+
+    rankGroupsMap.forEach((entries) => entries.sort((a, b) => a.order - b.order))
+    const rankGroups = Array.from(rankGroupsMap.entries())
+
+    const totalRankGroups = rankGroups.length
+    const totalRewardBuckets = sortedRewards.length
+    const totalRewardItems = sortedRewards.reduce(
+        (acc, rank) => acc + (Array.isArray(rank.rewards) ? rank.rewards.length : 0),
+        0
+    )
+
+    const rewardTypeMap = new Map<string, number>()
+    sortedRewards.forEach((rank) => {
+        if (!Array.isArray(rank.rewards)) return
+        rank.rewards.forEach((reward) => {
+            const key = String(reward.rewardType)
+            rewardTypeMap.set(key, (rewardTypeMap.get(key) ?? 0) + 1)
+        })
+    })
+    const rewardTypeSummary = Array.from(rewardTypeMap.entries()).map(([type, count]) => ({
+        type,
+        count,
+    }))
+
+    const startDateObj = season.startDate ? new Date(season.startDate) : null
+    const endDateObj = season.endDate ? new Date(season.endDate) : null
+    const durationDays =
+        startDateObj && endDateObj
+            ? Math.max(1, Math.round((endDateObj.getTime() - startDateObj.getTime()) / (1000 * 60 * 60 * 24)) + 1)
+            : null
+
+    const timelineItems = [
+        season.startDate && {
+            label: timelineLabels.start,
+            value: formatDateTime(season.startDate),
+            icon: Calendar,
+        },
+        season.endDate && {
+            label: timelineLabels.end,
+            value: formatDateTime(season.endDate),
+            icon: Calendar,
+        },
+        season.createdAt && {
+            label: timelineLabels.created,
+            value: formatDateTime(season.createdAt),
+            icon: Clock,
+        },
+        season.updatedAt && {
+            label: timelineLabels.updated,
+            value: formatDateTime(season.updatedAt),
+            icon: RefreshCcw,
+        },
+    ].filter(Boolean) as Array<{ label: string; value: string; icon: typeof Calendar }>
+
+    const summaryStats = [
+        {
+            label: summaryLabels.rankGroups,
+            value: totalRankGroups.toString(),
+            icon: Trophy,
+        },
+        {
+            label: summaryLabels.rewardBuckets,
+            value: totalRewardBuckets.toString(),
+            icon: Gift,
+        },
+        {
+            label: summaryLabels.rewardItems,
+            value: totalRewardItems.toString(),
+            icon: Award,
+        },
+        {
+            label: summaryLabels.duration,
+            value: durationDays
+                ? t('tournaments.detail.summary.durationValue', { count: durationDays })
+                : commonTexts.notAvailable,
+            icon: Calendar,
+        },
+        {
+            label: summaryLabels.openStatus.label,
+            value: season.hasOpened ? summaryLabels.openStatus.opened : summaryLabels.openStatus.closed,
+            icon: season.hasOpened ? CheckCircle2 : XCircle,
+            highlightClass: season.hasOpened ? "text-green-600" : "text-orange-500",
+        },
+    ]
+
+    const statusChips = [
+        {
+            key: "status",
+            content: (
+                <Badge className={`${getStatusBadgeColor(season.status, BATTLE_STATUS_CONFIG)} border`}>
+                    {getStatusText(season.status, BATTLE_STATUS_CONFIG)}
+                </Badge>
+            ),
+        },
+        {
+            key: "hasOpened",
+            content: (
+                <Badge
+                    className={`flex items-center gap-1 border ${season.hasOpened
+                        ? "bg-green-500/10 text-green-600 border-green-500/30"
+                        : "bg-orange-500/10 text-orange-600 border-orange-500/30"
+                        }`}
+                >
+                    {season.hasOpened ? (
+                        <>
+                            <CheckCircle2 className="w-3 h-3" />
+                            {t('tournaments.detail.chips.hasOpened.opened')}
+                        </>
+                    ) : (
+                        <>
+                            <XCircle className="w-3 h-3" />
+                            {t('tournaments.detail.chips.hasOpened.closed')}
+                        </>
+                    )}
+                </Badge>
+            ),
+        },
+        {
+            key: "precreate",
+            content: (
+                <Badge
+                    className={`flex items-center gap-1 border ${season.enablePrecreate
+                        ? "bg-blue-500/10 text-blue-600 border-blue-500/30"
+                        : "bg-muted text-muted-foreground border-border/60"
+                        }`}
+                >
+                    <Calendar className="w-3 h-3" />
+                    {season.enablePrecreate
+                        ? t('tournaments.detail.chips.precreate.enabled', { days: season.precreateBeforeEndDays })
+                        : t('tournaments.detail.chips.precreate.disabled')}
+                </Badge>
+            ),
+        },
+        {
+            key: "random-reward",
+            content: (
+                <Badge
+                    className={`flex items-center gap-1 border ${season.isRandomItemAgain
+                        ? "bg-purple-500/10 text-purple-600 border-purple-500/30"
+                        : "bg-muted text-muted-foreground border-border/60"
+                        }`}
+                >
+                    <RefreshCcw className="w-3 h-3" />
+                    {season.isRandomItemAgain
+                        ? t('tournaments.detail.chips.randomReward.enabled')
+                        : t('tournaments.detail.chips.randomReward.disabled')}
+                </Badge>
+            ),
+        },
+    ]
+
+    const overviewItems = [
+        {
+            label: overviewLabels.duration,
+            value: `${formatDateOnly(season.startDate)} - ${formatDateOnly(season.endDate)}`,
+            icon: Calendar,
+        },
+        {
+            label: overviewLabels.createdAt,
+            value: formatDateTime(season.createdAt),
+            icon: Clock,
+        },
+        {
+            label: overviewLabels.updatedAt,
+            value: formatDateTime(season.updatedAt),
+            icon: RefreshCcw,
+        },
+        {
+            label: overviewLabels.createdBy,
+            value: season.createdById !== null && season.createdById !== undefined
+                ? season.createdById.toString()
+                : commonTexts.notAvailable,
+            icon: Trophy,
+        },
+        {
+            label: overviewLabels.updatedBy,
+            value: season.updatedById !== null && season.updatedById !== undefined
+                ? season.updatedById.toString()
+                : commonTexts.notAvailable,
+            icon: Trophy,
+        },
+    ]
+
+    const metadataItems = [
+        { label: metadataLabels.seasonId, value: season.id?.toString() ?? commonTexts.notAvailable },
+        { label: metadataLabels.seasonKey, value: season.nameKey ?? commonTexts.notAvailable },
+        { label: metadataLabels.enablePrecreate, value: season.enablePrecreate ? commonTexts.yes : commonTexts.no },
+        {
+            label: metadataLabels.precreateDays,
+            value: season.enablePrecreate
+                ? t('tournaments.detail.metadata.daysValue', { count: season.precreateBeforeEndDays })
+                : commonTexts.notAvailable,
+        },
+        { label: metadataLabels.randomAgain, value: season.isRandomItemAgain ? commonTexts.yes : commonTexts.no },
+        { label: metadataLabels.hasOpened, value: season.hasOpened ? commonTexts.yes : commonTexts.no },
+    ]
+
+    const formatRankRange = (start: number, nextStart?: number) => {
+        if (nextStart === undefined || nextStart === null) {
+            return t('tournaments.detail.rewards.range.infinite', { start })
+        }
+        const end = nextStart - 1
+        if (end <= start) {
+            return t('tournaments.detail.rewards.range.single', { rank: start })
+        }
+        return t('tournaments.detail.rewards.range.range', { start, end })
+    }
+
+    const isStandalonePage = leaderboardSeasonId === undefined
+    const containerClassName = isStandalonePage ? "mt-24 p-8 space-y-8" : "space-y-8"
+
+    const content = (
+        <div className={containerClassName}>
             <Card className="bg-gradient-to-br from-card via-card to-card/95 border-border shadow-md">
-                <CardHeader className="pb-4">
-                    <div className="flex items-start justify-between gap-4">
-                        <div>
-                            <CardTitle className="text-2xl font-bold text-foreground">
-                                {season.nameTranslation || season.nameKey}
-                            </CardTitle>
-                            <p className="text-sm text-muted-foreground mt-1">
-                                Mã mùa: <span className="font-medium text-foreground">{season.nameKey}</span>
-                            </p>
-                        </div>
-                        <div className="flex flex-wrap gap-2 justify-end">
-                            <Badge className={`${getStatusBadgeColor(season.status, BATTLE_STATUS_CONFIG)} border`}>
-                                {getStatusText(season.status, BATTLE_STATUS_CONFIG)}
-                            </Badge>
-                            <Badge className={`flex items-center gap-1 border ${season.hasOpened ? "bg-green-500/10 text-green-600 border-green-500/30" : "bg-orange-500/10 text-orange-600 border-orange-500/30"}`}>
-                                {season.hasOpened ? (
-                                    <>
-                                        <CheckCircle2 className="w-3 h-3" />
-                                        Đã mở
-                                    </>
-                                ) : (
-                                    <>
-                                        <XCircle className="w-3 h-3" />
-                                        Chưa mở
-                                    </>
-                                )}
-                            </Badge>
-                            <Badge className={`flex items-center gap-1 border ${season.enablePrecreate ? "bg-blue-500/10 text-blue-600 border-blue-500/30" : "bg-muted text-muted-foreground border-border/60"}`}>
-                                <Calendar className="w-3 h-3" />
-                                {season.enablePrecreate ? `Mở sớm ${season.precreateBeforeEndDays} ngày` : "Không mở sớm"}
-                            </Badge>
-                            <Badge className={`flex items-center gap-1 border ${season.isRandomItemAgain ? "bg-purple-500/10 text-purple-600 border-purple-500/30" : "bg-muted text-muted-foreground border-border/60"}`}>
-                                <RefreshCcw className="w-3 h-3" />
-                                {season.isRandomItemAgain ? "Random lại phần thưởng" : "Giữ nguyên phần thưởng"}
-                            </Badge>
-                        </div>
+                <CardHeader className="space-y-3">
+                    <div className="flex flex-col gap-2">
+                        <CardTitle className="text-2xl font-bold text-foreground">
+                            {season.nameTranslation || season.nameKey}
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                            {t('tournaments.detail.labels.seasonCode', { code: season.nameKey })}
+                        </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                        {statusChips.map((chip) => (
+                            <span key={chip.key}>{chip.content}</span>
+                        ))}
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <div className="p-4 rounded-lg border border-border/60 bg-muted/20">
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Calendar className="w-4 h-4" />
-                                Thời gian diễn ra
-                            </div>
-                            <p className="mt-2 text-base font-semibold text-foreground">
-                                {formatDateOnly(season.startDate)} - {formatDateOnly(season.endDate)}
-                            </p>
-                        </div>
-                        <div className="p-4 rounded-lg border border-border/60 bg-muted/20">
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Clock className="w-4 h-4" />
-                                Thời gian tạo & cập nhật
-                            </div>
-                            <p className="mt-2 text-base font-semibold text-foreground">
-                                Tạo: {formatDateTime(season.createdAt)}
-                            </p>
-                            <p className="text-sm text-muted-foreground mt-1">
-                                Cập nhật: {formatDateTime(season.updatedAt)}
-                            </p>
-                        </div>
-                    </div>
-
-                    {nameTranslations.length > 0 && (
-                        <div className="space-y-3">
-                            <div className="flex items-center gap-2">
-                                <div className="p-2 bg-primary/10 rounded-lg">
-                                    <Languages className="w-4 h-4 text-primary" />
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+                        {summaryStats.map((stat) => (
+                            <div
+                                key={stat.label}
+                                className="rounded-xl border border-border/40 bg-gradient-to-br from-primary/5 via-background to-background/70 p-4 shadow-sm hover:shadow-primary/40 transition-shadow"
+                            >
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium text-muted-foreground">{stat.label}</span>
+                                    <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                                        <stat.icon className="w-4 h-4" />
+                                    </div>
                                 </div>
-                                <h3 className="text-lg font-semibold text-foreground">Tên đa ngôn ngữ</h3>
+                                <p className={`mt-3 text-2xl font-semibold text-foreground ${stat.highlightClass ?? ""}`}>
+                                    {stat.value}
+                                </p>
                             </div>
-                            <div className="flex flex-wrap gap-2">
-                                {nameTranslations.map((translation) => (
-                                    <Badge
-                                        key={translation.key}
-                                        className="border-border/60 bg-background text-foreground shadow-sm px-3 py-1 flex items-center gap-2"
-                                    >
-                                        <span className="uppercase text-xs font-semibold text-muted-foreground">{translation.key}</span>
-                                        <span className="text-sm font-medium">{translation.value}</span>
-                                    </Badge>
+                        ))}
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                        {overviewItems.map((item) => (
+                            <div
+                                key={item.label}
+                                className="p-4 rounded-lg border border-border/50 bg-gradient-to-br from-muted/60 via-card to-background/80 flex flex-col gap-1"
+                            >
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <item.icon className="w-4 h-4" />
+                                    {item.label}
+                                </div>
+                                <p className="text-base font-semibold text-foreground">{item.value}</p>
+                            </div>
+                        ))}
+                    </div>
+                    <Card className="border border-border/60 bg-background shadow-none">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-base font-semibold text-foreground">
+                                {metadataLabels.title}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid gap-3 sm:grid-cols-2">
+                                {metadataItems.map((item) => (
+                                    <div key={item.label} className="flex flex-col gap-1 rounded-lg border border-border/50 p-3">
+                                        <span className="text-xs uppercase text-muted-foreground tracking-wide">{item.label}</span>
+                                        <span className="text-sm font-medium text-foreground">{item.value ?? commonTexts.notAvailable}</span>
+                                    </div>
                                 ))}
                             </div>
+                        </CardContent>
+                    </Card>
+                </CardContent>
+            </Card>
+
+            <div className="grid gap-6 lg:grid-cols-2">
+                <Card className="border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background shadow-lg shadow-primary/10">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+                            <Calendar className="w-5 h-5 text-primary" />
+                            {timelineLabels.title}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {timelineItems.length === 0 ? (
+                            <p className="text-sm text-muted-foreground">{messages.noTimeline}</p>
+                        ) : (
+                            <ol className="relative border-s border-border/60 ps-5 space-y-4">
+                                {timelineItems.map((item) => (
+                                    <li key={item.label} className="space-y-1">
+                                        <span className="absolute -start-2.5 flex h-5 w-5 items-center justify-center rounded-full border border-border bg-background">
+                                            <item.icon className="h-3 w-3 text-primary" />
+                                        </span>
+                                        <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                                            {item.label}
+                                        </p>
+                                        <p className="text-sm font-semibold text-foreground">{item.value}</p>
+                                    </li>
+                                ))}
+                            </ol>
+                        )}
+                    </CardContent>
+                </Card>
+
+                <Card className="border border-emerald-200/50 bg-gradient-to-br from-emerald-500/10 via-background to-background shadow-lg shadow-emerald-200/20">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+                            <Gift className="w-5 h-5 text-primary" />
+                            {rewardOverviewLabels.title}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="flex flex-wrap gap-3">
+                            <div className="rounded-lg border border-border/60 bg-primary/5 px-4 py-3">
+                                <p className="text-xs uppercase text-muted-foreground tracking-wide">
+                                    {rewardOverviewLabels.rankGroups}
+                                </p>
+                                <p className="text-lg font-semibold text-primary">{totalRankGroups}</p>
+                            </div>
+                            <div className="rounded-lg border border-border/60 bg-emerald-500/5 px-4 py-3">
+                                <p className="text-xs uppercase text-muted-foreground tracking-wide">
+                                    {rewardOverviewLabels.rewardItems}
+                                </p>
+                                <p className="text-lg font-semibold text-emerald-600">{totalRewardItems}</p>
+                            </div>
+                        </div>
+                        {rewardTypeSummary.length === 0 ? (
+                            <p className="text-sm text-muted-foreground">{messages.noRewardStats}</p>
+                        ) : (
+                            <div className="space-y-3">
+                                {rewardTypeSummary.map((summary) => (
+                                    <div
+                                        key={summary.type}
+                                        className="flex items-center justify-between rounded-lg border border-border/50 bg-background px-4 py-3"
+                                    >
+                                        <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                                            <span className="inline-flex h-2 w-2 rounded-full bg-primary" />
+                                            {summary.type}
+                                        </div>
+                                        <span className="text-sm text-muted-foreground">
+                                            {rewardOverviewLabels.typeCount(summary.count)}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
+
+            <Card className="border border-blue-300/40 bg-gradient-to-br from-blue-500/10 via-background to-background shadow-lg shadow-blue-300/20">
+                <CardHeader className="pb-3">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                            <Languages className="w-5 h-5 text-primary" />
+                        </div>
+                        <CardTitle className="text-xl font-bold text-foreground">
+                            {translationLabels.title}
+                        </CardTitle>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    {nameTranslations.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">{translationLabels.empty}</p>
+                    ) : (
+                        <div className="overflow-x-auto rounded-md border border-border/60">
+                            <table className="min-w-full divide-y divide-border/60">
+                                <thead className="bg-muted/40">
+                                    <tr>
+                                        <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                            {translationLabels.language}
+                                        </th>
+                                        <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                            {translationLabels.value}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-border/40 bg-background/80">
+                                    {nameTranslations.map((translation) => (
+                                        <tr key={translation.key}>
+                                            <td className="px-4 py-2 text-sm font-medium uppercase text-muted-foreground">
+                                                {translation.key}
+                                            </td>
+                                            <td className="px-4 py-2 text-sm text-foreground">
+                                                {translation.value}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     )}
                 </CardContent>
             </Card>
 
-            <Card className="bg-card border-border shadow-md">
+            <Card className="border border-amber-300/50 bg-gradient-to-br from-amber-500/10 via-background to-background shadow-lg shadow-amber-200/30">
                 <CardHeader>
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-primary/10 rounded-lg">
                             <Gift className="w-5 h-5 text-primary" />
                         </div>
-                        <CardTitle className="text-xl font-bold text-foreground">Phần thưởng theo hạng</CardTitle>
+                        <CardTitle className="text-xl font-bold text-foreground">
+                            {rewardsLabels.title}
+                        </CardTitle>
                     </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    {sortedRewards.length === 0 ? (
-                        <div className="text-sm text-muted-foreground">Chưa thiết lập phần thưởng cho mùa giải này.</div>
+                <CardContent className="space-y-6">
+                    {rankGroups.length === 0 ? (
+                        <div className="text-sm text-muted-foreground">{messages.noRewards}</div>
                     ) : (
-                        sortedRewards.map((rank) => {
-                            const rewards = Array.isArray(rank.rewards) ? rank.rewards : []
+                        rankGroups.map(([rankName, entries]) => {
+                            const totalRewardsForRank = entries.reduce(
+                                (acc, entry) => acc + (Array.isArray(entry.rewards) ? entry.rewards.length : 0),
+                                0
+                            )
                             return (
-                                <Card key={rank.id} className="border border-border/70 bg-muted/20 shadow-sm">
-                                    <CardHeader className="pb-3">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2">
-                                                <Badge className="bg-primary/15 text-primary border-primary/30">
-                                                    Hạng {rank.rankName}
-                                                </Badge>
-                                                <span className="text-sm text-muted-foreground">Thứ tự: {rank.order}</span>
-                                            </div>
-                                            <Badge className="bg-yellow-500/10 text-yellow-600 border-yellow-500/30 flex items-center gap-1">
-                                                <Trophy className="w-3 h-3" />
-                                                {rewards.length} phần thưởng
+                                <div
+                                    key={rankName}
+                                    className="rounded-2xl border border-amber-300/40 bg-gradient-to-br from-amber-400/5 via-background to-background p-5 space-y-4 shadow-sm hover:shadow-amber-200/30 transition-shadow"
+                                >
+                                    <div className="flex flex-wrap items-center justify-between gap-3">
+                                        <div className="flex items-center gap-2">
+                                            <Badge className="bg-primary/15 text-primary border-primary/30 uppercase tracking-wide">
+                                                {rankName}
                                             </Badge>
+                                            <span className="text-sm text-muted-foreground">
+                                                {rewardsLabels.groupCount(entries.length)}
+                                            </span>
                                         </div>
-                                    </CardHeader>
-                                    <CardContent className="space-y-3">
-                                        {rewards.map((reward) => (
-                                            <div key={reward.id} className="p-3 rounded-lg border border-border/60 bg-background flex flex-col gap-2">
-                                                <div className="flex flex-wrap items-center gap-2 text-sm">
-                                                    <Badge className="bg-primary/10 text-primary border-primary/30">
-                                                        {renderRewardValue(reward.rewardType)}
-                                                    </Badge>
-                                                    <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/30">
-                                                        Mục tiêu: {renderRewardValue(reward.rewardTarget)}
-                                                    </Badge>
-                                                    <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
-                                                        Giá trị: {renderRewardValue(reward.rewardItem)}
-                                                    </Badge>
+                                        <Badge className="bg-yellow-500/10 text-yellow-600 border-yellow-500/30 flex items-center gap-1">
+                                            <Trophy className="w-3 h-3" />
+                                            {rewardsLabels.rewardCount(totalRewardsForRank)}
+                                        </Badge>
+                                    </div>
+                                    <div className="space-y-3">
+                                        {entries.map((entry, index) => {
+                                            const nextEntry = entries[index + 1]
+                                            const rangeLabel = formatRankRange(entry.order, nextEntry?.order)
+                                            const entryRewards = Array.isArray(entry.rewards) ? entry.rewards : []
+
+                                            return (
+                                                <div
+                                                    key={entry.id}
+                                                    className="rounded-xl border border-amber-200/40 bg-background/70 p-4 space-y-3"
+                                                >
+                                                    <div className="flex flex-wrap items-center justify-between gap-3">
+                                                        <div className="flex items-center gap-2">
+                                                            <Badge className="bg-amber-500/20 text-amber-700 border-amber-500/40 font-semibold">
+                                                                {rangeLabel}
+                                                            </Badge>
+                                                        </div>
+                                                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                                            {rewardsLabels.rewardCount(entryRewards.length)}
+                                                        </span>
+                                                    </div>
+
+                                                    {entryRewards.length === 0 ? (
+                                                        <p className="text-sm text-muted-foreground">
+                                                            {messages.noRewardRange}
+                                                        </p>
+                                                    ) : (
+                                                        <div className="overflow-x-auto">
+                                                            <table className="min-w-full divide-y divide-border/40">
+                                                                <thead className="bg-background/80">
+                                                                    <tr>
+                                                                        <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                                                            {rewardsLabels.table.type}
+                                                                        </th>
+                                                                        <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                                                            {rewardsLabels.table.target}
+                                                                        </th>
+                                                                        <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                                                            {rewardsLabels.table.value}
+                                                                        </th>
+                                                                        <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                                                            {rewardsLabels.table.note}
+                                                                        </th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody className="divide-y divide-border/40">
+                                                                    {entryRewards.map((reward) => (
+                                                                        <tr key={reward.id} className="bg-background/60">
+                                                                            <td className="px-4 py-2 text-sm text-foreground font-medium">
+                                                                                {renderRewardValue(reward.rewardType)}
+                                                                            </td>
+                                                                            <td className="px-4 py-2 text-sm text-foreground">
+                                                                                {renderRewardValue(reward.rewardTarget)}
+                                                                            </td>
+                                                                            <td className="px-4 py-2 text-sm text-primary font-semibold">
+                                                                                {renderRewardValue(reward.rewardItem)}
+                                                                            </td>
+                                                                            <td className="px-4 py-2 text-sm text-muted-foreground">
+                                                                                {reward.nameTranslation || commonTexts.notAvailable}
+                                                                            </td>
+                                                                        </tr>
+                                                                    ))}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                {reward.nameTranslation && (
-                                                    <p className="text-sm text-muted-foreground">
-                                                        Ghi chú: <span className="text-foreground font-medium">{reward.nameTranslation}</span>
-                                                    </p>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </CardContent>
-                                </Card>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
                             )
                         })
                     )}
                 </CardContent>
             </Card>
         </div>
+    )
+
+    return isStandalonePage ? (
+        <>
+            <HeaderAdmin title={t('tournaments.title')} description={t('tournaments.description')} />
+            {content}
+        </>
+    ) : (
+        content
     )
 }
