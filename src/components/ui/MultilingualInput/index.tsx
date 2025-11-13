@@ -86,7 +86,9 @@ const MultilingualInput: React.FC<MultilingualInputProps> = ({
                         {isReactHookForm ? (
                             errors?.[index]?.value && (
                                 <p className="text-xs text-error mt-1">
-                                    {errors[index]?.value?.message}
+                                    {typeof errors[index]?.value?.message === "string"
+                                        ? t(errors[index]?.value?.message as string)
+                                        : errors[index]?.value?.message}
                                 </p>
                             )
                         ) : (

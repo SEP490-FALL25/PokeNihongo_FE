@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@ui/Dialog"
 import { Button } from "@ui/Button"
 import { Input } from "@ui/Input"
@@ -11,6 +11,7 @@ import { BATTLE } from "@constants/battle"
 import { CreateBattleLeaderBoardSeasonRequestSchema, ICreateBattleLeaderBoardSeasonRequest } from "@models/battle/request"
 import { useCreateBattleLeaderBoardSeason } from "@hooks/useBattle"
 import MultilingualInput from "@ui/MultilingualInput"
+import CustomDatePicker from "@ui/DatePicker"
 
 interface CreateSeasonProps {
     isOpen: boolean
@@ -22,6 +23,8 @@ const defaultValues: ICreateBattleLeaderBoardSeasonRequest = {
     enablePrecreate: true,
     precreateBeforeEndDays: 7,
     isRandomItemAgain: true,
+    startDate: "",
+    endDate: "",
     nameTranslations: [
         { key: "vi", value: "" },
         { key: "en", value: "" },
@@ -38,6 +41,8 @@ const CreateSeason = ({ isOpen, onClose }: CreateSeasonProps) => {
         register,
         reset,
         watch,
+        setValue,
+        clearErrors,
         trigger,
         formState: { errors },
     } = useForm<ICreateBattleLeaderBoardSeasonRequest>({
@@ -55,10 +60,14 @@ const CreateSeason = ({ isOpen, onClose }: CreateSeasonProps) => {
     const createSeasonMutation = useCreateBattleLeaderBoardSeason()
 
     const isPrecreateEnabled = watch("enablePrecreate")
+    const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(null)
+    const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(null)
 
     useEffect(() => {
         if (isOpen) {
             reset(defaultValues)
+            setSelectedStartDate(null)
+            setSelectedEndDate(null)
         }
     }, [isOpen, reset])
 
@@ -83,6 +92,8 @@ const CreateSeason = ({ isOpen, onClose }: CreateSeasonProps) => {
         ],
         [t],
     )
+
+    const toIsoString = (date: Date | null) => (date ? new Date(date).toISOString() : "")
 
     const onSubmit = async (data: ICreateBattleLeaderBoardSeasonRequest) => {
         try {
@@ -129,6 +140,71 @@ const CreateSeason = ({ isOpen, onClose }: CreateSeasonProps) => {
                         requiredKey="tournaments.createSeason.nameRequiredVi"
                         fieldName="name"
                     />
+
+                    <section className="space-y-4">
+                        <h3 className="text-sm font-semibold text-foreground">
+                            {t("tournaments.createSeason.dateRangeLabel", { defaultValue: "Thời gian diễn ra" })}
+                        </h3>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-medium text-foreground">
+                                    {t("tournaments.createSeason.startDate", { defaultValue: "Ngày bắt đầu" })}
+                                </label>
+                                <CustomDatePicker
+                                    value={selectedStartDate}
+                                    onChange={(date) => {
+                                        setSelectedStartDate(date)
+                                        const iso = toIsoString(date)
+                                        setValue("startDate", iso, { shouldDirty: true })
+                                        clearErrors("startDate")
+                                        if (date && selectedEndDate && selectedEndDate < date) {
+                                            setSelectedEndDate(date)
+                                            setValue("endDate", iso, { shouldDirty: true })
+                                            clearErrors("endDate")
+                                        }
+                                    }}
+                                    placeholder={t("tournaments.createSeason.startDatePlaceholder", { defaultValue: "Chọn ngày bắt đầu" })}
+                                    hasError={!!errors.startDate}
+                                    dayPickerProps={{
+                                        disabled: { before: new Date() }
+                                    }}
+                                />
+                                <input type="hidden" {...register("startDate")} />
+                                {errors.startDate && (
+                                    <p className="text-xs text-error mt-1">
+                                        {t(errors.startDate.message as string)}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-medium text-foreground">
+                                    {t("tournaments.createSeason.endDate", { defaultValue: "Ngày kết thúc" })}
+                                </label>
+                                <CustomDatePicker
+                                    value={selectedEndDate}
+                                    onChange={(date) => {
+                                        setSelectedEndDate(date)
+                                        const iso = toIsoString(date)
+                                        setValue("endDate", iso, { shouldDirty: true })
+                                        clearErrors("endDate")
+                                    }}
+                                    placeholder={t("tournaments.createSeason.endDatePlaceholder", { defaultValue: "Chọn ngày kết thúc" })}
+                                    hasError={!!errors.endDate}
+                                    dayPickerProps={{
+                                        disabled: selectedStartDate
+                                            ? { before: selectedStartDate }
+                                            : { before: new Date() }
+                                    }}
+                                />
+                                <input type="hidden" {...register("endDate")} />
+                                {errors.endDate && (
+                                    <p className="text-xs text-error mt-1">
+                                        {t(errors.endDate.message as string)}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    </section>
 
                     <section className="space-y-3">
                         <div className="space-y-1.5">

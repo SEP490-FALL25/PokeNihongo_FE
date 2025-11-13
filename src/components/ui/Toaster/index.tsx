@@ -1,4 +1,4 @@
-"use client"
+""
 
 import { useToast } from "@/components/Atoms/ui/use-toast"
 import {

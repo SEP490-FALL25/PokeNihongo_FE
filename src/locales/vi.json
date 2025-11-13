@@ -42,6 +42,47 @@
         "retry": "Thử lại",
         "clearAll": "Xóa hết"
     },
+    "tournaments": {
+        "title": "Quản lý giải đấu",
+        "description": "Theo dõi và cấu hình các mùa giải đấu",
+        "createSeason": {
+            "title": "Tạo mùa giải mới",
+            "subtitle": "Thiết lập thông tin và cấu hình cho mùa giải mới.",
+            "nameLabel": "Tên mùa giải",
+            "nameHint": "Nhập tên cho từng ngôn ngữ để hiển thị chính xác.",
+            "namePlaceholder": "Nhập tên mùa giải ({{lang}})...",
+            "nameRequiredVi": "Vui lòng nhập tên mùa giải (Tiếng Việt)",
+            "nameRequiredEn": "Vui lòng nhập tên mùa giải (Tiếng Anh)",
+            "nameRequiredJa": "Vui lòng nhập tên mùa giải (Tiếng Nhật)",
+            "dateRangeLabel": "Thời gian diễn ra",
+            "startDate": "Ngày bắt đầu",
+            "startDatePlaceholder": "Chọn ngày bắt đầu",
+            "endDate": "Ngày kết thúc",
+            "endDatePlaceholder": "Chọn ngày kết thúc",
+            "statusLabel": "Trạng thái",
+            "autoCreateLabel": "Tự động tạo mùa tiếp theo",
+            "autoCreateDescription": "Hệ thống sẽ tự động mở mùa giải mới trước khi mùa hiện tại kết thúc.",
+            "precreateDays": "Tạo trước (ngày)",
+            "precreateHint": "Số ngày trước khi mùa giải kết thúc để mở mùa mới.",
+            "randomItemAgain": "Random lại phần thưởng",
+            "randomItemAgainOn": "Bật",
+            "randomItemAgainOff": "Tắt",
+            "submitting": "Đang tạo...",
+            "submit": "Tạo mùa giải",
+            "errors": {
+                "startDateRequired": "Vui lòng chọn ngày bắt đầu",
+                "endDateRequired": "Vui lòng chọn ngày kết thúc",
+                "endDateAfterStart": "Ngày kết thúc phải sau hoặc bằng ngày bắt đầu"
+            }
+        },
+        "delete": {
+            "confirmTitle": "Xác nhận xoá mùa giải",
+            "confirmMessage": "Bạn có chắc chắn muốn xoá mùa giải này không?",
+            "note": "Hành động này không thể hoàn tác.",
+            "confirmAction": "Xoá mùa giải",
+            "deleting": "Đang xoá..."
+        }
+    },
     "notFoundPage": {
         "title": "Trang không tồn tại",
         "description": "Xin lỗi, trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.",
