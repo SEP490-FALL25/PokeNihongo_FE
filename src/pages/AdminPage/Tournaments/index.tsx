@@ -8,12 +8,13 @@ import { Input } from "@ui/Input"
 import { Textarea } from "@ui/Textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@ui/Dialog"
-import { Trophy, Calendar, Users, Award, Search, Edit, Trash2, Eye, Loader2, Sparkles, Clock, CheckCircle2 } from "lucide-react"
+import { Trophy, Calendar, Users, Award, Search, Edit, Trash2, Eye, Loader2, Sparkles, Clock, CheckCircle2, X, Plus } from "lucide-react"
 import HeaderAdmin from "@organisms/Header/Admin"
 import { useTranslation } from "react-i18next"
 import { useBattleListLeaderBoardSeason } from "@hooks/useBattle"
 import PaginationControls from "@ui/PaginationControls"
 import { BATTLE } from "@constants/battle"
+import CustomDatePicker from "@ui/DatePicker"
 
 export default function TournamentManagement() {
     const { t } = useTranslation()
@@ -21,6 +22,9 @@ export default function TournamentManagement() {
     const [searchQuery, setSearchQuery] = useState("")
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
     const [selectedStatus, setSelectedStatus] = useState("all")
+    const [filterStartDate, setFilterStartDate] = useState<Date | null>(null)
+    const [filterEndDate, setFilterEndDate] = useState<Date | null>(null)
+    const [filterHasOpened, setFilterHasOpened] = useState<boolean | null>(null)
     const [showAddDialog, setShowAddDialog] = useState(false)
     const [selectedTournament, setSelectedTournament] = useState<number | null>(null)
     const [currentPage, setCurrentPage] = useState(1)
@@ -35,6 +39,15 @@ export default function TournamentManagement() {
 
         return () => clearTimeout(timer)
     }, [searchQuery])
+
+    // Format dates for API (YYYY-MM-DD format)
+    const formatDateForAPI = (date: Date | null) => {
+        if (!date) return undefined
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        return `${year}-${month}-${day}`
+    }
 
     // Build query params
     const queryParams = useMemo(() => {
@@ -51,8 +64,20 @@ export default function TournamentManagement() {
             params.status = selectedStatus
         }
 
+        if (filterStartDate) {
+            params.startDate = formatDateForAPI(filterStartDate)
+        }
+
+        if (filterEndDate) {
+            params.endDate = formatDateForAPI(filterEndDate)
+        }
+
+        if (filterHasOpened !== null) {
+            params.hasOpened = filterHasOpened
+        }
+
         return params
-    }, [currentPage, pageSize, debouncedSearchQuery, selectedStatus])
+    }, [currentPage, pageSize, debouncedSearchQuery, selectedStatus, filterStartDate, filterEndDate, filterHasOpened])
 
     // Fetch tournaments data
     const { data: tournaments, pagination, isLoading, error } = useBattleListLeaderBoardSeason(queryParams)
@@ -154,6 +179,18 @@ export default function TournamentManagement() {
         }
     }
 
+    // Handle clear filters
+    const handleClearFilters = () => {
+        setFilterStartDate(null)
+        setFilterEndDate(null)
+        setFilterHasOpened(null)
+        setSelectedStatus("all")
+        setSearchQuery("")
+        setCurrentPage(1)
+    }
+
+    const hasActiveFilters = filterStartDate || filterEndDate || filterHasOpened !== null || selectedStatus !== "all" || searchQuery
+
     return (
 
         <>
@@ -199,49 +236,114 @@ export default function TournamentManagement() {
                                 className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 shadow-lg"
                                 onClick={() => setShowAddDialog(true)}
                             >
-                                <Sparkles className="w-4 h-4 mr-2" />
+                                <Plus className="w-4 h-4 mr-2" />
                                 Tạo giải đấu
                             </Button>
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            <div className="flex-1 relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
-                                <Input
-                                    type="text"
-                                    placeholder="Tìm kiếm giải đấu..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-10 bg-background border-border text-foreground h-11 shadow-sm focus:shadow-md transition-shadow"
-                                />
+                        <div className="space-y-4">
+                            {/* First row: Search and Status */}
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <div className="flex-1 relative">
+                                    <label className="text-sm font-medium text-foreground mb-2 block">
+                                        Tìm kiếm
+                                    </label>
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+                                        <Input
+                                            type="text"
+                                            placeholder="Tìm kiếm giải đấu..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="pl-10 bg-background border-border text-foreground h-11 shadow-sm focus:shadow-md transition-shadow"
+                                        />
+                                    </div>
+                                </div>
                             </div>
-                            <Select
-                                value={selectedStatus}
-                                onValueChange={(value) => {
-                                    setSelectedStatus(value)
-                                    setCurrentPage(1)
-                                }}
-                            >
-                                <SelectTrigger className="w-[200px] bg-background border-border text-foreground h-11 shadow-sm">
-                                    <SelectValue placeholder="Trạng thái" />
-                                </SelectTrigger>
-                                <SelectContent className="bg-card border-border">
-                                    <SelectItem value="all">Tất cả</SelectItem>
-                                    <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE}>
-                                        {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE)}
-                                    </SelectItem>
-                                    <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.PREVIEW}>
-                                        {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.PREVIEW)}
-                                    </SelectItem>
-                                    <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.EXPIRED}>
-                                        {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.EXPIRED)}
-                                    </SelectItem>
-                                    <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.INACTIVE}>
-                                        {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.INACTIVE)}
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
+
+                            {/* Second row: Date filters, HasOpened, and Clear button */}
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                                <div>
+                                    <label className="text-sm font-medium text-foreground mb-2 block">
+                                        Ngày bắt đầu
+                                    </label>
+                                    <CustomDatePicker
+                                        value={filterStartDate}
+                                        onChange={(date) => {
+                                            setFilterStartDate(date)
+                                            setCurrentPage(1)
+                                        }}
+                                        placeholder="Chọn ngày bắt đầu"
+                                        dayPickerProps={{
+                                            disabled: false
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-foreground mb-2 block">
+                                        Ngày kết thúc
+                                    </label>
+                                    <CustomDatePicker
+                                        value={filterEndDate}
+                                        onChange={(date) => {
+                                            setFilterEndDate(date)
+                                            setCurrentPage(1)
+                                        }}
+                                        placeholder="Chọn ngày kết thúc"
+                                        dayPickerProps={{
+                                            disabled: false
+                                        }}
+                                    />
+                                </div>
+
+                                <div className="sm:w-[200px]">
+                                    <label className="text-sm font-medium text-foreground mb-2 block">
+                                        Trạng thái
+                                    </label>
+                                    <Select
+                                        value={selectedStatus}
+                                        onValueChange={(value) => {
+                                            setSelectedStatus(value)
+                                            setCurrentPage(1)
+                                        }}
+                                    >
+                                        <SelectTrigger className="w-full bg-background border-border text-foreground h-11 shadow-sm">
+                                            <SelectValue placeholder="Trạng thái" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-card border-border">
+                                            <SelectItem value="all">Tất cả</SelectItem>
+                                            <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE}>
+                                                {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE)}
+                                            </SelectItem>
+                                            <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.PREVIEW}>
+                                                {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.PREVIEW)}
+                                            </SelectItem>
+                                            <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.EXPIRED}>
+                                                {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.EXPIRED)}
+                                            </SelectItem>
+                                            <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.INACTIVE}>
+                                                {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.INACTIVE)}
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div className="flex items-end">
+                                    {hasActiveFilters ? (
+                                        <Button
+                                            variant="outline"
+                                            onClick={handleClearFilters}
+                                            className="w-full border-border text-foreground hover:bg-muted shadow-sm h-11"
+                                        >
+                                            <X className="w-4 h-4 mr-2" />
+                                            Xóa bộ lọc
+                                        </Button>
+                                    ) : (
+                                        <div className="h-11" />
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
@@ -297,9 +399,6 @@ export default function TournamentManagement() {
                                                         {tournament.nameTranslation || tournament.nameKey}
                                                     </CardTitle>
                                                 </div>
-                                                <p className="text-sm text-muted-foreground truncate">
-                                                    {tournament.nameKey}
-                                                </p>
                                             </div>
                                             <div className="p-3 bg-gradient-to-br from-yellow-500/20 to-amber-500/20 rounded-xl border border-yellow-500/30 shadow-lg group-hover:scale-110 transition-transform duration-300">
                                                 <Trophy className="w-6 h-6 text-yellow-500" />
@@ -333,29 +432,6 @@ export default function TournamentManagement() {
                                                 </span>
                                             </div>
                                             <div className="h-px bg-border/50" />
-                                            <div className="flex items-center justify-between text-sm">
-                                                <span className="text-muted-foreground flex items-center gap-2 font-medium">
-                                                    <Calendar className="w-4 h-4" />
-                                                    Trạng thái
-                                                </span>
-                                                <span className={`font-semibold ${tournament.hasOpened ? 'text-green-600' : 'text-muted-foreground'}`}>
-                                                    {tournament.hasOpened ? "Đã mở" : "Chưa mở"}
-                                                </span>
-                                            </div>
-                                            {tournament.enablePrecreate && (
-                                                <>
-                                                    <div className="h-px bg-border/50" />
-                                                    <div className="flex items-center justify-between text-sm">
-                                                        <span className="text-muted-foreground flex items-center gap-2 font-medium">
-                                                            <Sparkles className="w-4 h-4" />
-                                                            Tạo trước
-                                                        </span>
-                                                        <span className="text-foreground font-semibold">
-                                                            {tournament.precreateBeforeEndDays} ngày
-                                                        </span>
-                                                    </div>
-                                                </>
-                                            )}
                                         </div>
 
                                         {/* Action Buttons */}
@@ -417,7 +493,7 @@ export default function TournamentManagement() {
                             <DialogHeader className="px-6 pt-6 pb-4 border-b border-border bg-gradient-to-r from-primary/5 to-transparent">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 bg-primary/10 rounded-lg">
-                                        <Sparkles className="w-5 h-5 text-primary" />
+                                        <Plus className="w-5 h-5 text-primary" />
                                     </div>
                                     <div>
                                         <DialogTitle className="text-2xl font-bold text-foreground">Tạo giải đấu mới</DialogTitle>
@@ -517,7 +593,7 @@ export default function TournamentManagement() {
                                         Hủy
                                     </Button>
                                     <Button className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 shadow-lg">
-                                        <Sparkles className="w-4 h-4 mr-2" />
+                                        <Plus className="w-4 h-4 mr-2" />
                                         Tạo giải đấu
                                     </Button>
                                 </div>

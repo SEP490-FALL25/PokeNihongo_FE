@@ -1,4 +1,5 @@
 import { axiosPrivate } from "@configs/axios";
+import { ICreateBattleLeaderBoardSeasonRequest } from "@models/battle/request";
 import { IQueryRequest } from "@models/common/request";
 
 interface IQueryBattleLeaderBoardSeasonRequest extends IQueryRequest {
@@ -54,6 +55,10 @@ const battleService = {
         const queryString = queryParams.toString();
         const response = await axiosPrivate.get(`/leaderboard-season${queryString ? `?${queryString}` : ''}`);
         return response.data;
+    },
+
+    createBattleLeaderBoardSeason: async (data: ICreateBattleLeaderBoardSeasonRequest) => {
+        return await axiosPrivate.post('/leaderboard-season', data);
     },
 }
 
