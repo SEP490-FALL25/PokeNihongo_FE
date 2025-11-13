@@ -15,20 +15,21 @@ import PaginationControls from "@ui/PaginationControls"
 import { BATTLE } from "@constants/battle"
 import CustomDatePicker from "@ui/DatePicker"
 import CreateSeason from "./components/CreateSeason"
+import DialogDeleteSeason from "./components/DialogDeleteSeason"
 
 export default function TournamentManagement() {
     const { t } = useTranslation()
 
-    const [searchQuery, setSearchQuery] = useState("")
-    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
-    const [selectedStatus, setSelectedStatus] = useState("all")
+    const [searchQuery, setSearchQuery] = useState<string>("")
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("")
+    const [selectedStatus, setSelectedStatus] = useState<string>("all")
     const [filterStartDate, setFilterStartDate] = useState<Date | null>(null)
     const [filterEndDate, setFilterEndDate] = useState<Date | null>(null)
     const [filterHasOpened, setFilterHasOpened] = useState<"all" | "opened" | "notOpened">("all")
-    const [showAddDialog, setShowAddDialog] = useState(false)
+    const [showAddDialog, setShowAddDialog] = useState<boolean>(false)
     const [selectedTournament, setSelectedTournament] = useState<number | null>(null)
-    const [currentPage, setCurrentPage] = useState(1)
-    const [pageSize, setPageSize] = useState(15)
+    const [currentPage, setCurrentPage] = useState<number>(1)
+    const [pageSize, setPageSize] = useState<number>(15)
 
     // Debounce search query
     useEffect(() => {
@@ -91,7 +92,7 @@ export default function TournamentManagement() {
     const stats = useMemo(() => {
         const totalTournaments = pagination?.totalItem || 0
         const activeTournaments = tournamentsList.filter((t: any) => t.status === BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE).length
-        // TODO: Calculate total participants and monthly rewards when API provides these fields
+
         const totalParticipants = 0
         const monthlyRewards = 0
 
@@ -197,6 +198,13 @@ export default function TournamentManagement() {
         filterHasOpened !== "all" ||
         selectedStatus !== "all" ||
         !!searchQuery
+
+
+    /**
+     * Delete Candidate
+     */
+    const [deleteCandidate, setDeleteCandidate] = useState<{ id: number; name: string } | null>(null)
+    //------------------------End------------------------//
 
     return (
 
@@ -484,6 +492,7 @@ export default function TournamentManagement() {
                                                 variant="outline"
                                                 size="icon"
                                                 className="border-border text-destructive hover:bg-destructive/10 hover:border-destructive hover:text-destructive transition-all shadow-sm"
+                                                onClick={() => setDeleteCandidate({ id: tournament.id, name: tournament.nameTranslation || tournament.nameKey })}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
@@ -516,6 +525,12 @@ export default function TournamentManagement() {
                 )}
 
                 <CreateSeason isOpen={showAddDialog} onClose={() => setShowAddDialog(false)} />
+
+                <DialogDeleteSeason
+                    candidate={deleteCandidate}
+                    isOpen={!!deleteCandidate}
+                    onCancel={() => setDeleteCandidate(null)}
+                />
 
                 {/* Tournament Details Dialog */}
                 {selectedTournament && (
