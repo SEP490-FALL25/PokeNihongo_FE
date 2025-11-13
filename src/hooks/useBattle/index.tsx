@@ -57,3 +57,24 @@ export const useCreateBattleLeaderBoardSeason = () => {
     return createBattleLeaderBoardSeasonMutation
 }
 //----------------------End----------------------//
+
+
+/**
+ * Handle Delete Battle Leader Board Season
+ * @returns useMutation to delete battle leader board season
+ */
+export const useDeleteBattleLeaderBoardSeason = () => {
+    const queryClient = useQueryClient();
+    const deleteBattleLeaderBoardSeasonMutation = useMutation({
+        mutationFn: (id: number) => battleService.deleteBattleLeaderBoardSeason(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['battle-list-leader-board-season'] });
+            toast.success("Xóa mùa giải thành công");
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.message || "Có lỗi xảy ra khi xóa mùa giải");
+        },
+    })
+    return deleteBattleLeaderBoardSeasonMutation
+}
+//----------------------End----------------------//

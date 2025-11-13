@@ -60,6 +60,10 @@ const battleService = {
     createBattleLeaderBoardSeason: async (data: ICreateBattleLeaderBoardSeasonRequest) => {
         return await axiosPrivate.post('/leaderboard-season', data);
     },
+
+    deleteBattleLeaderBoardSeason: async (id: number) => {
+        return await axiosPrivate.delete(`/leaderboard-season/${id}`);
+    },
 }
 
 export default battleService;
