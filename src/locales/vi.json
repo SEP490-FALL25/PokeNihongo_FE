@@ -155,6 +155,17 @@
             },
             "rewards": {
                 "title": "Phần thưởng theo hạng",
+                "editButton": "Cập nhật phần thưởng",
+                "dialog": {
+                    "title": "Cập nhật phần thưởng mùa giải",
+                    "description": "Chọn phần thưởng áp dụng cho từng nhóm hạng và thứ tự.",
+                    "searchPlaceholder": "Tìm kiếm phần thưởng...",
+                    "noResults": "Không tìm thấy phần thưởng phù hợp.",
+                    "loading": "Đang tải danh sách phần thưởng...",
+                    "reset": "Thiết lập lại",
+                    "cancel": "Hủy",
+                    "save": "Lưu thay đổi"
+                },
                 "groupCount": "{{count}} nhóm thứ hạng",
                 "rewardCount": "{{count}} phần thưởng",
                 "range": {

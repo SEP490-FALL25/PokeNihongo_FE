@@ -104,12 +104,12 @@ export const useUpdateSeasonRankReward = () => {
     const queryClient = useQueryClient();
     const updateSeasonRankRewardMutation = useMutation({
         mutationFn: (data: IUpdateSeasonRankRewardRequest) => battleService.updateSeasonRankReward(data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['battle-leader-board-season-detail'] });
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['battle-leader-board-season-detail', variables.seasonId] });
             toast.success("Cập nhật thành công");
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.message || "Có lỗi xảy ra khi cập nhật thành công");
+            toast.error(error.response?.data?.message || "Có lỗi xảy ra khi cập nhật phần thưởng");
         },
     })
     return updateSeasonRankRewardMutation

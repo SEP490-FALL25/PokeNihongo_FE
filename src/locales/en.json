@@ -175,6 +175,17 @@
             },
             "rewards": {
                 "title": "Rank rewards",
+                "editButton": "Update rewards",
+                "dialog": {
+                    "title": "Update season rewards",
+                    "description": "Choose the rewards for each rank group and order.",
+                    "searchPlaceholder": "Search rewards...",
+                    "noResults": "No rewards match your search.",
+                    "loading": "Loading rewards...",
+                    "reset": "Reset",
+                    "cancel": "Cancel",
+                    "save": "Save changes"
+                },
                 "groupCount": "{{count}} rank buckets",
                 "rewardCount": "{{count}} rewards",
                 "range": {

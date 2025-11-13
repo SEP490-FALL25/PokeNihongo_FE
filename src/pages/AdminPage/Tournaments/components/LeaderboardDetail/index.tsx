@@ -1,12 +1,15 @@
+import { useMemo, useState } from "react"
 import { useGetBattleLeaderBoardSeasonDetail } from "@hooks/useBattle"
 import { Badge } from "@ui/Badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card"
+import { Button } from "@ui/Button"
 import { Award, Calendar, CheckCircle2, Clock, Gift, Languages, Loader2, RefreshCcw, Trophy, XCircle } from "lucide-react"
 import { useParams } from "react-router-dom"
 import { formatDateOnly, formatDateTime } from "@utils/date"
 import { BATTLE_STATUS_CONFIG, getStatusBadgeColor, getStatusText } from "@atoms/BadgeStatusColor"
 import HeaderAdmin from "@organisms/Header/Admin"
 import { useTranslation } from "react-i18next"
+import DialogUpdateRewardSeason from "../DialogUpdateRewardSeason"
 
 const renderRewardValue = (value: unknown) => {
     if (value === null || value === undefined) return "—"
@@ -78,6 +81,8 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
         hasOpened: t('tournaments.detail.metadata.hasOpened'),
     }
 
+    const [isRewardDialogOpen, setIsRewardDialogOpen] = useState(false)
+
     const rewardOverviewLabels = {
         title: t('tournaments.detail.rewardOverview.title'),
         rankGroups: t('tournaments.detail.rewardOverview.rankGroups'),
@@ -120,6 +125,89 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
 
     const { data: season, isLoading, error } = useGetBattleLeaderBoardSeasonDetail(resolvedId)
 
+    const nameTranslations = useMemo(
+        () => (Array.isArray(season?.nameTranslations) ? season!.nameTranslations : []),
+        [season]
+    )
+
+    const sortedRewards = useMemo(() => {
+        if (!Array.isArray(season?.seasonRankRewards)) return []
+        return [...season!.seasonRankRewards].sort((a, b) => a.order - b.order)
+    }, [season])
+
+    const rankGroups = useMemo(() => {
+        const map = new Map<string, typeof sortedRewards>()
+        sortedRewards.forEach((reward) => {
+            const list = map.get(reward.rankName)
+            if (list) {
+                list.push(reward)
+            } else {
+                map.set(reward.rankName, [reward])
+            }
+        })
+        return Array.from(map.entries()).map(([rankName, list]) => [
+            rankName,
+            [...list].sort((a, b) => a.order - b.order),
+        ]) as Array<[string, typeof sortedRewards]>
+    }, [sortedRewards])
+
+    const totalRankGroups = rankGroups.length
+    const totalRewardBuckets = sortedRewards.length
+    const totalRewardItems = useMemo(
+        () =>
+            sortedRewards.reduce(
+                (acc, rank) => acc + (Array.isArray(rank.rewards) ? rank.rewards.length : 0),
+                0
+            ),
+        [sortedRewards]
+    )
+
+    const rewardTypeSummary = useMemo(() => {
+        const typeMap = new Map<string, number>()
+        sortedRewards.forEach((rank) => {
+            if (!Array.isArray(rank.rewards)) return
+            rank.rewards.forEach((reward) => {
+                const key = String(reward.rewardType)
+                typeMap.set(key, (typeMap.get(key) ?? 0) + 1)
+            })
+        })
+        return Array.from(typeMap.entries()).map(([type, count]) => ({ type, count }))
+    }, [sortedRewards])
+
+    const durationDays = useMemo(() => {
+        if (!season?.startDate || !season?.endDate) return null
+        const start = new Date(season.startDate).getTime()
+        const end = new Date(season.endDate).getTime()
+        if (Number.isNaN(start) || Number.isNaN(end)) return null
+        return Math.max(1, Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1)
+    }, [season])
+
+    const timelineItems = useMemo(() => {
+        if (!season) return []
+        return [
+            season.startDate && {
+                label: timelineLabels.start,
+                value: formatDateTime(season.startDate),
+                icon: Calendar,
+            },
+            season.endDate && {
+                label: timelineLabels.end,
+                value: formatDateTime(season.endDate),
+                icon: Calendar,
+            },
+            season.createdAt && {
+                label: timelineLabels.created,
+                value: formatDateTime(season.createdAt),
+                icon: Clock,
+            },
+            season.updatedAt && {
+                label: timelineLabels.updated,
+                value: formatDateTime(season.updatedAt),
+                icon: RefreshCcw,
+            },
+        ].filter(Boolean) as Array<{ label: string; value: string; icon: typeof Calendar }>
+    }, [season, timelineLabels])
+
     if (isLoading) {
         return (
             <Card className="bg-card border-border shadow-md">
@@ -156,71 +244,6 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
             </Card>
         )
     }
-
-    const nameTranslations = Array.isArray(season.nameTranslations) ? season.nameTranslations : []
-    const sortedRewards = Array.isArray(season.seasonRankRewards)
-        ? [...season.seasonRankRewards].sort((a, b) => a.order - b.order)
-        : []
-
-    const rankGroupsMap = sortedRewards.reduce((acc, reward) => {
-        const group = acc.get(reward.rankName) ?? []
-        group.push(reward)
-        acc.set(reward.rankName, group)
-        return acc
-    }, new Map<string, typeof sortedRewards>())
-
-    rankGroupsMap.forEach((entries) => entries.sort((a, b) => a.order - b.order))
-    const rankGroups = Array.from(rankGroupsMap.entries())
-
-    const totalRankGroups = rankGroups.length
-    const totalRewardBuckets = sortedRewards.length
-    const totalRewardItems = sortedRewards.reduce(
-        (acc, rank) => acc + (Array.isArray(rank.rewards) ? rank.rewards.length : 0),
-        0
-    )
-
-    const rewardTypeMap = new Map<string, number>()
-    sortedRewards.forEach((rank) => {
-        if (!Array.isArray(rank.rewards)) return
-        rank.rewards.forEach((reward) => {
-            const key = String(reward.rewardType)
-            rewardTypeMap.set(key, (rewardTypeMap.get(key) ?? 0) + 1)
-        })
-    })
-    const rewardTypeSummary = Array.from(rewardTypeMap.entries()).map(([type, count]) => ({
-        type,
-        count,
-    }))
-
-    const startDateObj = season.startDate ? new Date(season.startDate) : null
-    const endDateObj = season.endDate ? new Date(season.endDate) : null
-    const durationDays =
-        startDateObj && endDateObj
-            ? Math.max(1, Math.round((endDateObj.getTime() - startDateObj.getTime()) / (1000 * 60 * 60 * 24)) + 1)
-            : null
-
-    const timelineItems = [
-        season.startDate && {
-            label: timelineLabels.start,
-            value: formatDateTime(season.startDate),
-            icon: Calendar,
-        },
-        season.endDate && {
-            label: timelineLabels.end,
-            value: formatDateTime(season.endDate),
-            icon: Calendar,
-        },
-        season.createdAt && {
-            label: timelineLabels.created,
-            value: formatDateTime(season.createdAt),
-            icon: Clock,
-        },
-        season.updatedAt && {
-            label: timelineLabels.updated,
-            value: formatDateTime(season.updatedAt),
-            icon: RefreshCcw,
-        },
-    ].filter(Boolean) as Array<{ label: string; value: string; icon: typeof Calendar }>
 
     const summaryStats = [
         {
@@ -572,13 +595,24 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
 
             <Card className="border border-amber-300/50 bg-gradient-to-br from-amber-500/10 via-background to-background shadow-lg shadow-amber-200/30">
                 <CardHeader>
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary/10 rounded-lg">
-                            <Gift className="w-5 h-5 text-primary" />
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-primary/10 rounded-lg">
+                                <Gift className="w-5 h-5 text-primary" />
+                            </div>
+                            <CardTitle className="text-xl font-bold text-foreground">
+                                {rewardsLabels.title}
+                            </CardTitle>
                         </div>
-                        <CardTitle className="text-xl font-bold text-foreground">
-                            {rewardsLabels.title}
-                        </CardTitle>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={rankGroups.length === 0}
+                            onClick={() => setIsRewardDialogOpen(true)}
+                            className="h-9"
+                        >
+                            {t('tournaments.detail.rewards.editButton')}
+                        </Button>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -688,12 +722,29 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
         </div>
     )
 
-    return isStandalonePage ? (
+    const rewardDialog = (
+        <DialogUpdateRewardSeason
+            open={isRewardDialogOpen}
+            onOpenChange={setIsRewardDialogOpen}
+            seasonId={season.id}
+            rankGroups={rankGroups}
+        />
+    )
+
+    if (isStandalonePage) {
+        return (
+            <>
+                <HeaderAdmin title={t('tournaments.title')} description={t('tournaments.description')} />
+                {content}
+                {rewardDialog}
+            </>
+        )
+    }
+
+    return (
         <>
-            <HeaderAdmin title={t('tournaments.title')} description={t('tournaments.description')} />
             {content}
+            {rewardDialog}
         </>
-    ) : (
-        content
     )
 }
