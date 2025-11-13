@@ -38,7 +38,7 @@ export const BattleLeaderBoardSeasonDetailEntitySchema = z.object({
     isRandomItemAgain: z.boolean(),
     ...byUser,
     ...at,
-    nameTranslation: z.string(),
+    nameTranslation: z.string().nullable(),
     nameTranslations: TranslationInputSchema,
     seasonRankRewards: z.array(z.object({
         id: z.number(),
@@ -46,10 +46,10 @@ export const BattleLeaderBoardSeasonDetailEntitySchema = z.object({
         order: z.number(),
         rewards: z.array(z.object({
             id: z.number(),
-            rewardType: z.number(),
-            rewardItem: z.string(),
-            rewardTarget: z.string(),
-            nameTranslation: z.string(),
+            rewardType: z.union([z.string(), z.number()]),
+            rewardItem: z.union([z.string(), z.number()]),
+            rewardTarget: z.string().nullable(),
+            nameTranslation: z.string().nullable(),
         })),
     })),
 })
