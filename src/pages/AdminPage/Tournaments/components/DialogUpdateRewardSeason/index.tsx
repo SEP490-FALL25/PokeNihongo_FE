@@ -1,18 +1,17 @@
-
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@ui/Dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/Tabs";
 import { ScrollArea, ScrollBar } from "@ui/ScrollArea";
-import { Checkbox } from "@ui/Checkbox";
 import { Input } from "@ui/Input";
 import { Badge } from "@ui/Badge";
 import { Button } from "@ui/Button";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, X, Edit2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useGetRewardList } from "@hooks/useReward";
 import { useUpdateSeasonRankReward } from "@hooks/useBattle";
 import { IRewardEntityType } from "@models/reward/entity";
 import { Card, CardContent, CardHeader } from "@ui/Card";
+import DialogReward from "../DialogReward";
 
 type PendingSelections = Record<string, Record<number, number[]>>;
 
@@ -55,15 +54,6 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
         save: t('tournaments.detail.rewards.dialog.save'),
     };
 
-    const rewardsLabels = {
-        rewardCount: (count: number) => t('tournaments.detail.rewards.rewardCount', { count }),
-        table: {
-            type: t('tournaments.detail.rewards.table.type'),
-            target: t('tournaments.detail.rewards.table.target'),
-            value: t('tournaments.detail.rewards.table.value'),
-            note: t('tournaments.detail.rewards.table.note'),
-        },
-    };
 
     const formatRangeLabel = useCallback((start: number, nextStart?: number) => {
         if (nextStart === undefined || nextStart === null) {
@@ -94,16 +84,20 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
     }, [rankGroups]);
 
     const [activeRank, setActiveRank] = useState<string>("");
-    const [rewardSearch, setRewardSearch] = useState("");
     const [pendingSelections, setPendingSelections] = useState<PendingSelections>({});
     const [newOrderInputs, setNewOrderInputs] = useState<Record<string, string>>({});
+    const [rewardSelectDialog, setRewardSelectDialog] = useState<{
+        open: boolean;
+        rankName: string;
+        order: number;
+    } | null>(null);
 
     useEffect(() => {
         if (open) {
             setPendingSelections(baselineSelections);
-            setRewardSearch("");
             setActiveRank(rankGroups[0]?.[0] ?? "");
             setNewOrderInputs({});
+            setRewardSelectDialog(null);
         }
     }, [open, baselineSelections, rankGroups]);
 
@@ -124,19 +118,6 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
         setNewOrderInputs((prev) => ({ ...prev, [rankName]: "" }));
     }, []);
 
-    const filteredRewardOptions = useMemo(() => {
-        const keyword = rewardSearch.trim().toLowerCase();
-        if (!keyword) return rewardOptions;
-        return rewardOptions.filter((reward) => {
-            const name = (reward.nameTranslation || reward.nameKey || "").toLowerCase();
-            return (
-                name.includes(keyword) ||
-                reward.rewardType?.toLowerCase().includes(keyword) ||
-                reward.rewardTarget?.toLowerCase().includes(keyword) ||
-                String(reward.rewardItem ?? "").includes(keyword)
-            );
-        });
-    }, [rewardOptions, rewardSearch]);
 
     const updateSeasonRankRewardMutation = useUpdateSeasonRankReward();
     const isSavingRewards = updateSeasonRankRewardMutation.isPending;
@@ -170,10 +151,33 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
 
     const handleReset = useCallback(() => {
         setPendingSelections(baselineSelections);
-        setRewardSearch("");
         setActiveRank(rankGroups[0]?.[0] ?? "");
         setNewOrderInputs({});
+        setRewardSelectDialog(null);
     }, [baselineSelections, rankGroups]);
+
+    const handleOpenRewardSelect = useCallback((rankName: string, order: number) => {
+        setRewardSelectDialog({ open: true, rankName, order });
+    }, []);
+
+    const handleCloseRewardSelect = useCallback(() => {
+        setRewardSelectDialog(null);
+    }, []);
+
+    const handleRemoveReward = useCallback((rankName: string, order: number, rewardId: number) => {
+        setPendingSelections((prev) => {
+            const rankOrders = { ...(prev[rankName] ?? {}) };
+            const currentSet = new Set(rankOrders[order] ?? []);
+            currentSet.delete(rewardId);
+            return {
+                ...prev,
+                [rankName]: {
+                    ...rankOrders,
+                    [order]: Array.from(currentSet),
+                },
+            };
+        });
+    }, []);
 
     const handleSaveRewards = useCallback(async () => {
         const payload = {
@@ -199,23 +203,16 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
 
     return (
         <Dialog open={open} onOpenChange={handleDialogChange}>
-            <DialogContent className="max-w-6xl max-h-[90vh] bg-white border-border shadow-xl flex flex-col">
-                <DialogHeader className="flex-shrink-0">
+            <DialogContent className="max-w-6xl h-[90vh] bg-white border-border shadow-xl flex flex-col overflow-hidden">
+                <DialogHeader className="flex-shrink-0 pb-4">
                     <DialogTitle>{dialogLabels.title}</DialogTitle>
                     <DialogDescription>{dialogLabels.description}</DialogDescription>
                 </DialogHeader>
                 {rankGroups.length === 0 ? (
                     <p className="text-sm text-muted-foreground">{messages.noRewards}</p>
                 ) : (
-                    <div className="flex flex-col gap-6 flex-1 min-h-0">
-                        <div className="flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
-                            <Input
-                                value={rewardSearch}
-                                onChange={(event) => setRewardSearch(event.target.value)}
-                                placeholder={dialogLabels.searchPlaceholder}
-                                className="max-w-md bg-background border-border"
-                                disabled={isRewardListLoading}
-                            />
+                    <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
+                        <div className="flex flex-wrap items-center justify-end gap-3 flex-shrink-0 mb-4">
                             <Button
                                 variant="outline"
                                 onClick={handleReset}
@@ -227,18 +224,20 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
                         <Tabs
                             value={activeRankValue}
                             onValueChange={setActiveRank}
-                            className="flex flex-col gap-4 flex-1 min-h-0 overflow-hidden"
+                            className="flex flex-col flex-1 min-h-0 overflow-hidden"
                         >
-                            <ScrollArea className="max-w-full flex-shrink-0">
-                                <TabsList className="flex w-full flex-nowrap gap-2 bg-muted/40 p-2">
-                                    {rankGroups.map(([rankName]) => (
-                                        <TabsTrigger key={rankName} value={rankName} className="min-w-[120px]">
-                                            {rankName}
-                                        </TabsTrigger>
-                                    ))}
-                                </TabsList>
-                                <ScrollBar orientation="horizontal" />
-                            </ScrollArea>
+                            <div className="flex-shrink-0 mb-4">
+                                <ScrollArea className="max-w-full">
+                                    <TabsList className="flex w-full flex-nowrap gap-2 bg-muted/40 p-2">
+                                        {rankGroups.map(([rankName]) => (
+                                            <TabsTrigger key={rankName} value={rankName} className="min-w-[120px]">
+                                                {rankName}
+                                            </TabsTrigger>
+                                        ))}
+                                    </TabsList>
+                                    <ScrollBar orientation="horizontal" />
+                                </ScrollArea>
+                            </div>
                             {rankGroups.map(([rankName, entries]) => {
                                 const existingOrders = new Set(entries.map(e => e.order));
                                 const newOrderInput = newOrderInputs[rankName] ?? "";
@@ -248,12 +247,12 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
                                     .sort((a, b) => a.order - b.order);
 
                                 return (
-                                    <TabsContent key={rankName} value={rankName} className="mt-0 flex-1 min-h-0 overflow-hidden">
-                                        <ScrollArea className="h-full">
-                                            <div className="space-y-4 pr-4 py-2">
+                                    <TabsContent key={rankName} value={rankName} className="mt-0 flex-1 min-h-0 flex flex-col overflow-hidden">
+                                        <ScrollArea className="flex-1">
+                                            <div className="space-y-3 py-2 pr-2">
                                                 {/* Add New Order Section */}
                                                 <Card className="border border-blue-200/50 bg-blue-50/50 shadow-sm">
-                                                    <CardHeader className="space-y-3">
+                                                    <CardHeader className="space-y-3 pb-3">
                                                         <div className="flex items-center gap-2">
                                                             <Plus className="w-4 h-4 text-primary" />
                                                             <span className="text-sm font-semibold text-foreground">
@@ -281,70 +280,47 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
                                                         </div>
                                                     </CardHeader>
                                                     {newOrderSelections.length > 0 && (
-                                                        <CardContent className="space-y-3">
+                                                        <CardContent className="space-y-3 pt-0">
                                                             {newOrderSelections.map(({ order, rewards }) => {
                                                                 const selectedRewardIds = rewards;
+                                                                const selectedRewards = selectedRewardIds
+                                                                    .map(id => rewardOptionsMap.get(id))
+                                                                    .filter((reward): reward is IRewardEntityType => reward !== undefined);
                                                                 return (
-                                                                    <div key={order} className="space-y-2 p-3 rounded-lg border border-blue-200/40 bg-background/70">
+                                                                    <div key={order} className="p-4 rounded-lg border border-blue-200/40 bg-background/70 space-y-3">
                                                                         <div className="flex items-center justify-between">
                                                                             <Badge className="bg-blue-500/20 text-blue-700 border-blue-500/40 font-semibold">
                                                                                 {t('tournaments.detail.rewards.range.single', { rank: order })}
                                                                             </Badge>
-                                                                            <span className="text-xs text-muted-foreground">
-                                                                                {rewardsLabels.rewardCount(selectedRewardIds.length)}
-                                                                            </span>
+                                                                            <Button
+                                                                                size="sm"
+                                                                                variant="outline"
+                                                                                onClick={() => handleOpenRewardSelect(rankName, order)}
+                                                                                disabled={isSavingRewards || isRewardListLoading}
+                                                                                className="h-8"
+                                                                            >
+                                                                                <Edit2 className="w-3 h-3 mr-1.5" />
+                                                                                {t('tournaments.detail.rewards.dialog.selectRewards', { defaultValue: 'Chọn rewards' })}
+                                                                            </Button>
                                                                         </div>
-                                                                        {isRewardListLoading ? (
-                                                                            <div className="flex items-center justify-center gap-2 py-4 text-sm text-muted-foreground">
-                                                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                                                {dialogLabels.loading}
-                                                                            </div>
-                                                                        ) : filteredRewardOptions.length === 0 ? (
-                                                                            <p className="text-sm text-muted-foreground">{dialogLabels.noResults}</p>
+                                                                        {selectedRewardIds.length === 0 ? (
+                                                                            <p className="text-sm text-muted-foreground py-2">
+                                                                                {messages.noRewardRange}
+                                                                            </p>
                                                                         ) : (
-                                                                            <ScrollArea className="h-48 pr-3">
-                                                                                <div className="space-y-2">
-                                                                                    {filteredRewardOptions.map((reward) => {
-                                                                                        const rewardId = reward.id;
-                                                                                        const checkboxId = `reward-new-${rankName}-${order}-${rewardId}`;
-                                                                                        const checked = selectedRewardIds.includes(rewardId);
-                                                                                        return (
-                                                                                            <div
-                                                                                                key={rewardId}
-                                                                                                className="flex items-start gap-3 rounded-lg border border-border/60 bg-background/70 p-2"
-                                                                                            >
-                                                                                                <Checkbox
-                                                                                                    id={checkboxId}
-                                                                                                    checked={checked}
-                                                                                                    disabled={isSavingRewards}
-                                                                                                    onCheckedChange={(state) => {
-                                                                                                        if (state === true || state === false) {
-                                                                                                            handleToggleReward(rankName, order, rewardId);
-                                                                                                        }
-                                                                                                    }}
-                                                                                                />
-                                                                                                <label htmlFor={checkboxId} className="flex flex-col gap-1 text-sm text-foreground cursor-pointer flex-1">
-                                                                                                    <span className="font-medium">
-                                                                                                        {reward.nameTranslation || reward.nameKey || `#${rewardId}`}
-                                                                                                    </span>
-                                                                                                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                                                                                                        <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/30">
-                                                                                                            {reward.rewardType}
-                                                                                                        </Badge>
-                                                                                                        <Badge className="bg-green-500/10 text-green-600 border-green-500/30">
-                                                                                                            {reward.rewardTarget}
-                                                                                                        </Badge>
-                                                                                                        <span className="font-semibold text-primary">
-                                                                                                            {reward.rewardItem}
-                                                                                                        </span>
-                                                                                                    </div>
-                                                                                                </label>
-                                                                                            </div>
-                                                                                        );
-                                                                                    })}
-                                                                                </div>
-                                                                                <ScrollBar orientation="vertical" />
-                                                                            </ScrollArea>
+                                                                            <div className="flex flex-wrap gap-2">
+                                                                                {selectedRewards.map((reward) => (
+                                                                                    <Badge
+                                                                                        key={reward.id}
+                                                                                        variant="secondary"
+                                                                                        className="bg-blue-500/10 text-blue-700 border-blue-500/30 pr-1 cursor-pointer hover:bg-blue-500/20 transition-colors"
+                                                                                        onClick={() => handleRemoveReward(rankName, order, reward.id)}
+                                                                                    >
+                                                                                        {reward.nameTranslation || reward.nameKey || `#${reward.id}`}
+                                                                                        <X className="w-3 h-3 ml-1.5" />
+                                                                                    </Badge>
+                                                                                ))}
+                                                                            </div>
                                                                         )}
                                                                     </div>
                                                                 );
@@ -356,100 +332,51 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
                                                     const nextEntry = entries[index + 1];
                                                     const rangeLabel = formatRangeLabel(entry.order, nextEntry?.order);
                                                     const selectedRewardIds = pendingSelections[rankName]?.[entry.order] ?? [];
+                                                    const selectedRewards = selectedRewardIds
+                                                        .map(id => rewardOptionsMap.get(id))
+                                                        .filter((reward): reward is IRewardEntityType => reward !== undefined);
 
                                                     return (
                                                         <Card
                                                             key={entry.id}
                                                             className="border border-amber-200/50 bg-background/90 shadow-sm"
                                                         >
-                                                            <CardHeader className="space-y-2">
+                                                            <CardHeader className="space-y-3 pb-3">
                                                                 <div className="flex flex-wrap items-center justify-between gap-3">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <Badge className="bg-primary/15 text-primary border-primary/30 font-semibold uppercase tracking-wide">
-                                                                            {rangeLabel}
-                                                                        </Badge>
-                                                                    </div>
-                                                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                                                                        {rewardsLabels.rewardCount(selectedRewardIds.length)}
-                                                                    </span>
-                                                                </div>
-                                                                <div className="flex flex-wrap gap-2">
-                                                                    {selectedRewardIds.length === 0 ? (
-                                                                        <span className="text-xs text-muted-foreground">
-                                                                            {messages.noRewardRange}
-                                                                        </span>
-                                                                    ) : (
-                                                                        selectedRewardIds.map((rewardId) => {
-                                                                            const reward = rewardOptionsMap.get(rewardId)
-                                                                            return (
-                                                                                <Badge
-                                                                                    key={rewardId}
-                                                                                    className="bg-primary/10 text-primary border-primary/30"
-                                                                                >
-                                                                                    {reward?.nameTranslation || reward?.nameKey || `#${rewardId}`}
-                                                                                </Badge>
-                                                                            )
-                                                                        })
-                                                                    )}
+                                                                    <Badge className="bg-primary/15 text-primary border-primary/30 font-semibold uppercase tracking-wide">
+                                                                        {rangeLabel}
+                                                                    </Badge>
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="outline"
+                                                                        onClick={() => handleOpenRewardSelect(rankName, entry.order)}
+                                                                        disabled={isSavingRewards || isRewardListLoading}
+                                                                        className="h-8"
+                                                                    >
+                                                                        <Edit2 className="w-3 h-3 mr-1.5" />
+                                                                        {t('tournaments.detail.rewards.dialog.selectRewards', { defaultValue: 'Chọn rewards' })}
+                                                                    </Button>
                                                                 </div>
                                                             </CardHeader>
-                                                            <CardContent className="space-y-3">
-                                                                {isRewardListLoading ? (
-                                                                    <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
-                                                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                                                        {dialogLabels.loading}
-                                                                    </div>
-                                                                ) : filteredRewardOptions.length === 0 ? (
-                                                                    <p className="text-sm text-muted-foreground">
-                                                                        {dialogLabels.noResults}
+                                                            <CardContent className="pt-0">
+                                                                {selectedRewardIds.length === 0 ? (
+                                                                    <p className="text-sm text-muted-foreground py-2">
+                                                                        {messages.noRewardRange}
                                                                     </p>
                                                                 ) : (
-                                                                    <ScrollArea className="h-64 pr-3">
-                                                                        <div className="space-y-2">
-                                                                            {filteredRewardOptions.map((reward) => {
-                                                                                const rewardId = reward.id
-                                                                                const checkboxId = `reward-${rankName}-${entry.order}-${rewardId}`
-                                                                                const checked = selectedRewardIds.includes(rewardId)
-                                                                                return (
-                                                                                    <div
-                                                                                        key={rewardId}
-                                                                                        className="flex items-start gap-3 rounded-lg border border-border/60 bg-background/70 p-3"
-                                                                                    >
-                                                                                        <Checkbox
-                                                                                            id={checkboxId}
-                                                                                            checked={checked}
-                                                                                            disabled={isSavingRewards}
-                                                                                            onCheckedChange={(state) => {
-                                                                                                if (state === true || state === false) {
-                                                                                                    handleToggleReward(rankName, entry.order, rewardId)
-                                                                                                }
-                                                                                            }}
-                                                                                        />
-                                                                                        <label
-                                                                                            htmlFor={checkboxId}
-                                                                                            className="flex flex-col gap-1 text-sm text-foreground cursor-pointer"
-                                                                                        >
-                                                                                            <span className="font-medium">
-                                                                                                {reward.nameTranslation || reward.nameKey || `#${rewardId}`}
-                                                                                            </span>
-                                                                                            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                                                                                                <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/30">
-                                                                                                    {reward.rewardType}
-                                                                                                </Badge>
-                                                                                                <Badge className="bg-green-500/10 text-green-600 border-green-500/30">
-                                                                                                    {reward.rewardTarget}
-                                                                                                </Badge>
-                                                                                                <span className="font-semibold text-primary">
-                                                                                                    {reward.rewardItem}
-                                                                                                </span>
-                                                                                            </div>
-                                                                                        </label>
-                                                                                    </div>
-                                                                                )
-                                                                            })}
-                                                                        </div>
-                                                                        <ScrollBar orientation="vertical" />
-                                                                    </ScrollArea>
+                                                                    <div className="flex flex-wrap gap-2">
+                                                                        {selectedRewards.map((reward) => (
+                                                                            <Badge
+                                                                                key={reward.id}
+                                                                                variant="secondary"
+                                                                                className="bg-primary/10 text-primary border-primary/30 pr-1 cursor-pointer hover:bg-primary/20 transition-colors"
+                                                                                onClick={() => handleRemoveReward(rankName, entry.order, reward.id)}
+                                                                            >
+                                                                                {reward.nameTranslation || reward.nameKey || `#${reward.id}`}
+                                                                                <X className="w-3 h-3 ml-1.5" />
+                                                                            </Badge>
+                                                                        ))}
+                                                                    </div>
                                                                 )}
                                                             </CardContent>
                                                         </Card>
@@ -464,7 +391,7 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
                         </Tabs>
                     </div>
                 )}
-                <DialogFooter className="flex items-center justify-end gap-2 flex-shrink-0">
+                <DialogFooter className="flex items-center justify-end gap-2 flex-shrink-0 pt-4 border-t">
                     <Button
                         variant="outline"
                         onClick={() => handleDialogChange(false)}
@@ -481,9 +408,26 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
                     </Button>
                 </DialogFooter>
             </DialogContent>
+
+            {/* Dialog chọn rewards */}
+            {rewardSelectDialog && (
+                <DialogReward
+                    open={rewardSelectDialog.open}
+                    onOpenChange={(open) => !open && handleCloseRewardSelect()}
+                    rankName={rewardSelectDialog.rankName}
+                    order={rewardSelectDialog.order}
+                    rewardOptions={rewardOptions}
+                    isRewardListLoading={isRewardListLoading}
+                    selectedRewardIds={pendingSelections[rewardSelectDialog.rankName]?.[rewardSelectDialog.order] ?? []}
+                    onToggleReward={(rewardId) => handleToggleReward(rewardSelectDialog.rankName, rewardSelectDialog.order, rewardId)}
+                    isSavingRewards={isSavingRewards}
+                    searchPlaceholder={dialogLabels.searchPlaceholder}
+                    loadingLabel={dialogLabels.loading}
+                    noResultsLabel={dialogLabels.noResults}
+                />
+            )}
         </Dialog>
     )
 }
 
 export default DialogUpdateRewardSeason
-
