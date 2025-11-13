@@ -42,6 +42,47 @@
         "retry": "再試行",
         "clearAll": "すべてクリア"
     },
+    "tournaments": {
+        "title": "トーナメント管理",
+        "description": "トーナメントシーズンを管理・設定します",
+        "createSeason": {
+            "title": "新しいシーズンを作成",
+            "subtitle": "新しいトーナメントシーズンの情報と設定を行います。",
+            "nameLabel": "シーズン名",
+            "nameHint": "各言語でシーズン名を入力してください。",
+            "namePlaceholder": "シーズン名を入力してください ({{lang}})...",
+            "nameRequiredVi": "シーズン名（ベトナム語）を入力してください",
+            "nameRequiredEn": "シーズン名（英語）を入力してください",
+            "nameRequiredJa": "シーズン名（日本語）を入力してください",
+            "dateRangeLabel": "開催期間",
+            "startDate": "開始日",
+            "startDatePlaceholder": "開始日を選択",
+            "endDate": "終了日",
+            "endDatePlaceholder": "終了日を選択",
+            "statusLabel": "ステータス",
+            "autoCreateLabel": "次のシーズンを自動作成",
+            "autoCreateDescription": "現在のシーズン終了前に次のシーズンを自動で作成します。",
+            "precreateDays": "事前作成日数",
+            "precreateHint": "シーズン終了の何日前に新しいシーズンを作成するか。",
+            "randomItemAgain": "報酬を再ランダム化",
+            "randomItemAgainOn": "オン",
+            "randomItemAgainOff": "オフ",
+            "submitting": "作成中...",
+            "submit": "シーズンを作成",
+            "errors": {
+                "startDateRequired": "開始日を選択してください",
+                "endDateRequired": "終了日を選択してください",
+                "endDateAfterStart": "終了日は開始日以降の日付を選択してください"
+            }
+        },
+        "delete": {
+            "confirmTitle": "シーズン削除の確認",
+            "confirmMessage": "このシーズンを削除してもよろしいですか？",
+            "note": "この操作は取り消せません。",
+            "confirmAction": "シーズンを削除",
+            "deleting": "削除中..."
+        }
+    },
     "notFoundPage": {
         "title": "ページが見つかりません",
         "description": "申し訳ございませんが、お探しのページは存在しないか、移動された可能性があります。",

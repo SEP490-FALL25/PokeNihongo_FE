@@ -1,30 +1,33 @@
-"use client"
-
 import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@ui/Card"
 import { Badge } from "@ui/Badge"
 import { Button } from "@ui/Button"
 import { Input } from "@ui/Input"
-import { Textarea } from "@ui/Textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@ui/Dialog"
-import { Trophy, Calendar, Users, Award, Search, Edit, Trash2, Eye, Loader2, Sparkles, Clock, CheckCircle2 } from "lucide-react"
+import { Trophy, Calendar, Users, Award, Search, Edit, Trash2, Eye, Loader2, Sparkles, Clock, CheckCircle2, X, Plus } from "lucide-react"
 import HeaderAdmin from "@organisms/Header/Admin"
 import { useTranslation } from "react-i18next"
 import { useBattleListLeaderBoardSeason } from "@hooks/useBattle"
 import PaginationControls from "@ui/PaginationControls"
 import { BATTLE } from "@constants/battle"
+import CustomDatePicker from "@ui/DatePicker"
+import CreateSeason from "./components/CreateSeason"
+import DialogDeleteSeason from "./components/DialogDeleteSeason"
 
 export default function TournamentManagement() {
     const { t } = useTranslation()
 
-    const [searchQuery, setSearchQuery] = useState("")
-    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
-    const [selectedStatus, setSelectedStatus] = useState("all")
-    const [showAddDialog, setShowAddDialog] = useState(false)
+    const [searchQuery, setSearchQuery] = useState<string>("")
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("")
+    const [selectedStatus, setSelectedStatus] = useState<string>("all")
+    const [filterStartDate, setFilterStartDate] = useState<Date | null>(null)
+    const [filterEndDate, setFilterEndDate] = useState<Date | null>(null)
+    const [filterHasOpened, setFilterHasOpened] = useState<"all" | "opened" | "notOpened">("all")
+    const [showAddDialog, setShowAddDialog] = useState<boolean>(false)
     const [selectedTournament, setSelectedTournament] = useState<number | null>(null)
-    const [currentPage, setCurrentPage] = useState(1)
-    const [pageSize, setPageSize] = useState(15)
+    const [currentPage, setCurrentPage] = useState<number>(1)
+    const [pageSize, setPageSize] = useState<number>(15)
 
     // Debounce search query
     useEffect(() => {
@@ -35,6 +38,15 @@ export default function TournamentManagement() {
 
         return () => clearTimeout(timer)
     }, [searchQuery])
+
+    // Format dates for API (YYYY-MM-DD format)
+    const formatDateForAPI = (date: Date | null) => {
+        if (!date) return undefined
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        return `${year}-${month}-${day}`
+    }
 
     // Build query params
     const queryParams = useMemo(() => {
@@ -51,8 +63,22 @@ export default function TournamentManagement() {
             params.status = selectedStatus
         }
 
+        if (filterStartDate) {
+            params.startDate = formatDateForAPI(filterStartDate)
+        }
+
+        if (filterEndDate) {
+            params.endDate = formatDateForAPI(filterEndDate)
+        }
+
+        if (filterHasOpened === "opened") {
+            params.hasOpened = true
+        } else if (filterHasOpened === "notOpened") {
+            params.hasOpened = false
+        }
+
         return params
-    }, [currentPage, pageSize, debouncedSearchQuery, selectedStatus])
+    }, [currentPage, pageSize, debouncedSearchQuery, selectedStatus, filterStartDate, filterEndDate, filterHasOpened])
 
     // Fetch tournaments data
     const { data: tournaments, pagination, isLoading, error } = useBattleListLeaderBoardSeason(queryParams)
@@ -64,7 +90,7 @@ export default function TournamentManagement() {
     const stats = useMemo(() => {
         const totalTournaments = pagination?.totalItem || 0
         const activeTournaments = tournamentsList.filter((t: any) => t.status === BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE).length
-        // TODO: Calculate total participants and monthly rewards when API provides these fields
+
         const totalParticipants = 0
         const monthlyRewards = 0
 
@@ -154,6 +180,30 @@ export default function TournamentManagement() {
         }
     }
 
+    // Handle clear filters
+    const handleClearFilters = () => {
+        setFilterStartDate(null)
+        setFilterEndDate(null)
+        setFilterHasOpened("all")
+        setSelectedStatus("all")
+        setSearchQuery("")
+        setCurrentPage(1)
+    }
+
+    const hasActiveFilters =
+        !!filterStartDate ||
+        !!filterEndDate ||
+        filterHasOpened !== "all" ||
+        selectedStatus !== "all" ||
+        !!searchQuery
+
+
+    /**
+     * Delete Candidate
+     */
+    const [deleteCandidate, setDeleteCandidate] = useState<{ id: number; name: string } | null>(null)
+    //------------------------End------------------------//
+
     return (
 
         <>
@@ -199,49 +249,136 @@ export default function TournamentManagement() {
                                 className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 shadow-lg"
                                 onClick={() => setShowAddDialog(true)}
                             >
-                                <Sparkles className="w-4 h-4 mr-2" />
+                                <Plus className="w-4 h-4 mr-2" />
                                 Tạo giải đấu
                             </Button>
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            <div className="flex-1 relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
-                                <Input
-                                    type="text"
-                                    placeholder="Tìm kiếm giải đấu..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-10 bg-background border-border text-foreground h-11 shadow-sm focus:shadow-md transition-shadow"
-                                />
+                        <div className="space-y-4">
+                            {/* Row 1: Search + Status */}
+                            <div className="flex flex-col lg:flex-row gap-4">
+                                <div className="flex-1">
+                                    <label className="text-sm font-medium text-foreground mb-2 block">
+                                        Tìm kiếm
+                                    </label>
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+                                        <Input
+                                            type="text"
+                                            placeholder="Tìm kiếm giải đấu..."
+                                            value={searchQuery}
+                                            onChange={(e) => {
+                                                setSearchQuery(e.target.value)
+                                                setCurrentPage(1)
+                                            }}
+                                            className="pl-10 bg-background border-border text-foreground h-11 shadow-sm focus:shadow-md transition-shadow"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="lg:w-[220px]">
+                                    <label className="text-sm font-medium text-foreground mb-2 block">
+                                        Trạng thái
+                                    </label>
+                                    <Select
+                                        value={selectedStatus}
+                                        onValueChange={(value) => {
+                                            setSelectedStatus(value)
+                                            setCurrentPage(1)
+                                        }}
+                                    >
+                                        <SelectTrigger className="w-full bg-background border-border text-foreground h-11 shadow-sm">
+                                            <SelectValue placeholder="Trạng thái" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-card border-border">
+                                            <SelectItem value="all">Tất cả</SelectItem>
+                                            <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE}>
+                                                {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE)}
+                                            </SelectItem>
+                                            <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.PREVIEW}>
+                                                {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.PREVIEW)}
+                                            </SelectItem>
+                                            <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.EXPIRED}>
+                                                {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.EXPIRED)}
+                                            </SelectItem>
+                                            <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.INACTIVE}>
+                                                {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.INACTIVE)}
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </div>
-                            <Select
-                                value={selectedStatus}
-                                onValueChange={(value) => {
-                                    setSelectedStatus(value)
-                                    setCurrentPage(1)
-                                }}
-                            >
-                                <SelectTrigger className="w-[200px] bg-background border-border text-foreground h-11 shadow-sm">
-                                    <SelectValue placeholder="Trạng thái" />
-                                </SelectTrigger>
-                                <SelectContent className="bg-card border-border">
-                                    <SelectItem value="all">Tất cả</SelectItem>
-                                    <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE}>
-                                        {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE)}
-                                    </SelectItem>
-                                    <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.PREVIEW}>
-                                        {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.PREVIEW)}
-                                    </SelectItem>
-                                    <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.EXPIRED}>
-                                        {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.EXPIRED)}
-                                    </SelectItem>
-                                    <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.INACTIVE}>
-                                        {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.INACTIVE)}
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
+
+                            {/* Row 2: Date filters + Has opened */}
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                                <div>
+                                    <label className="text-sm font-medium text-foreground mb-2 block">
+                                        Ngày bắt đầu
+                                    </label>
+                                    <CustomDatePicker
+                                        value={filterStartDate}
+                                        onChange={(date) => {
+                                            setFilterStartDate(date)
+                                            setCurrentPage(1)
+                                        }}
+                                        placeholder="Chọn ngày bắt đầu"
+                                        dayPickerProps={{
+                                            disabled: false
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-foreground mb-2 block">
+                                        Ngày kết thúc
+                                    </label>
+                                    <CustomDatePicker
+                                        value={filterEndDate}
+                                        onChange={(date) => {
+                                            setFilterEndDate(date)
+                                            setCurrentPage(1)
+                                        }}
+                                        placeholder="Chọn ngày kết thúc"
+                                        dayPickerProps={{
+                                            disabled: false
+                                        }}
+                                    />
+                                </div>
+                                <div className="lg:w-[220px]">
+                                    <label className="text-sm font-medium text-foreground mb-2 block">
+                                        Trạng thái mở
+                                    </label>
+                                    <Select
+                                        value={filterHasOpened}
+                                        onValueChange={(value: "all" | "opened" | "notOpened") => {
+                                            setFilterHasOpened(value)
+                                            setCurrentPage(1)
+                                        }}
+                                    >
+                                        <SelectTrigger className="w-full bg-background border-border text-foreground h-11 shadow-sm">
+                                            <SelectValue placeholder="Trạng thái mở" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-card border-border">
+                                            <SelectItem value="all">Tất cả</SelectItem>
+                                            <SelectItem value="opened">Đã mở</SelectItem>
+                                            <SelectItem value="notOpened">Chưa mở</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="flex items-end">
+                                    {hasActiveFilters ? (
+                                        <Button
+                                            variant="outline"
+                                            onClick={handleClearFilters}
+                                            className="w-full border-border text-foreground hover:bg-muted shadow-sm h-11"
+                                        >
+                                            <X className="w-4 h-4 mr-2" />
+                                            Xóa bộ lọc
+                                        </Button>
+                                    ) : (
+                                        <div className="h-11" />
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
@@ -297,9 +434,6 @@ export default function TournamentManagement() {
                                                         {tournament.nameTranslation || tournament.nameKey}
                                                     </CardTitle>
                                                 </div>
-                                                <p className="text-sm text-muted-foreground truncate">
-                                                    {tournament.nameKey}
-                                                </p>
                                             </div>
                                             <div className="p-3 bg-gradient-to-br from-yellow-500/20 to-amber-500/20 rounded-xl border border-yellow-500/30 shadow-lg group-hover:scale-110 transition-transform duration-300">
                                                 <Trophy className="w-6 h-6 text-yellow-500" />
@@ -333,29 +467,6 @@ export default function TournamentManagement() {
                                                 </span>
                                             </div>
                                             <div className="h-px bg-border/50" />
-                                            <div className="flex items-center justify-between text-sm">
-                                                <span className="text-muted-foreground flex items-center gap-2 font-medium">
-                                                    <Calendar className="w-4 h-4" />
-                                                    Trạng thái
-                                                </span>
-                                                <span className={`font-semibold ${tournament.hasOpened ? 'text-green-600' : 'text-muted-foreground'}`}>
-                                                    {tournament.hasOpened ? "Đã mở" : "Chưa mở"}
-                                                </span>
-                                            </div>
-                                            {tournament.enablePrecreate && (
-                                                <>
-                                                    <div className="h-px bg-border/50" />
-                                                    <div className="flex items-center justify-between text-sm">
-                                                        <span className="text-muted-foreground flex items-center gap-2 font-medium">
-                                                            <Sparkles className="w-4 h-4" />
-                                                            Tạo trước
-                                                        </span>
-                                                        <span className="text-foreground font-semibold">
-                                                            {tournament.precreateBeforeEndDays} ngày
-                                                        </span>
-                                                    </div>
-                                                </>
-                                            )}
                                         </div>
 
                                         {/* Action Buttons */}
@@ -379,6 +490,7 @@ export default function TournamentManagement() {
                                                 variant="outline"
                                                 size="icon"
                                                 className="border-border text-destructive hover:bg-destructive/10 hover:border-destructive hover:text-destructive transition-all shadow-sm"
+                                                onClick={() => setDeleteCandidate({ id: tournament.id, name: tournament.nameTranslation || tournament.nameKey })}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
@@ -410,121 +522,13 @@ export default function TournamentManagement() {
                     </>
                 )}
 
-                {/* Add Tournament Dialog */}
-                {showAddDialog && (
-                    <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-                        <DialogContent className="bg-gradient-to-br from-card via-card to-card/95 border-border max-w-2xl max-h-[90vh] overflow-hidden flex flex-col p-0 shadow-2xl">
-                            <DialogHeader className="px-6 pt-6 pb-4 border-b border-border bg-gradient-to-r from-primary/5 to-transparent">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-primary/10 rounded-lg">
-                                        <Sparkles className="w-5 h-5 text-primary" />
-                                    </div>
-                                    <div>
-                                        <DialogTitle className="text-2xl font-bold text-foreground">Tạo giải đấu mới</DialogTitle>
-                                        <p className="text-sm text-muted-foreground mt-1">Thêm giải đấu mới vào hệ thống</p>
-                                    </div>
-                                </div>
-                            </DialogHeader>
-                            <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6" style={{ minHeight: 0 }}>
-                                <div className="space-y-2">
-                                    <label className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                                        <Trophy className="w-4 h-4 text-primary" />
-                                        Tên giải đấu *
-                                    </label>
-                                    <Input
-                                        type="text"
-                                        placeholder="Nhập tên giải đấu..."
-                                        className="bg-background border-border text-foreground h-11 shadow-sm focus:shadow-md transition-shadow"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="block text-sm font-semibold text-foreground">Mô tả</label>
-                                    <Textarea
-                                        rows={3}
-                                        placeholder="Nhập mô tả giải đấu..."
-                                        className="bg-background border-border text-foreground shadow-sm focus:shadow-md transition-shadow resize-none"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <label className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                                            <Calendar className="w-4 h-4 text-primary" />
-                                            Ngày bắt đầu *
-                                        </label>
-                                        <Input
-                                            type="date"
-                                            className="bg-background border-border text-foreground h-11 shadow-sm focus:shadow-md transition-shadow"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                                            <Calendar className="w-4 h-4 text-primary" />
-                                            Ngày kết thúc *
-                                        </label>
-                                        <Input
-                                            type="date"
-                                            className="bg-background border-border text-foreground h-11 shadow-sm focus:shadow-md transition-shadow"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <label className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                                            <Users className="w-4 h-4 text-primary" />
-                                            Số người tối đa
-                                        </label>
-                                        <Input
-                                            type="number"
-                                            placeholder="Nhập số người..."
-                                            className="bg-background border-border text-foreground h-11 shadow-sm focus:shadow-md transition-shadow"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                                            <Award className="w-4 h-4 text-primary" />
-                                            Giải thưởng
-                                        </label>
-                                        <Input
-                                            type="text"
-                                            placeholder="Nhập giải thưởng..."
-                                            className="bg-background border-border text-foreground h-11 shadow-sm focus:shadow-md transition-shadow"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="block text-sm font-semibold text-foreground">Cấp độ</label>
-                                    <Select>
-                                        <SelectTrigger className="bg-background border-border text-foreground h-11 shadow-sm">
-                                            <SelectValue placeholder="Chọn cấp độ" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-card border-border">
-                                            <SelectItem value="beginner">Beginner</SelectItem>
-                                            <SelectItem value="intermediate">Intermediate</SelectItem>
-                                            <SelectItem value="advanced">Advanced</SelectItem>
-                                            <SelectItem value="all">All Levels</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-                            <div className="flex justify-between items-center gap-3 px-6 py-4 border-t border-border bg-muted/30">
-                                <p className="text-xs text-muted-foreground">* Trường bắt buộc</p>
-                                <div className="flex gap-3">
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => setShowAddDialog(false)}
-                                        className="border-border text-foreground hover:bg-muted shadow-sm"
-                                    >
-                                        Hủy
-                                    </Button>
-                                    <Button className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 shadow-lg">
-                                        <Sparkles className="w-4 h-4 mr-2" />
-                                        Tạo giải đấu
-                                    </Button>
-                                </div>
-                            </div>
-                        </DialogContent>
-                    </Dialog>
-                )}
+                <CreateSeason isOpen={showAddDialog} onClose={() => setShowAddDialog(false)} />
+
+                <DialogDeleteSeason
+                    candidate={deleteCandidate}
+                    isOpen={!!deleteCandidate}
+                    onCancel={() => setDeleteCandidate(null)}
+                />
 
                 {/* Tournament Details Dialog */}
                 {selectedTournament && (

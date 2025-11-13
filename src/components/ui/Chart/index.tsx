@@ -1,4 +1,4 @@
-"use client"
+""
 
 import { cn } from "@utils/CN"
 import * as React from "react"

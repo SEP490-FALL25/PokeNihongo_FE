@@ -1,4 +1,4 @@
-"use client"
+""
 
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@ui/Card"
@@ -85,37 +85,37 @@ export default function PackageManagement() {
     ]
 
     const stats = [
-        { 
-            label: "Tổng gói dịch vụ", 
-            value: "4", 
-            icon: Package, 
+        {
+            label: "Tổng gói dịch vụ",
+            value: "4",
+            icon: Package,
             gradient: "from-blue-500/10 to-cyan-500/10",
             iconBg: "bg-blue-500/10",
             iconColor: "text-blue-500",
             borderColor: "border-blue-500/20"
         },
-        { 
-            label: "Doanh thu tháng này", 
-            value: "125M VND", 
-            icon: DollarSign, 
+        {
+            label: "Doanh thu tháng này",
+            value: "125M VND",
+            icon: DollarSign,
             gradient: "from-green-500/10 to-emerald-500/10",
             iconBg: "bg-green-500/10",
             iconColor: "text-green-500",
             borderColor: "border-green-500/20"
         },
-        { 
-            label: "Tổng người đăng ký", 
-            value: "902", 
-            icon: Users, 
+        {
+            label: "Tổng người đăng ký",
+            value: "902",
+            icon: Users,
             gradient: "from-purple-500/10 to-pink-500/10",
             iconBg: "bg-purple-500/10",
             iconColor: "text-purple-500",
             borderColor: "border-purple-500/20"
         },
-        { 
-            label: "Tăng trưởng", 
-            value: "+23%", 
-            icon: TrendingUp, 
+        {
+            label: "Tăng trưởng",
+            value: "+23%",
+            icon: TrendingUp,
             gradient: "from-yellow-500/10 to-amber-500/10",
             iconBg: "bg-yellow-500/10",
             iconColor: "text-yellow-500",
@@ -125,27 +125,27 @@ export default function PackageManagement() {
 
     const getColorClasses = (color: string) => {
         const colors: Record<string, { bg: string; text: string; border: string; gradient: string }> = {
-            blue: { 
-                bg: "bg-blue-500/10", 
-                text: "text-blue-600", 
+            blue: {
+                bg: "bg-blue-500/10",
+                text: "text-blue-600",
                 border: "border-blue-500/40",
                 gradient: "from-blue-500/20 to-cyan-500/20"
             },
-            purple: { 
-                bg: "bg-purple-500/10", 
-                text: "text-purple-600", 
+            purple: {
+                bg: "bg-purple-500/10",
+                text: "text-purple-600",
                 border: "border-purple-500/40",
                 gradient: "from-purple-500/20 to-pink-500/20"
             },
-            yellow: { 
-                bg: "bg-yellow-500/10", 
-                text: "text-yellow-600", 
+            yellow: {
+                bg: "bg-yellow-500/10",
+                text: "text-yellow-600",
                 border: "border-yellow-500/40",
                 gradient: "from-yellow-500/20 to-amber-500/20"
             },
-            red: { 
-                bg: "bg-red-500/10", 
-                text: "text-red-600", 
+            red: {
+                bg: "bg-red-500/10",
+                text: "text-red-600",
                 border: "border-red-500/40",
                 gradient: "from-red-500/20 to-rose-500/20"
             },
@@ -160,8 +160,8 @@ export default function PackageManagement() {
                 {/* Stats Cards */}
                 <div className="grid gap-6 md:grid-cols-4">
                     {stats.map((stat) => (
-                        <Card 
-                            key={stat.label} 
+                        <Card
+                            key={stat.label}
                             className={`relative overflow-hidden bg-gradient-to-br ${stat.gradient} border ${stat.borderColor} shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}
                         >
                             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-full -mr-16 -mt-16" />
@@ -193,7 +193,7 @@ export default function PackageManagement() {
                                 </div>
                                 <CardTitle className="text-xl font-bold text-foreground">Danh sách gói dịch vụ</CardTitle>
                             </div>
-                            <Button 
+                            <Button
                                 className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 shadow-lg"
                                 onClick={() => setShowAddDialog(true)}
                             >
@@ -216,8 +216,8 @@ export default function PackageManagement() {
 
                 {/* Packages Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {packages.filter(pkg => 
-                        !searchQuery || 
+                    {packages.filter(pkg =>
+                        !searchQuery ||
                         pkg.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         pkg.nameEn.toLowerCase().includes(searchQuery.toLowerCase())
                     ).map((pkg) => {
@@ -229,7 +229,7 @@ export default function PackageManagement() {
                             >
                                 {/* Decorative gradient overlay */}
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-white/5 to-transparent rounded-full -mr-32 -mt-32 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                                
+
                                 {/* Popular Badge */}
                                 {pkg.id === 2 && (
                                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
@@ -281,14 +281,14 @@ export default function PackageManagement() {
                                             <span className="text-foreground font-bold text-lg">{pkg.subscribers}</span>
                                         </div>
                                         <div className="flex gap-2">
-                                            <Button 
+                                            <Button
                                                 variant="outline"
                                                 className="flex-1 border-border text-foreground hover:bg-primary/10 hover:border-primary/50 hover:text-primary transition-all shadow-sm"
                                             >
                                                 <Edit className="w-4 h-4 mr-2" />
                                                 Sửa
                                             </Button>
-                                            <Button 
+                                            <Button
                                                 variant="outline"
                                                 size="icon"
                                                 className="border-border text-destructive hover:bg-destructive/10 hover:border-destructive hover:text-destructive transition-all shadow-sm"
