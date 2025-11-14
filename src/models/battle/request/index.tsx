@@ -53,7 +53,7 @@ export const UpdateSeasonRankRewardRequestSchema = z.object({
     items: z.array(z.object({
         rankName: z.string(),
         infoOrders: z.array(z.object({
-            order: z.number(),
+            order: z.number().nullable(),
             rewards: z.array(z.number()),
         })),
     })),
