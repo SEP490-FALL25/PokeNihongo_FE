@@ -180,7 +180,8 @@
                 "range": {
                     "single": "Top {{rank}}",
                     "range": "Top {{start}} - {{end}}",
-                    "infinite": "Top {{start}}+"
+                    "infinite": "Top {{start}}+",
+                    "default": "Phần thưởng chung cho toàn bộ rank"
                 },
                 "table": {
                     "type": "Loại",
