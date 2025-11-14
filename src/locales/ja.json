@@ -75,6 +75,115 @@
                 "endDateAfterStart": "終了日は開始日以降の日付を選択してください"
             }
         },
+        "detail": {
+            "messages": {
+                "invalidSeason": "有効なシーズン情報が見つかりません。",
+                "loading": "シーズンの詳細を読み込んでいます...",
+                "loadError": "シーズン詳細を読み込めません。後でもう一度お試しください。",
+                "noData": "シーズン情報がありません。",
+                "noTimeline": "タイムライン情報はまだありません。",
+                "noRewardStats": "報酬の統計はまだありません。",
+                "noRewards": "このシーズンには報酬が設定されていません。",
+                "noRewardRange": "この順位範囲の報酬はまだ設定されていません。",
+                "noTranslations": "このシーズンの翻訳が設定されていません。"
+            },
+            "common": {
+                "yes": "はい",
+                "no": "いいえ",
+                "notAvailable": "—"
+            },
+            "summary": {
+                "rankGroups": "ランクグループ数",
+                "rewardBuckets": "報酬バケット数",
+                "rewardItems": "報酬項目数",
+                "duration": "シーズン期間",
+                "durationValue": "{{count}}日",
+                "openStatus": {
+                    "label": "公開状態",
+                    "opened": "公開済み",
+                    "closed": "未公開"
+                }
+            },
+            "timeline": {
+                "title": "シーズンタイムライン",
+                "start": "シーズン開始",
+                "end": "シーズン終了",
+                "created": "作成日時",
+                "updated": "最終更新"
+            },
+            "overview": {
+                "duration": "実施期間",
+                "createdAt": "作成日時",
+                "updatedAt": "更新日時",
+                "createdBy": "作成者 ID",
+                "updatedBy": "更新者 ID"
+            },
+            "metadata": {
+                "title": "設定情報",
+                "seasonId": "リーダーボード ID",
+                "seasonKey": "内部キー",
+                "enablePrecreate": "早期登録を許可",
+                "precreateDays": "早期日数",
+                "daysValue": "{{count}}日",
+                "randomAgain": "報酬を再抽選",
+                "hasOpened": "シーズン公開"
+            },
+            "chips": {
+                "hasOpened": {
+                    "opened": "公開済み",
+                    "closed": "未公開"
+                },
+                "precreate": {
+                    "enabled": "{{days}}日前から公開",
+                    "disabled": "早期公開なし"
+                },
+                "randomReward": {
+                    "enabled": "報酬を再抽選",
+                    "disabled": "報酬を保持"
+                }
+            },
+            "rewardOverview": {
+                "title": "報酬概要",
+                "rankGroups": "ランクグループ数",
+                "rewardItems": "報酬項目数",
+                "typeCount": "報酬 {{count}} 件"
+            },
+            "translations": {
+                "title": "多言語名称",
+                "language": "言語",
+                "value": "表示名"
+            },
+            "rewards": {
+                "title": "ランク別報酬",
+                "editButton": "報酬を更新",
+                "dialog": {
+                    "title": "シーズン報酬を更新",
+                    "description": "各ランクグループと順位に適用する報酬を選択してください。",
+                    "searchPlaceholder": "報酬を検索...",
+                    "noResults": "一致する報酬が見つかりません。",
+                    "loading": "報酬リストを読み込み中...",
+                    "reset": "リセット",
+                    "cancel": "キャンセル",
+                    "save": "変更を保存"
+                },
+                "groupCount": "順位グループ {{count}} 件",
+                "rewardCount": "報酬 {{count}} 件",
+                "range": {
+                    "single": "トップ {{rank}}",
+                    "range": "トップ {{start}} ～ {{end}}",
+                    "infinite": "トップ {{start}}+"
+                },
+                "table": {
+                    "type": "種別",
+                    "target": "対象",
+                    "value": "値",
+                    "note": "備考"
+                }
+            },
+            "labels": {
+                "seasonCode": "シーズンコード: {{code}}"
+            }
+        },
         "delete": {
             "confirmTitle": "シーズン削除の確認",
             "confirmMessage": "このシーズンを削除してもよろしいですか？",

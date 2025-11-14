@@ -2,8 +2,8 @@ import battleService from "@services/battle";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { selectCurrentLanguage } from "@redux/features/language/selector";
-import { IBattleListLeaderBoardSeasonResponse } from "@models/battle/response/inde";
-import { ICreateBattleLeaderBoardSeasonRequest } from "@models/battle/request";
+import { IBattleLeaderBoardSeasonDetailResponse, IBattleListLeaderBoardSeasonResponse } from "@models/battle/response";
+import { ICreateBattleLeaderBoardSeasonRequest, IUpdateSeasonRankRewardRequest } from "@models/battle/request";
 import { toast } from "react-toastify";
 
 /**
@@ -33,6 +33,21 @@ export const useBattleListLeaderBoardSeason = (params?: any) => {
         isLoading,
         error,
     };
+}
+//----------------------End----------------------//
+
+
+/**
+ * Handle Get Battle Leader Board Season Detail
+ * @param leaderboardSeasonId 
+ * @returns 
+ */
+export const useGetBattleLeaderBoardSeasonDetail = (leaderboardSeasonId: number) => {
+    const { data, isLoading, error } = useQuery<IBattleLeaderBoardSeasonDetailResponse>({
+        queryKey: ['battle-leader-board-season-detail', leaderboardSeasonId],
+        queryFn: () => battleService.getBattleLeaderBoardSeasonDetail(leaderboardSeasonId),
+    });
+    return { data: data?.data, isLoading, error };
 }
 //----------------------End----------------------//
 
@@ -76,5 +91,27 @@ export const useDeleteBattleLeaderBoardSeason = () => {
         },
     })
     return deleteBattleLeaderBoardSeasonMutation
+}
+//----------------------End----------------------//
+
+
+/**
+ * Handle Update Season Rank Reward
+ * @param data 
+ * @returns 
+ */
+export const useUpdateSeasonRankReward = () => {
+    const queryClient = useQueryClient();
+    const updateSeasonRankRewardMutation = useMutation({
+        mutationFn: (data: IUpdateSeasonRankRewardRequest) => battleService.updateSeasonRankReward(data),
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['battle-leader-board-season-detail', variables.seasonId] });
+            toast.success("Cập nhật thành công");
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.message || "Có lỗi xảy ra khi cập nhật phần thưởng");
+        },
+    })
+    return updateSeasonRankRewardMutation
 }
 //----------------------End----------------------//

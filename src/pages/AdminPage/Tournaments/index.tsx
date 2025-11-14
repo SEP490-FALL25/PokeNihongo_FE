@@ -4,8 +4,7 @@ import { Badge } from "@ui/Badge"
 import { Button } from "@ui/Button"
 import { Input } from "@ui/Input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@ui/Dialog"
-import { Trophy, Calendar, Users, Award, Search, Edit, Trash2, Eye, Loader2, Sparkles, Clock, CheckCircle2, X, Plus } from "lucide-react"
+import { Trophy, Calendar, Users, Award, Search, Edit, Trash2, Loader2, Clock, CheckCircle2, X, Plus } from "lucide-react"
 import HeaderAdmin from "@organisms/Header/Admin"
 import { useTranslation } from "react-i18next"
 import { useBattleListLeaderBoardSeason } from "@hooks/useBattle"
@@ -14,9 +13,14 @@ import { BATTLE } from "@constants/battle"
 import CustomDatePicker from "@ui/DatePicker"
 import CreateSeason from "./components/CreateSeason"
 import DialogDeleteSeason from "./components/DialogDeleteSeason"
+import { ROUTES } from "@constants/route"
+import { useNavigate } from "react-router-dom"
+import { formatDateOnly } from "@utils/date"
+import { BATTLE_STATUS_CONFIG, getStatusBadgeColor, getStatusText } from "@atoms/BadgeStatusColor"
 
 export default function TournamentManagement() {
     const { t } = useTranslation()
+    const router = useNavigate()
 
     const [searchQuery, setSearchQuery] = useState<string>("")
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("")
@@ -25,7 +29,6 @@ export default function TournamentManagement() {
     const [filterEndDate, setFilterEndDate] = useState<Date | null>(null)
     const [filterHasOpened, setFilterHasOpened] = useState<"all" | "opened" | "notOpened">("all")
     const [showAddDialog, setShowAddDialog] = useState<boolean>(false)
-    const [selectedTournament, setSelectedTournament] = useState<number | null>(null)
     const [currentPage, setCurrentPage] = useState<number>(1)
     const [pageSize, setPageSize] = useState<number>(15)
 
@@ -133,52 +136,6 @@ export default function TournamentManagement() {
             },
         ]
     }, [tournamentsList, pagination])
-
-    // Format date
-    const formatDate = (dateString: string) => {
-        try {
-            const date = new Date(dateString)
-            return date.toLocaleDateString("vi-VN", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-            })
-        } catch (error) {
-            return dateString
-        }
-    }
-
-    // Get status color based on API status
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE:
-                return "bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-600 border-green-500/40 shadow-sm"
-            case BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.PREVIEW:
-                return "bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-600 border-blue-500/40 shadow-sm"
-            case BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.EXPIRED:
-                return "bg-gradient-to-r from-gray-500/20 to-slate-500/20 text-gray-600 border-gray-500/40 shadow-sm"
-            case BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.INACTIVE:
-                return "bg-gradient-to-r from-red-500/20 to-rose-500/20 text-red-600 border-red-500/40 shadow-sm"
-            default:
-                return "bg-gradient-to-r from-gray-500/20 to-slate-500/20 text-gray-600 border-gray-500/40 shadow-sm"
-        }
-    }
-
-    // Get status text
-    const getStatusText = (status: string) => {
-        switch (status) {
-            case BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE:
-                return "Đang diễn ra"
-            case BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.PREVIEW:
-                return "Xem trước"
-            case BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.EXPIRED:
-                return "Đã kết thúc"
-            case BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.INACTIVE:
-                return "Không hoạt động"
-            default:
-                return status
-        }
-    }
 
     // Handle clear filters
     const handleClearFilters = () => {
@@ -293,16 +250,16 @@ export default function TournamentManagement() {
                                         <SelectContent className="bg-card border-border">
                                             <SelectItem value="all">Tất cả</SelectItem>
                                             <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE}>
-                                                {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE)}
+                                                {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE, BATTLE_STATUS_CONFIG)}
                                             </SelectItem>
                                             <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.PREVIEW}>
-                                                {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.PREVIEW)}
+                                                {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.PREVIEW, BATTLE_STATUS_CONFIG)}
                                             </SelectItem>
                                             <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.EXPIRED}>
-                                                {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.EXPIRED)}
+                                                {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.EXPIRED, BATTLE_STATUS_CONFIG)}
                                             </SelectItem>
                                             <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.INACTIVE}>
-                                                {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.INACTIVE)}
+                                                {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.INACTIVE, BATTLE_STATUS_CONFIG)}
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>
@@ -421,7 +378,8 @@ export default function TournamentManagement() {
                             {tournamentsList.map((tournament: any) => (
                                 <Card
                                     key={tournament.id}
-                                    className="group relative overflow-hidden bg-gradient-to-br from-card via-card to-card/95 border-border hover:border-primary/50 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+                                    className="cursor-pointer group relative overflow-hidden bg-gradient-to-br from-card via-card to-card/95 border-border hover:border-primary/50 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+                                    onClick={() => router(`${ROUTES.ADMIN.TOURNAMENT_MANAGEMENT}/${tournament.id}`)}
                                 >
                                     {/* Decorative gradient overlay */}
                                     <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/5 via-transparent to-transparent rounded-full -mr-32 -mt-32 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -444,8 +402,8 @@ export default function TournamentManagement() {
                                     <CardContent className="relative space-y-4">
                                         {/* Status Badges */}
                                         <div className="flex flex-wrap gap-2">
-                                            <Badge className={`${getStatusColor(tournament.status)} border shadow-sm font-medium`}>
-                                                {getStatusText(tournament.status)}
+                                            <Badge className={`${getStatusBadgeColor(tournament.status, BATTLE_STATUS_CONFIG)} border shadow-sm font-medium`}>
+                                                {getStatusText(tournament.status, BATTLE_STATUS_CONFIG)}
                                             </Badge>
                                             {tournament.hasOpened && (
                                                 <Badge className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-600 border-green-500/30 shadow-sm font-medium flex items-center gap-1">
@@ -463,7 +421,7 @@ export default function TournamentManagement() {
                                                     Thời gian
                                                 </span>
                                                 <span className="text-foreground font-semibold">
-                                                    {formatDate(tournament.startDate)} - {formatDate(tournament.endDate)}
+                                                    {formatDateOnly(tournament.startDate)} - {formatDateOnly(tournament.endDate)}
                                                 </span>
                                             </div>
                                             <div className="h-px bg-border/50" />
@@ -471,14 +429,6 @@ export default function TournamentManagement() {
 
                                         {/* Action Buttons */}
                                         <div className="flex gap-2 pt-2">
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => setSelectedTournament(tournament.id)}
-                                                className="flex-1 border-border text-foreground hover:bg-primary/10 hover:border-primary/50 hover:text-primary transition-all shadow-sm"
-                                            >
-                                                <Eye className="w-4 h-4 mr-2" />
-                                                Chi tiết
-                                            </Button>
                                             <Button
                                                 variant="outline"
                                                 size="icon"
@@ -503,7 +453,7 @@ export default function TournamentManagement() {
                         {/* Pagination */}
                         {pagination && pagination.totalPage > 0 && (
                             <Card className="bg-card border-border shadow-md">
-                                <CardFooter className="border-t border-border py-4">
+                                <CardFooter className="py-4">
                                     <PaginationControls
                                         currentPage={pagination.current}
                                         totalPages={pagination.totalPage}
@@ -529,131 +479,7 @@ export default function TournamentManagement() {
                     isOpen={!!deleteCandidate}
                     onCancel={() => setDeleteCandidate(null)}
                 />
-
-                {/* Tournament Details Dialog */}
-                {selectedTournament && (
-                    <Dialog open={!!selectedTournament} onOpenChange={() => setSelectedTournament(null)}>
-                        <DialogContent className="bg-card border-border max-w-4xl max-h-[80vh] overflow-y-auto">
-                            <DialogHeader>
-                                <DialogTitle className="text-foreground">Chi tiết giải đấu</DialogTitle>
-                            </DialogHeader>
-                            <TournamentDetails tournamentId={selectedTournament} />
-                        </DialogContent>
-                    </Dialog>
-                )}
             </div >
         </>
-    )
-}
-
-function TournamentDetails({ tournamentId }: { tournamentId: number }) {
-    // TODO: Fetch tournament details and leaderboard using tournamentId
-    // const { data: tournamentDetails } = useTournamentDetails(tournamentId);
-    // const { data: leaderboard } = useTournamentLeaderboard(tournamentId);
-
-    const leaderboard = [
-        { rank: 1, name: "Nguyễn Văn A", score: 1250, pokemon: "Charizard" },
-        { rank: 2, name: "Trần Thị B", score: 1180, pokemon: "Pikachu" },
-        { rank: 3, name: "Lê Văn C", score: 1120, pokemon: "Mewtwo" },
-        { rank: 4, name: "Phạm Thị D", score: 1050, pokemon: "Blastoise" },
-        { rank: 5, name: "Hoàng Văn E", score: 980, pokemon: "Venusaur" },
-    ]
-
-    // Suppress unused variable warning - will be used when API is implemented
-    void tournamentId;
-
-    return (
-        <div className="space-y-6">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-3 gap-4">
-                <Card className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20 shadow-lg">
-                    <CardContent className="pt-6">
-                        <div className="flex items-center justify-between mb-2">
-                            <Users className="w-5 h-5 text-blue-500" />
-                        </div>
-                        <div className="text-3xl font-bold text-foreground mb-1">156</div>
-                        <p className="text-sm text-muted-foreground font-medium">Người tham gia</p>
-                    </CardContent>
-                </Card>
-                <Card className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20 shadow-lg">
-                    <CardContent className="pt-6">
-                        <div className="flex items-center justify-between mb-2">
-                            <Trophy className="w-5 h-5 text-purple-500" />
-                        </div>
-                        <div className="text-3xl font-bold text-foreground mb-1">1,234</div>
-                        <p className="text-sm text-muted-foreground font-medium">Trận đấu</p>
-                    </CardContent>
-                </Card>
-                <Card className="bg-gradient-to-br from-yellow-500/10 to-amber-500/10 border-yellow-500/20 shadow-lg">
-                    <CardContent className="pt-6">
-                        <div className="flex items-center justify-between mb-2">
-                            <Award className="w-5 h-5 text-yellow-500" />
-                        </div>
-                        <div className="text-3xl font-bold text-yellow-600 mb-1">1M VND</div>
-                        <p className="text-sm text-muted-foreground font-medium">Giải thưởng</p>
-                    </CardContent>
-                </Card>
-            </div>
-
-            {/* Leaderboard */}
-            <div>
-                <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                        <Trophy className="w-5 h-5 text-primary" />
-                    </div>
-                    <h3 className="text-xl font-bold text-foreground">Bảng xếp hạng</h3>
-                </div>
-                <div className="space-y-3">
-                    {leaderboard.map((player) => (
-                        <Card
-                            key={player.rank}
-                            className={`bg-card border-border hover:shadow-lg transition-all duration-200 ${player.rank <= 3 ? 'border-primary/30 shadow-md' : 'shadow-sm'
-                                }`}
-                        >
-                            <CardContent className="p-4">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div
-                                            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-lg ${player.rank === 1
-                                                ? "bg-gradient-to-br from-yellow-400 to-yellow-600 text-black"
-                                                : player.rank === 2
-                                                    ? "bg-gradient-to-br from-gray-300 to-gray-500 text-black"
-                                                    : player.rank === 3
-                                                        ? "bg-gradient-to-br from-orange-500 to-orange-700 text-white"
-                                                        : "bg-muted text-foreground"
-                                                }`}
-                                        >
-                                            {player.rank === 1 && <Trophy className="w-5 h-5" />}
-                                            {player.rank !== 1 && player.rank}
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-foreground text-base">{player.name}</p>
-                                            <p className="text-sm text-muted-foreground flex items-center gap-1">
-                                                <Sparkles className="w-3 h-3" />
-                                                {player.pokemon}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <div className="flex items-baseline gap-1">
-                                            <p className="text-2xl font-bold text-foreground">{player.score.toLocaleString()}</p>
-                                            <p className="text-xs text-muted-foreground">điểm</p>
-                                        </div>
-                                        {player.rank <= 3 && (
-                                            <Badge className={`mt-1 ${player.rank === 1 ? 'bg-yellow-500/20 text-yellow-600 border-yellow-500/30' :
-                                                player.rank === 2 ? 'bg-gray-500/20 text-gray-600 border-gray-500/30' :
-                                                    'bg-orange-500/20 text-orange-600 border-orange-500/30'
-                                                }`}>
-                                                Top {player.rank}
-                                            </Badge>
-                                        )}
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
-            </div>
-        </div>
     )
 }

@@ -43,3 +43,21 @@ export const CreateBattleLeaderBoardSeasonRequestSchema = z
 
 export type ICreateBattleLeaderBoardSeasonRequest = z.infer<typeof CreateBattleLeaderBoardSeasonRequestSchema>;
 //---------------------End------------------------//
+
+
+/**
+ * Update Season Rank Reward Request Schema
+ */
+export const UpdateSeasonRankRewardRequestSchema = z.object({
+    seasonId: z.number(),
+    items: z.array(z.object({
+        rankName: z.string(),
+        infoOrders: z.array(z.object({
+            order: z.number(),
+            rewards: z.array(z.number()),
+        })),
+    })),
+});
+
+export type IUpdateSeasonRankRewardRequest = z.infer<typeof UpdateSeasonRankRewardRequestSchema>;
+//---------------------End------------------------//
