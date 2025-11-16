@@ -16,6 +16,7 @@ import PersistToken from "@layouts/PersistToken"
 import NotFoundPage from "@pages/NotFoundPage"
 import PaymentFailed from "@pages/PaymentPage/PaymentFailed"
 import PaymentSuccess from "@pages/PaymentPage/PaymentSuccess"
+import LeaderboardDetail from "@pages/AdminPage/Tournaments/components/LeaderboardDetail"
 
 const AdminDashboard = lazy(() => import("@pages/AdminPage/Dashboard"))
 const PermissionManagement = lazy(() => import("@pages/AdminPage/Permission"))
@@ -61,6 +62,7 @@ const RouterComponent = () => {
                                 { path: ROUTES.ADMIN.PACKAGE_MANAGEMENT, element: <PackageManagement /> },
                                 { path: ROUTES.ADMIN.POKEMON_MANAGEMENT, element: <PokemonManagement /> },
                                 { path: ROUTES.ADMIN.TOURNAMENT_MANAGEMENT, element: <TournamentManagement /> },
+                                { path: `${ROUTES.ADMIN.TOURNAMENT_MANAGEMENT}/:tournamentId`, element: <LeaderboardDetail /> },
                                 { path: ROUTES.ADMIN.AI_PROMPTS_MANAGEMENT, element: <AIPromptManagement /> },
                                 { path: ROUTES.ADMIN.CUSTOM_AI_MANAGEMENT, element: <CustomAIManagement /> },
                                 { path: `${ROUTES.ADMIN.CUSTOM_AI_MANAGEMENT}/:configId`, element: <CustomAIDetail /> },

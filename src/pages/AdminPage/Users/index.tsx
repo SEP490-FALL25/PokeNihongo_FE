@@ -5,7 +5,7 @@ import { Input } from "@ui/Input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@ui/Table"
 import { Badge } from "@ui/Badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select"
-import { Search, Plus, Edit, Trash2, MoreVertical } from "lucide-react"
+import { Search, Plus, Edit, Trash2, MoreVertical, Users as UsersIcon, UserCheck, UserX, UserCog, Loader2 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@ui/DropdownMenu"
 import HeaderAdmin from "@organisms/Header/Admin"
 import { useUserList } from "@hooks/useUser"
@@ -119,58 +119,91 @@ const UsersManagement = () => {
         <>
             {/* Header */}
             <HeaderAdmin title={t('users.title')} description={t('users.description')} />
-            <div className="mt-24 p-8">
+            <div className="mt-24 p-8 space-y-8">
                 {/* Stats Cards */}
-                <div className="grid gap-6 md:grid-cols-4 mb-8">
-                    <Card className="bg-card border-border">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">{t('users.totalUsers')}</CardTitle>
+                <div className="grid gap-6 md:grid-cols-4">
+                    <Card className="relative overflow-hidden bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-full -mr-16 -mt-16" />
+                        <CardHeader className="pb-3 relative">
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="text-sm font-semibold text-foreground/90">{t('users.totalUsers')}</CardTitle>
+                                <div className="p-2 bg-blue-500/10 rounded-lg text-blue-500">
+                                    <UsersIcon className="w-5 h-5" />
+                                </div>
+                            </div>
                         </CardHeader>
-                        <CardContent>
-                            <div className="text-3xl font-bold text-foreground">
+                        <CardContent className="relative">
+                            <div className="text-4xl font-bold text-foreground mb-1">
                                 {pagination?.totalItem || 0}
                             </div>
+                            <div className="h-1 w-16 bg-gradient-to-r from-transparent via-current to-transparent opacity-20 mt-2" />
                         </CardContent>
                     </Card>
-                    <Card className="bg-card border-border">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">{t('users.currentPage')}</CardTitle>
+                    <Card className="relative overflow-hidden bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-full -mr-16 -mt-16" />
+                        <CardHeader className="pb-3 relative">
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="text-sm font-semibold text-foreground/90">{t('users.currentPage')}</CardTitle>
+                                <div className="p-2 bg-green-500/10 rounded-lg text-green-500">
+                                    <UserCheck className="w-5 h-5" />
+                                </div>
+                            </div>
                         </CardHeader>
-                        <CardContent>
-                            <div className="text-3xl font-bold text-foreground">
+                        <CardContent className="relative">
+                            <div className="text-4xl font-bold text-foreground mb-1">
                                 {pagination?.current || 0} / {pagination?.totalPage || 0}
                             </div>
+                            <div className="h-1 w-16 bg-gradient-to-r from-transparent via-current to-transparent opacity-20 mt-2" />
                         </CardContent>
                     </Card>
-                    <Card className="bg-card border-border">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">{t('users.resultsPerPage')}</CardTitle>
+                    <Card className="relative overflow-hidden bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-full -mr-16 -mt-16" />
+                        <CardHeader className="pb-3 relative">
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="text-sm font-semibold text-foreground/90">{t('users.resultsPerPage')}</CardTitle>
+                                <div className="p-2 bg-purple-500/10 rounded-lg text-purple-500">
+                                    <UserCog className="w-5 h-5" />
+                                </div>
+                            </div>
                         </CardHeader>
-                        <CardContent>
-                            <div className="text-3xl font-bold text-foreground">
+                        <CardContent className="relative">
+                            <div className="text-4xl font-bold text-foreground mb-1">
                                 {pagination?.pageSize || 0}
                             </div>
+                            <div className="h-1 w-16 bg-gradient-to-r from-transparent via-current to-transparent opacity-20 mt-2" />
                         </CardContent>
                     </Card>
-                    <Card className="bg-card border-border">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">{t('users.displaying')}</CardTitle>
+                    <Card className="relative overflow-hidden bg-gradient-to-br from-yellow-500/10 to-amber-500/10 border-yellow-500/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-full -mr-16 -mt-16" />
+                        <CardHeader className="pb-3 relative">
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="text-sm font-semibold text-foreground/90">{t('users.displaying')}</CardTitle>
+                                <div className="p-2 bg-yellow-500/10 rounded-lg text-yellow-500">
+                                    <UserX className="w-5 h-5" />
+                                </div>
+                            </div>
                         </CardHeader>
-                        <CardContent>
-                            <div className="text-3xl font-bold text-foreground">
+                        <CardContent className="relative">
+                            <div className="text-4xl font-bold text-foreground mb-1">
                                 {users.length}
                             </div>
+                            <div className="h-1 w-16 bg-gradient-to-r from-transparent via-current to-transparent opacity-20 mt-2" />
                         </CardContent>
                     </Card>
                 </div>
 
                 {/* Users Table */}
-                <Card className="bg-card border-border">
-                    <CardHeader>
+                <Card className="bg-gradient-to-br from-card via-card to-card/95 border-border shadow-md">
+                    <CardHeader className="pb-4">
                         <div className="flex items-center justify-between">
-                            <CardTitle className="text-foreground">{t('users.listTitle')}</CardTitle>
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-primary/10 rounded-lg">
+                                    <UsersIcon className="w-5 h-5 text-primary" />
+                                </div>
+                                <CardTitle className="text-xl font-bold text-foreground">{t('users.listTitle')}</CardTitle>
+                            </div>
                             <Button
-                                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                                className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 shadow-lg"
                                 onClick={() => setIsAddDialogOpen(true)}
                             >
                                 <Plus className="h-4 w-4 mr-2" />
@@ -178,21 +211,21 @@ const UsersManagement = () => {
                             </Button>
                         </div>
                         <div className="mt-4 space-y-4">
-                            <div className="flex gap-4">
+                            <div className="flex flex-col sm:flex-row gap-4">
                                 <div className="flex-1 relative">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
                                     <Input
                                         placeholder={t('users.searchPlaceholder')}
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="pl-10 bg-background border-border text-foreground"
+                                        className="pl-10 bg-background border-border text-foreground h-11 shadow-sm focus:shadow-md transition-shadow"
                                     />
                                 </div>
                                 <Select value={statusFilter} onValueChange={(value) => {
                                     setStatusFilter(value)
                                     setCurrentPage(1)
                                 }}>
-                                    <SelectTrigger className="w-[180px] bg-background border-border text-foreground">
+                                    <SelectTrigger className="w-[180px] bg-background border-border text-foreground h-11 shadow-sm">
                                         <SelectValue placeholder={t('users.status')} />
                                     </SelectTrigger>
                                     <SelectContent className="bg-card border-border">
@@ -206,7 +239,7 @@ const UsersManagement = () => {
                                     setRoleFilter(value)
                                     setCurrentPage(1)
                                 }}>
-                                    <SelectTrigger className="w-[180px] bg-background border-border text-foreground">
+                                    <SelectTrigger className="w-[180px] bg-background border-border text-foreground h-11 shadow-sm">
                                         <SelectValue placeholder={t('users.role')} />
                                     </SelectTrigger>
                                     <SelectContent className="bg-card border-border">
@@ -221,16 +254,23 @@ const UsersManagement = () => {
                     </CardHeader>
                     <CardContent>
                         {isLoading ? (
-                            <div className="flex items-center justify-center py-8">
-                                <div className="text-muted-foreground">{t('users.loading')}</div>
+                            <div className="flex flex-col items-center justify-center py-12">
+                                <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+                                <p className="text-muted-foreground">{t('users.loading')}</p>
                             </div>
                         ) : error ? (
-                            <div className="flex items-center justify-center py-8">
-                                <div className="text-destructive">{t('users.error')}</div>
+                            <div className="flex flex-col items-center justify-center py-12">
+                                <div className="p-3 bg-destructive/10 rounded-full mb-4">
+                                    <UserX className="w-8 h-8 text-destructive" />
+                                </div>
+                                <p className="text-destructive font-medium">{t('users.error')}</p>
                             </div>
                         ) : users.length === 0 ? (
-                            <div className="flex items-center justify-center py-8">
-                                <div className="text-muted-foreground">{t('users.noUsers')}</div>
+                            <div className="flex flex-col items-center justify-center py-12">
+                                <div className="p-3 bg-muted rounded-full mb-4">
+                                    <UsersIcon className="w-8 h-8 text-muted-foreground" />
+                                </div>
+                                <p className="text-muted-foreground font-medium">{t('users.noUsers')}</p>
                             </div>
                         ) : (
                             <>
@@ -279,35 +319,35 @@ const UsersManagement = () => {
                                     </TableHeader>
                                     <TableBody>
                                         {users.map((user: IUser) => (
-                                            <TableRow key={user.id} className="border-border hover:bg-muted/50">
-                                                <TableCell className="text-muted-foreground">{user.id}</TableCell>
-                                                <TableCell className="font-medium text-foreground">{user.name}</TableCell>
+                                            <TableRow key={user.id} className="border-border hover:bg-muted/30 transition-colors group">
+                                                <TableCell className="text-muted-foreground font-medium">{user.id}</TableCell>
+                                                <TableCell className="font-semibold text-foreground">{user.name}</TableCell>
                                                 <TableCell className="text-muted-foreground">{user.email}</TableCell>
                                                 <TableCell>
-                                                    <Badge className={getRoleBadgeColor(user.role.name)}>
+                                                    <Badge className={`${getRoleBadgeColor(user.role.name)} shadow-sm font-medium`}>
                                                         {user.role.name}
                                                     </Badge>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Badge className={getStatusBadgeColor(user.status)}>
+                                                    <Badge className={`${getStatusBadgeColor(user.status)} shadow-sm font-medium`}>
                                                         {getStatusLabel(user.status)}
                                                     </Badge>
                                                 </TableCell>
-                                                <TableCell className="text-muted-foreground">{user.exp}</TableCell>
+                                                <TableCell className="text-muted-foreground font-medium">{user.exp}</TableCell>
                                                 <TableCell className="text-muted-foreground">{formatDate(user.createdAt)}</TableCell>
                                                 <TableCell className="text-right">
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+                                                            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:bg-primary/10 transition-all">
                                                                 <MoreVertical className="h-4 w-4" />
                                                             </Button>
                                                         </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end" className="bg-card border-border">
-                                                            <DropdownMenuItem className="text-foreground hover:bg-muted cursor-pointer">
+                                                        <DropdownMenuContent align="end" className="bg-card border-border shadow-lg">
+                                                            <DropdownMenuItem className="text-foreground hover:bg-primary/10 cursor-pointer transition-colors">
                                                                 <Edit className="h-4 w-4 mr-2" />
                                                                 {t('users.edit')}
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem className="text-destructive hover:bg-destructive/10 cursor-pointer">
+                                                            <DropdownMenuItem className="text-destructive hover:bg-destructive/10 cursor-pointer transition-colors">
                                                                 <Trash2 className="h-4 w-4 mr-2" />
                                                                 {t('users.delete')}
                                                             </DropdownMenuItem>
@@ -321,21 +361,23 @@ const UsersManagement = () => {
 
                                 {/* Pagination */}
                                 {pagination && pagination.totalPage > 0 && (
-                                    <div className="mt-4 pt-4 border-t border-border">
-                                        <PaginationControls
-                                            currentPage={pagination.current}
-                                            totalPages={pagination.totalPage}
-                                            totalItems={pagination.totalItem}
-                                            itemsPerPage={pagination.pageSize}
-                                            onPageChange={setCurrentPage}
-                                            onItemsPerPageChange={(newSize) => {
-                                                setPageSize(newSize)
-                                                setCurrentPage(1)
-                                            }}
-                                            itemsPerPageOptions={[10, 15, 25, 50]}
-                                            isLoading={isLoading}
-                                        />
-                                    </div>
+                                    <Card className="bg-card border-border shadow-md mt-4">
+                                        <CardContent className="pt-4">
+                                            <PaginationControls
+                                                currentPage={pagination.current}
+                                                totalPages={pagination.totalPage}
+                                                totalItems={pagination.totalItem}
+                                                itemsPerPage={pagination.pageSize}
+                                                onPageChange={setCurrentPage}
+                                                onItemsPerPageChange={(newSize) => {
+                                                    setPageSize(newSize)
+                                                    setCurrentPage(1)
+                                                }}
+                                                itemsPerPageOptions={[10, 15, 25, 50]}
+                                                isLoading={isLoading}
+                                            />
+                                        </CardContent>
+                                    </Card>
                                 )}
                             </>
                         )}

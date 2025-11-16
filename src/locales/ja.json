@@ -42,6 +42,157 @@
         "retry": "再試行",
         "clearAll": "すべてクリア"
     },
+    "tournaments": {
+        "title": "トーナメント管理",
+        "description": "トーナメントシーズンを管理・設定します",
+        "createSeason": {
+            "title": "新しいシーズンを作成",
+            "subtitle": "新しいトーナメントシーズンの情報と設定を行います。",
+            "nameLabel": "シーズン名",
+            "nameHint": "各言語でシーズン名を入力してください。",
+            "namePlaceholder": "シーズン名を入力してください ({{lang}})...",
+            "nameRequiredVi": "シーズン名（ベトナム語）を入力してください",
+            "nameRequiredEn": "シーズン名（英語）を入力してください",
+            "nameRequiredJa": "シーズン名（日本語）を入力してください",
+            "dateRangeLabel": "開催期間",
+            "startDate": "開始日",
+            "startDatePlaceholder": "開始日を選択",
+            "endDate": "終了日",
+            "endDatePlaceholder": "終了日を選択",
+            "statusLabel": "ステータス",
+            "autoCreateLabel": "次のシーズンを自動作成",
+            "autoCreateDescription": "現在のシーズン終了前に次のシーズンを自動で作成します。",
+            "precreateDays": "事前作成日数",
+            "precreateHint": "シーズン終了の何日前に新しいシーズンを作成するか。",
+            "randomItemAgain": "報酬を再ランダム化",
+            "randomItemAgainOn": "オン",
+            "randomItemAgainOff": "オフ",
+            "submitting": "作成中...",
+            "submit": "シーズンを作成",
+            "errors": {
+                "startDateRequired": "開始日を選択してください",
+                "endDateRequired": "終了日を選択してください",
+                "endDateAfterStart": "終了日は開始日以降の日付を選択してください"
+            }
+        },
+        "detail": {
+            "messages": {
+                "invalidSeason": "有効なシーズン情報が見つかりません。",
+                "loading": "シーズンの詳細を読み込んでいます...",
+                "loadError": "シーズン詳細を読み込めません。後でもう一度お試しください。",
+                "noData": "シーズン情報がありません。",
+                "noTimeline": "タイムライン情報はまだありません。",
+                "noRewardStats": "報酬の統計はまだありません。",
+                "noRewards": "このシーズンには報酬が設定されていません。",
+                "noRewardRange": "この順位範囲の報酬はまだ設定されていません。",
+                "noTranslations": "このシーズンの翻訳が設定されていません。"
+            },
+            "common": {
+                "yes": "はい",
+                "no": "いいえ",
+                "notAvailable": "—"
+            },
+            "summary": {
+                "rankGroups": "ランクグループ数",
+                "rewardBuckets": "報酬バケット数",
+                "rewardItems": "報酬項目数",
+                "duration": "シーズン期間",
+                "durationValue": "{{count}}日",
+                "openStatus": {
+                    "label": "公開状態",
+                    "opened": "公開済み",
+                    "closed": "未公開"
+                }
+            },
+            "timeline": {
+                "title": "シーズンタイムライン",
+                "start": "シーズン開始",
+                "end": "シーズン終了",
+                "created": "作成日時",
+                "updated": "最終更新"
+            },
+            "overview": {
+                "duration": "実施期間",
+                "createdAt": "作成日時",
+                "updatedAt": "更新日時",
+                "createdBy": "作成者 ID",
+                "updatedBy": "更新者 ID"
+            },
+            "metadata": {
+                "title": "設定情報",
+                "seasonId": "リーダーボード ID",
+                "seasonKey": "内部キー",
+                "enablePrecreate": "早期登録を許可",
+                "precreateDays": "早期日数",
+                "daysValue": "{{count}}日",
+                "randomAgain": "報酬を再抽選",
+                "hasOpened": "シーズン公開"
+            },
+            "chips": {
+                "hasOpened": {
+                    "opened": "公開済み",
+                    "closed": "未公開"
+                },
+                "precreate": {
+                    "enabled": "{{days}}日前から公開",
+                    "disabled": "早期公開なし"
+                },
+                "randomReward": {
+                    "enabled": "報酬を再抽選",
+                    "disabled": "報酬を保持"
+                }
+            },
+            "rewardOverview": {
+                "title": "報酬概要",
+                "rankGroups": "ランクグループ数",
+                "rewardItems": "報酬項目数",
+                "typeCount": "報酬 {{count}} 件"
+            },
+            "translations": {
+                "title": "多言語名称",
+                "language": "言語",
+                "value": "表示名"
+            },
+            "rewards": {
+                "title": "ランク別報酬",
+                "editButton": "報酬を更新",
+                "dialog": {
+                    "title": "シーズン報酬を更新",
+                    "description": "各ランクグループと順位に適用する報酬を選択してください。",
+                    "searchPlaceholder": "報酬を検索...",
+                    "noResults": "一致する報酬が見つかりません。",
+                    "loading": "報酬リストを読み込み中...",
+                    "reset": "リセット",
+                    "cancel": "キャンセル",
+                    "save": "変更を保存"
+                },
+                "groupCount": "順位グループ {{count}} 件",
+                "rewardCount": "報酬 {{count}} 件",
+                "range": {
+                    "single": "トップ {{rank}}",
+                    "range": "トップ {{start}} ～ {{end}}",
+                    "infinite": "トップ {{start}}+",
+                    "default": "ランク共通の報酬"
+                },
+                "table": {
+                    "type": "種別",
+                    "target": "対象",
+                    "value": "値",
+                    "note": "備考"
+                }
+            },
+            "labels": {
+                "seasonCode": "シーズンコード: {{code}}"
+            }
+        },
+        "delete": {
+            "confirmTitle": "シーズン削除の確認",
+            "confirmMessage": "このシーズンを削除してもよろしいですか？",
+            "note": "この操作は取り消せません。",
+            "confirmAction": "シーズンを削除",
+            "deleting": "削除中..."
+        }
+    },
     "notFoundPage": {
         "title": "ページが見つかりません",
         "description": "申し訳ございませんが、お探しのページは存在しないか、移動された可能性があります。",

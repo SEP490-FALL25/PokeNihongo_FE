@@ -42,6 +42,166 @@
         "retry": "Thử lại",
         "clearAll": "Xóa hết"
     },
+    "tournaments": {
+        "title": "Quản lý giải đấu",
+        "description": "Theo dõi và cấu hình các mùa giải đấu",
+        "createSeason": {
+            "title": "Tạo mùa giải mới",
+            "subtitle": "Thiết lập thông tin và cấu hình cho mùa giải mới.",
+            "nameLabel": "Tên mùa giải",
+            "nameHint": "Nhập tên cho từng ngôn ngữ để hiển thị chính xác.",
+            "namePlaceholder": "Nhập tên mùa giải ({{lang}})...",
+            "nameRequiredVi": "Vui lòng nhập tên mùa giải (Tiếng Việt)",
+            "nameRequiredEn": "Vui lòng nhập tên mùa giải (Tiếng Anh)",
+            "nameRequiredJa": "Vui lòng nhập tên mùa giải (Tiếng Nhật)",
+            "dateRangeLabel": "Thời gian diễn ra",
+            "startDate": "Ngày bắt đầu",
+            "startDatePlaceholder": "Chọn ngày bắt đầu",
+            "endDate": "Ngày kết thúc",
+            "endDatePlaceholder": "Chọn ngày kết thúc",
+            "statusLabel": "Trạng thái",
+            "autoCreateLabel": "Tự động tạo mùa tiếp theo",
+            "autoCreateDescription": "Hệ thống sẽ tự động mở mùa giải mới trước khi mùa hiện tại kết thúc.",
+            "precreateDays": "Tạo trước (ngày)",
+            "precreateHint": "Số ngày trước khi mùa giải kết thúc để mở mùa mới.",
+            "randomItemAgain": "Random lại phần thưởng",
+            "randomItemAgainOn": "Bật",
+            "randomItemAgainOff": "Tắt",
+            "submitting": "Đang tạo...",
+            "submit": "Tạo mùa giải",
+            "errors": {
+                "startDateRequired": "Vui lòng chọn ngày bắt đầu",
+                "endDateRequired": "Vui lòng chọn ngày kết thúc",
+                "endDateAfterStart": "Ngày kết thúc phải sau hoặc bằng ngày bắt đầu"
+            }
+        },
+        "detail": {
+            "messages": {
+                "invalidSeason": "Không tìm thấy thông tin mùa giải hợp lệ.",
+                "loading": "Đang tải chi tiết mùa giải...",
+                "loadError": "Không thể tải chi tiết mùa giải. Vui lòng thử lại sau.",
+                "noData": "Không có dữ liệu mùa giải.",
+                "noTimeline": "Chưa có thông tin thời gian.",
+                "noRewardStats": "Chưa có thống kê phần thưởng.",
+                "noRewards": "Chưa thiết lập phần thưởng cho mùa giải này.",
+                "noRewardRange": "Chưa cập nhật phần thưởng cho phạm vi hạng này.",
+                "noTranslations": "Chưa cấu hình bản dịch cho mùa giải này."
+            },
+            "common": {
+                "yes": "Có",
+                "no": "Không",
+                "notAvailable": "—"
+            },
+            "summary": {
+                "rankGroups": "Nhóm hạng",
+                "rewardBuckets": "Nhóm phần thưởng",
+                "rewardItems": "Tổng mục thưởng",
+                "duration": "Thời lượng mùa",
+                "durationValue": "{{count}} ngày",
+                "openStatus": {
+                    "label": "Trạng thái mở",
+                    "opened": "Đã mở",
+                    "closed": "Chưa mở"
+                }
+            },
+            "timeline": {
+                "title": "Dòng thời gian mùa giải",
+                "start": "Bắt đầu mùa",
+                "end": "Kết thúc mùa",
+                "created": "Khởi tạo",
+                "updated": "Cập nhật gần nhất"
+            },
+            "overview": {
+                "duration": "Thời gian diễn ra",
+                "createdAt": "Tạo lúc",
+                "updatedAt": "Cập nhật lúc",
+                "createdBy": "ID tạo bởi",
+                "updatedBy": "ID cập nhật"
+            },
+            "metadata": {
+                "title": "Thông tin cấu hình",
+                "seasonId": "LeaderBoard ID",
+                "seasonKey": "Key nội bộ",
+                "enablePrecreate": "Cho phép mở sớm",
+                "precreateDays": "Số ngày mở sớm",
+                "daysValue": "{{count}} ngày",
+                "randomAgain": "Random lại phần thưởng",
+                "hasOpened": "Đã mở"
+            },
+            "chips": {
+                "hasOpened": {
+                    "opened": "Đã mở",
+                    "closed": "Chưa mở"
+                },
+                "precreate": {
+                    "enabled": "Mở sớm {{days}} ngày",
+                    "disabled": "Không mở sớm"
+                },
+                "randomReward": {
+                    "enabled": "Random lại phần thưởng",
+                    "disabled": "Giữ nguyên phần thưởng"
+                }
+            },
+            "rewardOverview": {
+                "title": "Tổng quan phần thưởng",
+                "rankGroups": "Nhóm hạng",
+                "rewardItems": "Tổng mục thưởng",
+                "typeCount": "{{count}} phần thưởng"
+            },
+            "translations": {
+                "title": "Tên đa ngôn ngữ",
+                "language": "Ngôn ngữ",
+                "value": "Tên hiển thị"
+            },
+            "rewards": {
+                "title": "Phần thưởng theo hạng",
+                "editButton": "Cập nhật phần thưởng",
+                "dialog": {
+                    "title": "Cập nhật phần thưởng mùa giải",
+                    "description": "Chọn phần thưởng áp dụng cho từng nhóm hạng và thứ tự.",
+                    "searchPlaceholder": "Tìm kiếm phần thưởng...",
+                    "noResults": "Không tìm thấy phần thưởng phù hợp.",
+                    "loading": "Đang tải danh sách phần thưởng...",
+                    "reset": "Thiết lập lại",
+                    "cancel": "Hủy",
+                    "save": "Lưu thay đổi",
+                    "commonRewards": "Phần thưởng chung cho tất cả",
+                    "noCommonRewards": "Chưa có phần thưởng chung cho rank này.",
+                    "selectCommonRewardsTitle": "Chọn rewards chung - {{rankName}}",
+                    "selectCommonRewardsDescription": "Tìm kiếm và chọn rewards chung áp dụng cho toàn bộ rank này",
+                    "selectRewardsTitle": "Chọn rewards - {{rankName}} (Order {{order}})",
+                    "selectRewardsDescription": "Tìm kiếm và chọn rewards cho vị trí này",
+                    "selectRewards": "Chọn rewards",
+                    "addNewOrder": "Thêm vị trí mới",
+                    "orderPlaceholder": "Nhập vị trí (order)"
+                },
+                "groupCount": "{{count}} nhóm thứ hạng",
+                "rewardCount": "{{count}} phần thưởng",
+                "range": {
+                    "single": "Top {{rank}}",
+                    "range": "Top {{start}} - {{end}}",
+                    "infinite": "Top {{start}}+",
+                    "default": "Phần thưởng chung cho toàn bộ rank"
+                },
+                "table": {
+                    "type": "Loại",
+                    "target": "Mục tiêu",
+                    "value": "Giá trị",
+                    "note": "Ghi chú"
+                }
+            },
+            "labels": {
+                "seasonCode": "Mã mùa: {{code}}"
+            }
+        },
+        "delete": {
+            "confirmTitle": "Xác nhận xoá mùa giải",
+            "confirmMessage": "Bạn có chắc chắn muốn xoá mùa giải này không?",
+            "note": "Hành động này không thể hoàn tác.",
+            "confirmAction": "Xoá mùa giải",
+            "deleting": "Đang xoá..."
+        }
+    },
     "notFoundPage": {
         "title": "Trang không tồn tại",
         "description": "Xin lỗi, trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.",

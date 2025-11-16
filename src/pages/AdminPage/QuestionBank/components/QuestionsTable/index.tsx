@@ -1,9 +1,9 @@
 import React from "react";
-import { Table, TableBody, TableCell, TableHeader, TableRow } from "@ui/Table";
+import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "@ui/Table";
 import SortableTableHeader from "@ui/SortableTableHeader";
 import { Button } from "@ui/Button";
 import { Badge } from "@ui/Badge";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Loader2, FileQuestion } from "lucide-react";
 import { QuestionEntityType } from "@models/questionBank/entity";
 
 const QuestionsTable: React.FC<COMPONENTS.IQuestionsTableProps> = ({
@@ -20,14 +20,14 @@ const QuestionsTable: React.FC<COMPONENTS.IQuestionsTableProps> = ({
     <div className="overflow-x-auto">
       <Table className="min-w-full">
         <TableHeader>
-          <TableRow className="border-gray-200 hover:bg-gray-50">
+          <TableRow className="border-border hover:bg-muted/30">
             <SortableTableHeader
               title={t("questionBank.questionId")}
               sortKey="id"
               currentSortBy={filters.sortBy}
               currentSort={filters.sortOrder as "asc" | "desc"}
               onSort={handleSort}
-              className="text-gray-600 font-semibold w-12"
+              className="text-muted-foreground font-semibold w-12"
             />
             <SortableTableHeader
               title={t("questionBank.question")}
@@ -35,7 +35,7 @@ const QuestionsTable: React.FC<COMPONENTS.IQuestionsTableProps> = ({
               currentSortBy={filters.sortBy}
               currentSort={filters.sortOrder as "asc" | "desc"}
               onSort={handleSort}
-              className="text-gray-600 font-semibold w-64"
+              className="text-muted-foreground font-semibold w-64"
             />
             <SortableTableHeader
               title={t("questionBank.questionType")}
@@ -43,7 +43,7 @@ const QuestionsTable: React.FC<COMPONENTS.IQuestionsTableProps> = ({
               currentSortBy={filters.sortBy}
               currentSort={filters.sortOrder as "asc" | "desc"}
               onSort={handleSort}
-              className="text-gray-600 font-semibold w-20"
+              className="text-muted-foreground font-semibold w-20"
             />
             <SortableTableHeader
               title={t("questionBank.level")}
@@ -51,7 +51,7 @@ const QuestionsTable: React.FC<COMPONENTS.IQuestionsTableProps> = ({
               currentSortBy={filters.sortBy}
               currentSort={filters.sortOrder as "asc" | "desc"}
               onSort={handleSort}
-              className="text-gray-600 font-semibold w-16"
+              className="text-muted-foreground font-semibold w-16"
             />
             <SortableTableHeader
               title={t("questionBank.meaning")}
@@ -59,57 +59,61 @@ const QuestionsTable: React.FC<COMPONENTS.IQuestionsTableProps> = ({
               currentSortBy={filters.sortBy}
               currentSort={filters.sortOrder as "asc" | "desc"}
               onSort={handleSort}
-              className="text-gray-600 font-semibold w-32"
+              className="text-muted-foreground font-semibold w-32"
             />
-            <SortableTableHeader
-              title={t("questionBank.actions")}
-              sortable={false}
-              className="text-right w-20"
-            />
+            <TableHead className="text-muted-foreground text-right w-20">{t("questionBank.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center">
-                {t("common.loading")}
+              <TableCell colSpan={6} className="text-center py-12">
+                <div className="flex flex-col items-center justify-center gap-4">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <p className="text-muted-foreground">{t("common.loading")}</p>
+                </div>
               </TableCell>
             </TableRow>
           ) : questions.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center">
-                {t("questionBank.noQuestions")}
+              <TableCell colSpan={6} className="text-center py-12">
+                <div className="flex flex-col items-center justify-center gap-4">
+                  <div className="p-3 bg-muted rounded-full">
+                    <FileQuestion className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <p className="text-muted-foreground font-medium">{t("questionBank.noQuestions")}</p>
+                </div>
               </TableCell>
             </TableRow>
           ) : (
             questions.map((question: QuestionEntityType) => (
-              <TableRow key={question.id} className="border-gray-200 hover:bg-gray-50 h-12">
-                <TableCell className="font-medium w-12 whitespace-nowrap text-sm py-2">
+              <TableRow key={question.id} className="border-border hover:bg-muted/30 transition-colors group">
+                <TableCell className="font-medium w-12 whitespace-nowrap text-sm py-3 text-muted-foreground">
                   {question.id}
                 </TableCell>
-                <TableCell className="truncate py-2 w-64">
+                <TableCell className="truncate py-3 w-64">
                   <div className="max-w-60">
-                    <div className="font-medium text-sm truncate leading-tight">
+                    <div className="font-semibold text-sm truncate leading-tight text-foreground">
                       {question.questionJp}
                     </div>
-                    <div className="text-xs text-gray-500 truncate leading-tight">
+                    <div className="text-xs text-muted-foreground truncate leading-tight mt-1">
                       {question.pronunciation || "No pronunciation"}
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="w-20 whitespace-nowrap py-2">
-                  <Badge variant="secondary" className="text-xs">
+                <TableCell className="w-20 whitespace-nowrap py-3">
+                  <Badge variant="secondary" className="text-xs shadow-sm font-medium">
                     {getQuestionTypeLabel(question.questionType)}
                   </Badge>
                 </TableCell>
-                <TableCell className="w-16 whitespace-nowrap py-2">
-                  <Badge variant="outline" className="text-xs">N{question.levelN}</Badge>
+                <TableCell className="w-16 whitespace-nowrap py-3">
+                  <Badge variant="outline" className="text-xs shadow-sm font-medium">N{question.levelN}</Badge>
                 </TableCell>
-                <TableCell className="w-32 py-2">
+                <TableCell className="w-32 py-3">
                   {question.meanings && question.meanings.length > 0 ? (
-                    <div className="text-gray-500 text-xs space-y-1">
+                    <div className="text-muted-foreground text-xs space-y-1">
                       {question.meanings.map((meaning: COMPONENTS.IQuestionMeaningLike, index: number) => (
-                        <div key={index} className="truncate">
+                        <div key={index} className="truncate bg-muted/30 px-2 py-1 rounded-md">
                           {"language" in meaning && "value" in meaning ? (
                             <>
                               <span className="font-medium">{meaning.language}:</span> {meaning.value}
@@ -128,28 +132,28 @@ const QuestionsTable: React.FC<COMPONENTS.IQuestionsTableProps> = ({
                       ))}
                     </div>
                   ) : question.meaning ? (
-                    <div className="text-gray-500 text-xs">{question.meaning}</div>
+                    <div className="text-muted-foreground text-xs bg-muted/30 px-2 py-1 rounded-md">{question.meaning}</div>
                   ) : (
-                    <span className="text-gray-400 text-xs">No translation</span>
+                    <span className="text-muted-foreground text-xs">No translation</span>
                   )}
                 </TableCell>
-                <TableCell className="text-right w-20 py-2">
+                <TableCell className="text-right w-20 py-3">
                   <div className="flex gap-1 justify-end">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7"
+                      className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-primary/10 transition-all"
                       onClick={() => openEditDialog(question)}
                     >
-                      <Edit className="h-3 w-3" />
+                      <Edit className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 text-red-500 hover:bg-red-100"
+                      className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive transition-all"
                       onClick={() => setDeleteQuestionId(question.id)}
                     >
-                      <Trash2 className="h-3 w-3" />
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </TableCell>

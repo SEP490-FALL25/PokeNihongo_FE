@@ -62,6 +62,157 @@
         "startByAdding": "Start by adding {{type}} to this lesson.",
         "addFirst": "Add First {{type}}"
     },
+    "tournaments": {
+        "title": "Tournament Management",
+        "description": "Monitor and configure tournament seasons",
+        "createSeason": {
+            "title": "Create New Season",
+            "subtitle": "Set up details and configuration for the new tournament season.",
+            "nameLabel": "Season name",
+            "nameHint": "Provide the season name in each language for accurate display.",
+            "namePlaceholder": "Enter season name ({{lang}})...",
+            "nameRequiredVi": "Please enter the season name (Vietnamese)",
+            "nameRequiredEn": "Please enter the season name (English)",
+            "nameRequiredJa": "Please enter the season name (Japanese)",
+            "dateRangeLabel": "Season duration",
+            "startDate": "Start date",
+            "startDatePlaceholder": "Select start date",
+            "endDate": "End date",
+            "endDatePlaceholder": "Select end date",
+            "statusLabel": "Status",
+            "autoCreateLabel": "Auto-create next season",
+            "autoCreateDescription": "Automatically open a new season before the current one ends.",
+            "precreateDays": "Pre-create (days)",
+            "precreateHint": "Number of days before the season ends to open a new one.",
+            "randomItemAgain": "Randomize rewards again",
+            "randomItemAgainOn": "On",
+            "randomItemAgainOff": "Off",
+            "submitting": "Creating...",
+            "submit": "Create season",
+            "errors": {
+                "startDateRequired": "Please select a start date",
+                "endDateRequired": "Please select an end date",
+                "endDateAfterStart": "End date must be after or equal to the start date"
+            }
+        },
+        "detail": {
+            "messages": {
+                "invalidSeason": "Season information not found.",
+                "loading": "Loading season detail...",
+                "loadError": "Unable to load season detail. Please try again later.",
+                "noData": "No season data available.",
+                "noTimeline": "No timeline information yet.",
+                "noRewardStats": "No reward statistics available.",
+                "noRewards": "No rewards have been configured for this season.",
+                "noRewardRange": "No rewards defined for this rank range.",
+                "noTranslations": "No translations configured for this season."
+            },
+            "common": {
+                "yes": "Yes",
+                "no": "No",
+                "notAvailable": "—"
+            },
+            "summary": {
+                "rankGroups": "Rank groups",
+                "rewardBuckets": "Reward buckets",
+                "rewardItems": "Reward items",
+                "duration": "Season length",
+                "durationValue": "{{count}} days",
+                "openStatus": {
+                    "label": "Open status",
+                    "opened": "Opened",
+                    "closed": "Not opened"
+                }
+            },
+            "timeline": {
+                "title": "Season timeline",
+                "start": "Season start",
+                "end": "Season end",
+                "created": "Created at",
+                "updated": "Last updated"
+            },
+            "overview": {
+                "duration": "Active period",
+                "createdAt": "Created at",
+                "updatedAt": "Updated at",
+                "createdBy": "Created by (ID)",
+                "updatedBy": "Updated by (ID)"
+            },
+            "metadata": {
+                "title": "Configuration",
+                "seasonId": "Leaderboard ID",
+                "seasonKey": "Internal key",
+                "enablePrecreate": "Allow early registration",
+                "precreateDays": "Early days",
+                "daysValue": "{{count}} days",
+                "randomAgain": "Re-random rewards",
+                "hasOpened": "Season opened"
+            },
+            "chips": {
+                "hasOpened": {
+                    "opened": "Opened",
+                    "closed": "Not opened"
+                },
+                "precreate": {
+                    "enabled": "Opens {{days}} days early",
+                    "disabled": "No early opening"
+                },
+                "randomReward": {
+                    "enabled": "Re-random rewards",
+                    "disabled": "Keep rewards"
+                }
+            },
+            "rewardOverview": {
+                "title": "Reward overview",
+                "rankGroups": "Rank groups",
+                "rewardItems": "Reward items",
+                "typeCount": "{{count}} rewards"
+            },
+            "translations": {
+                "title": "Multilingual names",
+                "language": "Language",
+                "value": "Display name"
+            },
+            "rewards": {
+                "title": "Rank rewards",
+                "editButton": "Update rewards",
+                "dialog": {
+                    "title": "Update season rewards",
+                    "description": "Choose the rewards for each rank group and order.",
+                    "searchPlaceholder": "Search rewards...",
+                    "noResults": "No rewards match your search.",
+                    "loading": "Loading rewards...",
+                    "reset": "Reset",
+                    "cancel": "Cancel",
+                    "save": "Save changes"
+                },
+                "groupCount": "{{count}} rank buckets",
+                "rewardCount": "{{count}} rewards",
+                "range": {
+                    "single": "Top {{rank}}",
+                    "range": "Top {{start}} - {{end}}",
+                    "infinite": "Top {{start}}+",
+                    "default": "Applies to all ranks in this group"
+                },
+                "table": {
+                    "type": "Type",
+                    "target": "Target",
+                    "value": "Value",
+                    "note": "Note"
+                }
+            },
+            "labels": {
+                "seasonCode": "Season code: {{code}}"
+            }
+        },
+        "delete": {
+            "confirmTitle": "Delete season confirmation",
+            "confirmMessage": "Are you sure you want to delete this season?",
+            "note": "This action cannot be undone.",
+            "confirmAction": "Delete season",
+            "deleting": "Deleting..."
+        }
+    },
     "notFoundPage": {
         "title": "Page Not Found",
         "description": "Sorry, the page you are looking for does not exist or has been moved.",
