@@ -13,6 +13,10 @@ const PUBLIC = {
     NOT_FOUND: '/404',
 }
 
+const PAYMENT = {
+    FAILED: '/payment/failed',
+}
+
 const ADMIN = {
     ROOT: '/admin/overview',
     USERS: '/admin/users',
@@ -62,5 +66,6 @@ export const ROUTES = {
     MANAGER,
     LESSONS,
     ROLE,
+    PAYMENT,
 };
 

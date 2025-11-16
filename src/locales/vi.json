@@ -48,6 +48,40 @@
         "goBack": "← Quay lại",
         "goToLogin": "Về trang đăng nhập"
     },
+    "payment": {
+        "failed": {
+            "title": "Thanh toán thất bại",
+            "orderCode": "Mã đơn hàng",
+            "helpText": "Vui lòng liên hệ hỗ trợ nếu vấn đề vẫn tiếp tục xảy ra.",
+            "buttons": {
+                "retry": "Thử lại",
+                "goHome": "Về trang chủ"
+            },
+            "errors": {
+                "payment_not_found": {
+                    "title": "Không tìm thấy thanh toán",
+                    "description": "Không tìm thấy thông tin thanh toán cho đơn hàng này. Vui lòng kiểm tra lại mã đơn hàng hoặc liên hệ hỗ trợ."
+                },
+                "payment_failed": {
+                    "title": "Thanh toán thất bại",
+                    "description": "Giao dịch thanh toán không thành công. Vui lòng thử lại hoặc sử dụng phương thức thanh toán khác.",
+                    "descriptionWithReason": "Giao dịch thanh toán không thành công. Lý do: {{reason}}. Vui lòng thử lại hoặc sử dụng phương thức thanh toán khác."
+                },
+                "system_error": {
+                    "title": "Lỗi hệ thống",
+                    "description": "Đã xảy ra lỗi hệ thống trong quá trình xử lý thanh toán. Vui lòng thử lại sau hoặc liên hệ hỗ trợ nếu vấn đề vẫn tiếp tục."
+                },
+                "payment_cancelled": {
+                    "title": "Thanh toán đã bị hủy",
+                    "description": "Giao dịch thanh toán đã bị hủy. Bạn có thể thử lại nếu muốn tiếp tục thanh toán."
+                },
+                "unknown": {
+                    "title": "Lỗi không xác định",
+                    "description": "Đã xảy ra lỗi không xác định trong quá trình thanh toán. Vui lòng thử lại hoặc liên hệ hỗ trợ."
+                }
+            }
+        }
+    },
     "navigation": {
         "dashboard": "Tổng quan",
         "users": "Quản lý người dùng",

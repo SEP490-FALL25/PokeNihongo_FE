@@ -68,6 +68,40 @@
         "goBack": "← Go Back",
         "goToLogin": "Go to Login"
     },
+    "payment": {
+        "failed": {
+            "title": "Payment Failed",
+            "orderCode": "Order Code",
+            "helpText": "Please contact support if the issue persists.",
+            "buttons": {
+                "retry": "Retry",
+                "goHome": "Go Home"
+            },
+            "errors": {
+                "payment_not_found": {
+                    "title": "Payment Not Found",
+                    "description": "Payment information for this order was not found. Please check the order code or contact support."
+                },
+                "payment_failed": {
+                    "title": "Payment Failed",
+                    "description": "The payment transaction was unsuccessful. Please try again or use a different payment method.",
+                    "descriptionWithReason": "The payment transaction was unsuccessful. Reason: {{reason}}. Please try again or use a different payment method."
+                },
+                "system_error": {
+                    "title": "System Error",
+                    "description": "A system error occurred during payment processing. Please try again later or contact support if the issue persists."
+                },
+                "payment_cancelled": {
+                    "title": "Payment Cancelled",
+                    "description": "The payment transaction has been cancelled. You can try again if you wish to continue with the payment."
+                },
+                "unknown": {
+                    "title": "Unknown Error",
+                    "description": "An unknown error occurred during payment processing. Please try again or contact support."
+                }
+            }
+        }
+    },
     "navigation": {
         "dashboard": "Dashboard",
         "users": "User Management",
