@@ -164,14 +164,24 @@
                     "loading": "Đang tải danh sách phần thưởng...",
                     "reset": "Thiết lập lại",
                     "cancel": "Hủy",
-                    "save": "Lưu thay đổi"
+                    "save": "Lưu thay đổi",
+                    "commonRewards": "Phần thưởng chung cho tất cả",
+                    "noCommonRewards": "Chưa có phần thưởng chung cho rank này.",
+                    "selectCommonRewardsTitle": "Chọn rewards chung - {{rankName}}",
+                    "selectCommonRewardsDescription": "Tìm kiếm và chọn rewards chung áp dụng cho toàn bộ rank này",
+                    "selectRewardsTitle": "Chọn rewards - {{rankName}} (Order {{order}})",
+                    "selectRewardsDescription": "Tìm kiếm và chọn rewards cho vị trí này",
+                    "selectRewards": "Chọn rewards",
+                    "addNewOrder": "Thêm vị trí mới",
+                    "orderPlaceholder": "Nhập vị trí (order)"
                 },
                 "groupCount": "{{count}} nhóm thứ hạng",
                 "rewardCount": "{{count}} phần thưởng",
                 "range": {
                     "single": "Top {{rank}}",
                     "range": "Top {{start}} - {{end}}",
-                    "infinite": "Top {{start}}+"
+                    "infinite": "Top {{start}}+",
+                    "default": "Phần thưởng chung cho toàn bộ rank"
                 },
                 "table": {
                     "type": "Loại",

@@ -171,7 +171,8 @@
                 "range": {
                     "single": "トップ {{rank}}",
                     "range": "トップ {{start}} ～ {{end}}",
-                    "infinite": "トップ {{start}}+"
+                    "infinite": "トップ {{start}}+",
+                    "default": "ランク共通の報酬"
                 },
                 "table": {
                     "type": "種別",

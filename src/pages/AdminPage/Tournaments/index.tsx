@@ -16,7 +16,7 @@ import DialogDeleteSeason from "./components/DialogDeleteSeason"
 import { ROUTES } from "@constants/route"
 import { useNavigate } from "react-router-dom"
 import { formatDateOnly } from "@utils/date"
-import { BATTLE_STATUS_CONFIG, getStatusBadgeColor, getStatusText } from "@atoms/BadgeStatusColor"
+import { BATTLE_STATUS_CONFIG, getStatusBadgeColor, getStatusText, StatusStyleConfig } from "@atoms/BadgeStatusColor"
 
 export default function TournamentManagement() {
     const { t } = useTranslation()
@@ -154,6 +154,34 @@ export default function TournamentManagement() {
         selectedStatus !== "all" ||
         !!searchQuery
 
+    // Brightened badge config for better visibility in TournamentManagement
+    const BRIGHTENED_BATTLE_STATUS_CONFIG: StatusStyleConfig = {
+        [BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE]: {
+            colorClass: "bg-gradient-to-r from-green-500/50 to-emerald-500/50 text-green-700 border-2 border-green-500/70 shadow-md",
+            label: "Đang diễn ra",
+        },
+        [BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.PREVIEW]: {
+            colorClass: "bg-gradient-to-r from-blue-500/50 to-cyan-500/50 text-blue-700 border-2 border-blue-500/70 shadow-md",
+            label: "Xem trước",
+        },
+        [BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.EXPIRED]: {
+            colorClass: "bg-gradient-to-r from-gray-500/50 to-slate-500/50 text-gray-700 border-2 border-gray-500/70 shadow-md",
+            label: "Đã kết thúc",
+        },
+        [BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.INACTIVE]: {
+            colorClass: "bg-gradient-to-r from-red-500/50 to-rose-500/50 text-red-700 border-2 border-red-500/70 shadow-md",
+            label: "Không hoạt động",
+        },
+        DEFAULT: {
+            colorClass: "bg-gradient-to-r from-gray-500/50 to-slate-500/50 text-gray-700 border-2 border-gray-500/70 shadow-md",
+            label: "Không xác định",
+        },
+    }
+
+    // Helper to get brightened badge color
+    const getBrightenedBadgeColor = (status: string) => {
+        return getStatusBadgeColor(status, BRIGHTENED_BATTLE_STATUS_CONFIG)
+    }
 
     /**
      * Delete Candidate
@@ -402,12 +430,12 @@ export default function TournamentManagement() {
                                     <CardContent className="relative space-y-4">
                                         {/* Status Badges */}
                                         <div className="flex flex-wrap gap-2">
-                                            <Badge className={`${getStatusBadgeColor(tournament.status, BATTLE_STATUS_CONFIG)} border shadow-sm font-medium`}>
+                                            <Badge className={`${getBrightenedBadgeColor(tournament.status)} font-semibold`}>
                                                 {getStatusText(tournament.status, BATTLE_STATUS_CONFIG)}
                                             </Badge>
                                             {tournament.hasOpened && (
-                                                <Badge className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-600 border-green-500/30 shadow-sm font-medium flex items-center gap-1">
-                                                    <CheckCircle2 className="w-3 h-3" />
+                                                <Badge className="bg-gradient-to-r from-green-500/50 to-emerald-500/50 text-green-800 border-2 border-green-500/70 shadow-md font-semibold flex items-center gap-1.5">
+                                                    <CheckCircle2 className="w-3.5 h-3.5" />
                                                     Đã mở
                                                 </Badge>
                                             )}

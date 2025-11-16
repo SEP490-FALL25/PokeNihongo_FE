@@ -11,6 +11,19 @@ import HeaderAdmin from "@organisms/Header/Admin"
 import { useTranslation } from "react-i18next"
 import DialogUpdateRewardSeason from "../DialogUpdateRewardSeason"
 
+type SeasonRankRewardEntry = {
+    id: number
+    order: number | null | undefined
+}
+
+const getRewardOrderValue = (value: SeasonRankRewardEntry["order"]) => value ?? Number.MAX_SAFE_INTEGER
+
+const compareSeasonRankRewards = <T extends SeasonRankRewardEntry>(a: T, b: T) => {
+    const diff = getRewardOrderValue(a.order) - getRewardOrderValue(b.order)
+    if (diff !== 0) return diff
+    return a.id - b.id
+}
+
 const renderRewardValue = (value: unknown) => {
     if (value === null || value === undefined) return "—"
     return typeof value === "string" || typeof value === "number" ? value : JSON.stringify(value)
@@ -132,7 +145,7 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
 
     const sortedRewards = useMemo(() => {
         if (!Array.isArray(season?.seasonRankRewards)) return []
-        return [...season!.seasonRankRewards].sort((a, b) => a.order - b.order)
+        return [...season.seasonRankRewards].sort(compareSeasonRankRewards)
     }, [season])
 
     const rankGroups = useMemo(() => {
@@ -147,7 +160,7 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
         })
         return Array.from(map.entries()).map(([rankName, list]) => [
             rankName,
-            [...list].sort((a, b) => a.order - b.order),
+            [...list].sort(compareSeasonRankRewards),
         ]) as Array<[string, typeof sortedRewards]>
     }, [sortedRewards])
 
@@ -388,8 +401,11 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
         { label: metadataLabels.hasOpened, value: season.hasOpened ? commonTexts.yes : commonTexts.no },
     ]
 
-    const formatRankRange = (start: number, nextStart?: number) => {
-        if (nextStart === undefined || nextStart === null) {
+    const formatRankRange = (start?: number | null, nextStart?: number | null) => {
+        if (start === null || start === undefined) {
+            return t('tournaments.detail.rewards.range.default')
+        }
+        if (nextStart === null || nextStart === undefined) {
             return t('tournaments.detail.rewards.range.infinite', { start })
         }
         const end = nextStart - 1
@@ -646,7 +662,7 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
                                     <div className="space-y-3">
                                         {entries.map((entry, index) => {
                                             const nextEntry = entries[index + 1]
-                                            const rangeLabel = formatRankRange(entry.order, nextEntry?.order)
+                                            const rangeLabel = formatRankRange(entry.order, nextEntry?.order ?? null)
                                             const entryRewards = Array.isArray(entry.rewards) ? entry.rewards : []
 
                                             return (

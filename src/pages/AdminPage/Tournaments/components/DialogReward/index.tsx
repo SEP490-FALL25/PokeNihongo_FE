@@ -13,7 +13,7 @@ interface DialogRewardProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     rankName: string;
-    order: number;
+    order: number | null;
     rewardOptions: IRewardEntityType[];
     isRewardListLoading: boolean;
     selectedRewardIds: number[];
@@ -65,16 +65,27 @@ const DialogReward = ({
             <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col overflow-hidden bg-white">
                 <DialogHeader>
                     <DialogTitle>
-                        {t('tournaments.detail.rewards.dialog.selectRewardsTitle', {
-                            defaultValue: 'Chọn rewards',
-                            rankName,
-                            order
-                        })}
+                        {order === null
+                            ? t('tournaments.detail.rewards.dialog.selectCommonRewardsTitle', {
+                                defaultValue: 'Chọn rewards chung',
+                                rankName
+                            })
+                            : t('tournaments.detail.rewards.dialog.selectRewardsTitle', {
+                                defaultValue: 'Chọn rewards',
+                                rankName,
+                                order
+                            })
+                        }
                     </DialogTitle>
                     <DialogDescription>
-                        {t('tournaments.detail.rewards.dialog.selectRewardsDescription', {
-                            defaultValue: 'Tìm kiếm và chọn rewards cho vị trí này'
-                        })}
+                        {order === null
+                            ? t('tournaments.detail.rewards.dialog.selectCommonRewardsDescription', {
+                                defaultValue: 'Tìm kiếm và chọn rewards chung áp dụng cho toàn bộ rank này'
+                            })
+                            : t('tournaments.detail.rewards.dialog.selectRewardsDescription', {
+                                defaultValue: 'Tìm kiếm và chọn rewards cho vị trí này'
+                            })
+                        }
                     </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col flex-1 min-h-0 space-y-4">
@@ -100,7 +111,7 @@ const DialogReward = ({
                                 {filteredRewardOptions.map((reward) => {
                                     const rewardId = reward.id;
                                     const checked = selectedRewardIds.includes(rewardId);
-                                    const checkboxId = `reward-select-${rankName}-${order}-${rewardId}`;
+                                    const checkboxId = `reward-select-${rankName}-${order ?? 'null'}-${rewardId}`;
                                     return (
                                         <div
                                             key={rewardId}

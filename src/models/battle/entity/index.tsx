@@ -43,7 +43,7 @@ export const BattleLeaderBoardSeasonDetailEntitySchema = z.object({
     seasonRankRewards: z.array(z.object({
         id: z.number(),
         rankName: z.string(),
-        order: z.number(),
+        order: z.number().nullable(),
         rewards: z.array(z.object({
             id: z.number(),
             rewardType: z.union([z.string(), z.number()]),
