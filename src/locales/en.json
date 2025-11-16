@@ -73,10 +73,7 @@
             "title": "Payment Failed",
             "orderCode": "Order Code",
             "helpText": "Please contact support if the issue persists.",
-            "buttons": {
-                "retry": "Retry",
-                "goHome": "Go Home"
-            },
+            "returnToApp": "Please return to your app",
             "errors": {
                 "payment_not_found": {
                     "title": "Payment Not Found",
@@ -100,6 +97,15 @@
                     "description": "An unknown error occurred during payment processing. Please try again or contact support."
                 }
             }
+        },
+        "success": {
+            "title": "Payment Successful",
+            "description": "Your payment transaction has been processed successfully. Thank you for using our service!",
+            "orderId": "Order ID",
+            "amount": "Amount",
+            "plan": "Service Plan",
+            "helpText": "Detailed information has been sent to your email. Please check your inbox.",
+            "returnToApp": "Please return to your app"
         }
     },
     "navigation": {

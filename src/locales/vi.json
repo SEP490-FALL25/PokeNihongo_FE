@@ -53,10 +53,7 @@
             "title": "Thanh toán thất bại",
             "orderCode": "Mã đơn hàng",
             "helpText": "Vui lòng liên hệ hỗ trợ nếu vấn đề vẫn tiếp tục xảy ra.",
-            "buttons": {
-                "retry": "Thử lại",
-                "goHome": "Về trang chủ"
-            },
+            "returnToApp": "Vui lòng quay lại app của bạn",
             "errors": {
                 "payment_not_found": {
                     "title": "Không tìm thấy thanh toán",
@@ -80,6 +77,15 @@
                     "description": "Đã xảy ra lỗi không xác định trong quá trình thanh toán. Vui lòng thử lại hoặc liên hệ hỗ trợ."
                 }
             }
+        },
+        "success": {
+            "title": "Thanh toán thành công",
+            "description": "Giao dịch thanh toán của bạn đã được xử lý thành công. Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!",
+            "orderId": "Mã đơn hàng",
+            "amount": "Số tiền",
+            "plan": "Gói dịch vụ",
+            "helpText": "Thông tin chi tiết đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư đến.",
+            "returnToApp": "Vui lòng quay lại app của bạn"
         }
     },
     "navigation": {

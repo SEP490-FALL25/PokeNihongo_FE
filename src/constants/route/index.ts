@@ -15,6 +15,7 @@ const PUBLIC = {
 
 const PAYMENT = {
     FAILED: '/payment/failed',
+    SUCCESS: '/payment/success',
 }
 
 const ADMIN = {

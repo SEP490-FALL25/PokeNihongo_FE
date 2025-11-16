@@ -1,9 +1,7 @@
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/Card';
-import { XCircle, AlertCircle, FileQuestion, RefreshCw, Home } from 'lucide-react';
-import { ROUTES } from '@constants/route';
+import { XCircle, AlertCircle, FileQuestion, RefreshCw } from 'lucide-react';
 
 type PaymentErrorType =
     | 'payment_not_found'
@@ -13,7 +11,6 @@ type PaymentErrorType =
 
 const PaymentFailed = () => {
     const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
     const { t } = useTranslation();
 
     const error = searchParams.get('error') as PaymentErrorType | null;
@@ -116,23 +113,11 @@ const PaymentFailed = () => {
                         </p>
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                        <Button
-                            onClick={() => navigate(-1)}
-                            variant="outline"
-                            className="flex-1 flex items-center justify-center gap-2"
-                        >
-                            <RefreshCw className="w-4 h-4" />
-                            {t('payment.failed.buttons.retry')}
-                        </Button>
-                        <Button
-                            onClick={() => navigate(ROUTES.PUBLIC.HOME)}
-                            className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-primary/90"
-                        >
-                            <Home className="w-4 h-4" />
-                            {t('payment.failed.buttons.goHome')}
-                        </Button>
+                    {/* Return to App Message */}
+                    <div className="text-center pt-4">
+                        <p className="text-base font-medium text-gray-700">
+                            {t('payment.failed.returnToApp')}
+                        </p>
                     </div>
                 </CardContent>
             </Card>

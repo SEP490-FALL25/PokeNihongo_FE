@@ -15,6 +15,7 @@ import GachaBannerDetail from "@pages/AdminPage/ConfigGacha/components/GachaBann
 import PersistToken from "@layouts/PersistToken"
 import NotFoundPage from "@pages/NotFoundPage"
 import PaymentFailed from "@pages/PaymentPage/PaymentFailed"
+import PaymentSuccess from "@pages/PaymentPage/PaymentSuccess"
 
 const AdminDashboard = lazy(() => import("@pages/AdminPage/Dashboard"))
 const PermissionManagement = lazy(() => import("@pages/AdminPage/Permission"))
@@ -95,6 +96,10 @@ const RouterComponent = () => {
         {
             path: ROUTES.PAYMENT.FAILED,
             element: <PaymentFailed />,
+        },
+        {
+            path: ROUTES.PAYMENT.SUCCESS,
+            element: <PaymentSuccess />,
         },
         //#endregion
 
