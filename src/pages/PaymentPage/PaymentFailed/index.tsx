@@ -14,7 +14,6 @@ const PaymentFailed = () => {
     const { t } = useTranslation();
 
     const error = searchParams.get('error') as PaymentErrorType | null;
-    const orderCode = searchParams.get('orderCode');
     const reason = searchParams.get('reason');
 
     // Get error configuration
@@ -91,20 +90,6 @@ const PaymentFailed = () => {
                             {errorConfig.description}
                         </p>
                     </div>
-
-                    {/* Order Code */}
-                    {orderCode && (
-                        <div className={`rounded-lg ${errorConfig.bgColor} border ${errorConfig.borderColor} p-4`}>
-                            <div className="flex flex-col gap-2">
-                                <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                                    {t('payment.failed.orderCode')}
-                                </span>
-                                <span className="text-lg font-mono font-bold text-gray-900">
-                                    {orderCode}
-                                </span>
-                            </div>
-                        </div>
-                    )}
 
                     {/* Additional Info */}
                     <div className="bg-white/60 rounded-lg p-4 border border-gray-200">
