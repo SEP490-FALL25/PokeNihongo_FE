@@ -1,0 +1,8 @@
+const SUBSCRIPTION_TYPE = {
+    LIFETIME: 'LIFETIME',
+    RECURRING: 'RECURRING',
+} as const;
+
+export const SUBSCRIPTION = {
+    SUBSCRIPTION_TYPE,
+}
