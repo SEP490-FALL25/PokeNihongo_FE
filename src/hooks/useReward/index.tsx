@@ -19,6 +19,22 @@ export const useGetRewardList = (params?: IQueryRequest) => {
 };
 //----------------------End----------------------//
 
+
+/**
+ * Handle Get Reward By Id
+ * @param id 
+ * @returns 
+ */
+export const useGetRewardById = (id: number) => {
+    const getRewardByIdQuery = useQuery({
+        queryKey: ['reward-by-id', id],
+        queryFn: () => rewardService.getRewardById(id),
+    });
+    return { data: getRewardByIdQuery.data?.data?.data, isLoading: getRewardByIdQuery.isLoading, error: getRewardByIdQuery.error };
+};
+//----------------------End----------------------//
+
+
 /**
  * Handle Create Reward
  * @returns { createRewardMutation }

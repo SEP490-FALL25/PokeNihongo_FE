@@ -48,6 +48,10 @@ const rewardService = {
         return axiosPrivate.get(`/reward${queryString ? `?${queryString}` : ''}`);
     },
 
+    getRewardById: async (rewardId: number) => {
+        return axiosPrivate.get(`/reward/admin/${rewardId}`);
+    },
+
     createReward: async (data: ICreateRewardRequest) => {
         return axiosPrivate.post('/reward', data);
     },
