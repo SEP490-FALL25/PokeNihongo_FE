@@ -8,9 +8,9 @@ export const REWARD_TYPE = {
 
 export const REWARD_TARGET = {
     EXP: 'EXP',
-    POINT: 'POINT',
     POKEMON: 'POKEMON',
-    BADGE: 'BADGE',
+    POKE_COINS: 'POKE_COINS',
+    SPARKLES: 'SPARKLES',
 } as const;
 
 export const REWARD = {

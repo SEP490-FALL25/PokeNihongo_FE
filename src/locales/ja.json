@@ -974,6 +974,7 @@
         "rewardItem": "数量",
         "rewardItemPlaceholder": "数量を入力... ({{lang}})",
         "rewardItemRequired": "有効な数量を入力してください",
+        "rewardValue": "価値",
         "rewardTarget": "報酬対象",
         "rewardTargetPlaceholder": "報酬対象を選択",
         "rewardTargetRequired": "報酬対象を選択してください",
@@ -987,9 +988,9 @@
         "rewardTypeACHIEVEMENT": "実績",
         "rewardTypeLEVEL": "レベル",
         "rewardTargetEXP": "経験値",
-        "rewardTargetPOINT": "ポイント",
         "rewardTargetPOKEMON": "ポケモン",
-        "rewardTargetBADGE": "バッジ"
+        "rewardTargetPOKE_COINS": "ポケコイン",
+        "rewardTargetSPARKLES": "スパークル"
     },
     "users": {
         "title": "ユーザー管理",

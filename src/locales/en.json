@@ -1013,6 +1013,7 @@
         "rewardItem": "Amount",
         "rewardItemPlaceholder": "Enter amount... ({{lang}})",
         "rewardItemRequired": "Please enter valid amount",
+        "rewardValue": "Value",
         "rewardTarget": "Reward Target",
         "rewardTargetPlaceholder": "Select reward target",
         "rewardTargetRequired": "Please select reward target",
@@ -1026,9 +1027,9 @@
         "rewardTypeACHIEVEMENT": "Achievement",
         "rewardTypeLEVEL": "Level",
         "rewardTargetEXP": "Experience Points",
-        "rewardTargetPOINT": "Points",
         "rewardTargetPOKEMON": "Pokemon",
-        "rewardTargetBADGE": "Badge"
+        "rewardTargetPOKE_COINS": "Poké Coins",
+        "rewardTargetSPARKLES": "Sparkles"
     },
     "users": {
         "title": "User Management",

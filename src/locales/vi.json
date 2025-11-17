@@ -991,6 +991,7 @@
         "rewardItem": "Số lượng",
         "rewardItemPlaceholder": "Nhập số lượng...",
         "rewardItemRequired": "Vui lòng nhập số lượng hợp lệ",
+        "rewardValue": "Giá trị",
         "rewardTarget": "Mục tiêu phần thưởng",
         "rewardTargetPlaceholder": "Chọn mục tiêu phần thưởng",
         "rewardTargetRequired": "Vui lòng chọn mục tiêu phần thưởng",
@@ -1004,9 +1005,9 @@
         "rewardTypeACHIEVEMENT": "Thành tựu",
         "rewardTypeLEVEL": "Cấp độ",
         "rewardTargetEXP": "Điểm kinh nghiệm",
-        "rewardTargetPOINT": "Điểm",
         "rewardTargetPOKEMON": "Pokemon",
-        "rewardTargetBADGE": "Huy hiệu"
+        "rewardTargetPOKE_COINS": "Poke Coins",
+        "rewardTargetSPARKLES": "Sparkles"
     },
     "users": {
         "title": "Quản lý người dùng",

@@ -5,7 +5,7 @@ import { Input } from "@ui/Input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@ui/Table";
 import { Badge } from "@ui/Badge";
-import { Plus, Edit, Trash2, MoreVertical, Gift, Sparkles, Loader2, Search } from "lucide-react";
+import { Plus, Edit, Trash2, MoreVertical, Gift, Loader2, Search } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@ui/DropdownMenu";
 import HeaderAdmin from "@organisms/Header/Admin";
 import { toast } from "react-toastify";
@@ -14,9 +14,8 @@ import { useTranslation } from "react-i18next";
 import { useGetRewardList, useDeleteReward } from "@hooks/useReward";
 import PaginationControls from "@ui/PaginationControls";
 import SortableTableHeader from "@ui/SortableTableHeader";
-import FilterPanel from "@ui/FilterPanel";
-import TableSkeleton from "@ui/TableSkeleton";
 import { IRewardEntityType } from "@models/reward/entity";
+import { REWARD_TYPE, REWARD_TARGET } from "@constants/reward";
 
 const RewardManagement = () => {
     const { t } = useTranslation();
@@ -47,20 +46,41 @@ const RewardManagement = () => {
     // Filter options
     const typeOptions = [
         { value: "all", label: t('reward.allTypes') },
-        { value: "DAILY_REQUEST", label: "Daily Request" },
-        { value: "LEVEL_UP", label: "Level Up" },
-        { value: "ACHIEVEMENT", label: "Achievement" },
-        { value: "SPECIAL_EVENT", label: "Special Event" }
+        { value: REWARD_TYPE.LESSON, label: t('reward.rewardTypeLESSON') },
+        { value: REWARD_TYPE.DAILY_REQUEST, label: t('reward.rewardTypeDAILY_REQUEST') },
+        { value: REWARD_TYPE.EVENT, label: t('reward.rewardTypeEVENT') },
+        { value: REWARD_TYPE.ACHIEVEMENT, label: t('reward.rewardTypeACHIEVEMENT') },
+        { value: REWARD_TYPE.LEVEL, label: t('reward.rewardTypeLEVEL') },
     ];
 
     const targetOptions = [
         { value: "all", label: t('reward.allTargets') },
-        { value: "EXP", label: "Experience Points" },
-        { value: "GEM", label: "Gems" },
-        { value: "STAMINA", label: "Stamina" },
-        { value: "COIN", label: "Coins" },
-        { value: "ITEM", label: "Items" }
+        { value: REWARD_TARGET.EXP, label: t('reward.rewardTargetEXP') },
+        { value: REWARD_TARGET.POKEMON, label: t('reward.rewardTargetPOKEMON') },
+        { value: REWARD_TARGET.POKE_COINS, label: t('reward.rewardTargetPOKE_COINS') },
+        { value: REWARD_TARGET.SPARKLES, label: t('reward.rewardTargetSPARKLES') },
     ];
+
+    const getRewardTypeLabel = (type: string) => {
+        switch (type) {
+            case REWARD_TYPE.LESSON: return t('reward.rewardTypeLESSON');
+            case REWARD_TYPE.DAILY_REQUEST: return t('reward.rewardTypeDAILY_REQUEST');
+            case REWARD_TYPE.EVENT: return t('reward.rewardTypeEVENT');
+            case REWARD_TYPE.ACHIEVEMENT: return t('reward.rewardTypeACHIEVEMENT');
+            case REWARD_TYPE.LEVEL: return t('reward.rewardTypeLEVEL');
+            default: return type;
+        }
+    };
+
+    const getRewardTargetLabel = (target: string) => {
+        switch (target) {
+            case REWARD_TARGET.EXP: return t('reward.rewardTargetEXP');
+            case REWARD_TARGET.POKEMON: return t('reward.rewardTargetPOKEMON');
+            case REWARD_TARGET.POKE_COINS: return t('reward.rewardTargetPOKE_COINS');
+            case REWARD_TARGET.SPARKLES: return t('reward.rewardTargetSPARKLES');
+            default: return target;
+        }
+    };
 
     const handleDelete = async (rewardId: number) => {
         if (window.confirm(t('reward.confirmDelete'))) {
@@ -89,13 +109,6 @@ const RewardManagement = () => {
         setCurrentPage(1);
     };
 
-    const handleClearAllFilters = () => {
-        setSearchQuery("");
-        setTypeFilter("all");
-        setTargetFilter("all");
-        setCurrentPage(1);
-    };
-
     const openAddDialog = () => {
         setEditingReward(null);
         setIsAddEditDialogOpen(true);
@@ -104,27 +117,6 @@ const RewardManagement = () => {
     const closeDialog = () => {
         setIsAddEditDialogOpen(false);
         setEditingReward(null);
-    };
-
-    const getRewardTypeLabel = (type: string) => {
-        switch (type) {
-            case "DAILY_REQUEST": return "Daily Request";
-            case "LEVEL_UP": return "Level Up";
-            case "ACHIEVEMENT": return "Achievement";
-            case "SPECIAL_EVENT": return "Special Event";
-            default: return type;
-        }
-    };
-
-    const getRewardTargetLabel = (target: string) => {
-        switch (target) {
-            case "EXP": return "Experience Points";
-            case "GEM": return "Gems";
-            case "STAMINA": return "Stamina";
-            case "COIN": return "Coins";
-            case "ITEM": return "Items";
-            default: return target;
-        }
     };
 
     return (
@@ -162,7 +154,7 @@ const RewardManagement = () => {
                                 </div>
                                 <CardTitle className="text-xl font-bold text-foreground">{t('reward.title')}</CardTitle>
                             </div>
-                            <Button 
+                            <Button
                                 className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 shadow-lg"
                                 onClick={openAddDialog}
                             >
@@ -240,7 +232,7 @@ const RewardManagement = () => {
                                             onSort={handleSort}
                                         />
                                         <SortableTableHeader
-                                            title={t('reward.rewardItem')}
+                                            title={t('reward.rewardValue')}
                                             sortKey="rewardItem"
                                             currentSortBy={sortBy}
                                             currentSort={sort}

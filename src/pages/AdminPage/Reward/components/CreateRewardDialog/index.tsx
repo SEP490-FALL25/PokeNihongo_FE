@@ -87,9 +87,9 @@ const CreateRewardDialog = ({ isOpen, onClose, editingReward }: CreateRewardDial
 
     const rewardTargetOptions = [
         { value: REWARD_TARGET.EXP, label: t('reward.rewardTargetEXP') },
-        { value: REWARD_TARGET.POINT, label: t('reward.rewardTargetPOINT') },
         { value: REWARD_TARGET.POKEMON, label: t('reward.rewardTargetPOKEMON') },
-        { value: REWARD_TARGET.BADGE, label: t('reward.rewardTargetBADGE') },
+        { value: REWARD_TARGET.POKE_COINS, label: t('reward.rewardTargetPOKE_COINS') },
+        { value: REWARD_TARGET.SPARKLES, label: t('reward.rewardTargetSPARKLES') },
     ];
 
     const handleFormSubmit = async (data: ICreateRewardRequest) => {
