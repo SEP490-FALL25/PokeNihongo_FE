@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { IQueryRequest } from "@models/common/request";
 import { useSelector } from "react-redux";
 import { selectCurrentLanguage } from "@redux/features/language/selector";
+import { RewardByIdEntitySchema } from "@models/reward/entity";
 
 /**
  * Handle Get Reward List
@@ -25,12 +26,16 @@ export const useGetRewardList = (params?: IQueryRequest) => {
  * @param id 
  * @returns 
  */
-export const useGetRewardById = (id: number) => {
+export const useGetRewardById = (id?: number, options?: { enabled?: boolean }) => {
     const getRewardByIdQuery = useQuery({
         queryKey: ['reward-by-id', id],
-        queryFn: () => rewardService.getRewardById(id),
+        queryFn: async () => {
+            const response = await rewardService.getRewardById(id!);
+            return RewardByIdEntitySchema.parse(response.data?.data);
+        },
+        enabled: Boolean(id) && (options?.enabled ?? true),
     });
-    return { data: getRewardByIdQuery.data?.data?.data, isLoading: getRewardByIdQuery.isLoading, error: getRewardByIdQuery.error };
+    return { data: getRewardByIdQuery.data, isLoading: getRewardByIdQuery.isLoading, error: getRewardByIdQuery.error };
 };
 //----------------------End----------------------//
 
@@ -60,8 +65,9 @@ export const useUpdateReward = () => {
     const queryClient = useQueryClient();
     const updateRewardMutation = useMutation({
         mutationFn: ({ id, data }: { id: number; data: ICreateRewardRequest }) => rewardService.updateReward(id, data),
-        onSuccess: () => {
+        onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['reward-list'] });
+            queryClient.invalidateQueries({ queryKey: ['reward-by-id', variables.id] });
         },
     });
     return updateRewardMutation;

@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import HeaderAdmin from "@organisms/Header/Admin";
 import { toast } from "react-toastify";
 import CreateRewardDialog from "./components/CreateRewardDialog";
+import UpdateRewardDialog from "./components/UpdateRewardDialog";
 import { useTranslation } from "react-i18next";
 import { useGetRewardList, useDeleteReward } from "@hooks/useReward";
 import PaginationControls from "@ui/PaginationControls";
@@ -22,8 +23,9 @@ const RewardManagement = () => {
 
     // --- States ---
     const [searchQuery, setSearchQuery] = useState("");
-    const [isAddEditDialogOpen, setIsAddEditDialogOpen] = useState(false);
-    const [editingReward, setEditingReward] = useState<any | null>(null);
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+    const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+    const [editingReward, setEditingReward] = useState<IRewardEntityType | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(15);
     const [typeFilter, setTypeFilter] = useState("all");
@@ -94,9 +96,9 @@ const RewardManagement = () => {
         }
     };
 
-    const handleEdit = (reward: any) => {
+    const handleEdit = (reward: IRewardEntityType) => {
         setEditingReward(reward);
-        setIsAddEditDialogOpen(true);
+        setIsUpdateDialogOpen(true);
     };
 
     const handleSort = (columnKey: string) => {
@@ -111,11 +113,16 @@ const RewardManagement = () => {
 
     const openAddDialog = () => {
         setEditingReward(null);
-        setIsAddEditDialogOpen(true);
+        setIsCreateDialogOpen(true);
     };
 
-    const closeDialog = () => {
-        setIsAddEditDialogOpen(false);
+    const closeCreateDialog = () => {
+        setIsCreateDialogOpen(false);
+        setEditingReward(null);
+    };
+
+    const closeUpdateDialog = () => {
+        setIsUpdateDialogOpen(false);
         setEditingReward(null);
     };
 
@@ -327,8 +334,12 @@ const RewardManagement = () => {
 
             {/* Dialog component */}
             <CreateRewardDialog
-                isOpen={isAddEditDialogOpen}
-                onClose={closeDialog}
+                isOpen={isCreateDialogOpen}
+                onClose={closeCreateDialog}
+            />
+            <UpdateRewardDialog
+                isOpen={isUpdateDialogOpen}
+                onClose={closeUpdateDialog}
                 editingReward={editingReward}
             />
         </>
