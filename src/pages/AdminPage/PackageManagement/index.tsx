@@ -3,9 +3,8 @@
 import { useMemo, useState } from "react"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@ui/Card"
 import { Badge } from "@ui/Badge"
-import { Button } from "@ui/Button"
 import { Input } from "@ui/Input"
-import { Package, DollarSign, Users, TrendingUp, Plus, Search, Check, Sparkles, Loader2 } from "lucide-react"
+import { Package, DollarSign, Users, TrendingUp, Search, Check, Sparkles, Loader2 } from "lucide-react"
 import HeaderAdmin from "@organisms/Header/Admin"
 import { useTranslation } from "react-i18next"
 import { useGetDashboardSubscriptionPlan } from "@hooks/useDashboard"
@@ -273,13 +272,6 @@ export default function PackageManagement() {
                                 </div>
                                 <CardTitle className="text-xl font-bold text-foreground">Danh sách gói dịch vụ</CardTitle>
                             </div>
-                            <Button
-                                className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 shadow-lg"
-                                disabled
-                            >
-                                <Plus className="w-4 h-4 mr-2" />
-                                Tạo gói mới
-                            </Button>
                         </div>
                         <div className="flex-1 relative">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />

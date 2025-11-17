@@ -42,3 +42,42 @@ export const DashboardSubscriptionPlanEntitySchema = z.object({
     })),
 })
 //------------------End------------------//
+
+
+/**
+ * Dashboard Revenue Entity Schema
+ */
+export const DashboardRevenueEntitySchema = z.object({
+    period: z.object({
+        month: z.number(),
+        year: z.number(),
+    }),
+    totalRevenue: z.object({
+        month: z.number(),
+        year: z.number(),
+    }),
+    plans: z.array(z.object({
+        planId: z.number(),
+        subscriptionId: z.number(),
+        subscription: z.object({
+            id: z.number(),
+            nameKey: z.string(),
+            descriptionKey: z.string(),
+            tagName: z.string(),
+        }),
+        durationInDays: z.number().nullable(),
+        price: z.number(),
+        type: z.enum(SUBSCRIPTION.SUBSCRIPTION_TYPE),
+        revenue: z.object({
+            month: z.object({
+                total: z.number(),
+                count: z.number(),
+            }),
+            year: z.object({
+                total: z.number(),
+                count: z.number(),
+            }),
+        }),
+    })),
+})
+//------------------End------------------//

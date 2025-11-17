@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import dashboardService from "@services/dashboard";
-import { DashboardSubscriptionPlanEntitySchema } from "@models/subscription/entity";
+import { DashboardRevenueEntitySchema, DashboardSubscriptionPlanEntitySchema } from "@models/subscription/entity";
 import { useSelector } from "react-redux";
 import { selectCurrentLanguage } from "@redux/features/language/selector";
 
@@ -18,5 +18,23 @@ export const useGetDashboardSubscriptionPlan = () => {
         },
     });
     return { data: getDashboardSubscriptionPlanQuery.data, isLoading: getDashboardSubscriptionPlanQuery.isLoading, error: getDashboardSubscriptionPlanQuery.error };
+}
+//------------------End------------------//
+
+
+/**
+ * Handle Get Dashboard Revenue
+ * @returns 
+ */
+export const useGetDashboardRevenue = (month: number, year: number) => {
+    const currentLanguage = useSelector(selectCurrentLanguage);
+    const getDashboardRevenueQuery = useQuery({
+        queryKey: ['dashboard-revenue', month, year, currentLanguage],
+        queryFn: async () => {
+            const response = await dashboardService.getDashboardRevenue(month, year);
+            return DashboardRevenueEntitySchema.parse(response.data?.data);
+        },
+    });
+    return { data: getDashboardRevenueQuery.data, isLoading: getDashboardRevenueQuery.isLoading, error: getDashboardRevenueQuery.error };
 }
 //------------------End------------------//
