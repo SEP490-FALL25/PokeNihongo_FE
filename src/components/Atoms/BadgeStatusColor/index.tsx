@@ -40,8 +40,8 @@ export const getStatusBadgeColor = (
 ) => {
     if (typeof statusOrActive === "boolean") {
         return statusOrActive
-            ? "bg-chart-4 text-white"
-            : "bg-white border border-black text-foreground hover:bg-white hover:border-black hover:text-foreground"
+            ? "bg-chart-4 text-black"
+            : "bg-white border border-black [&&]:text-black hover:bg-white hover:border-black hover:text-black"
     }
 
     return config[statusOrActive]?.colorClass ?? config.DEFAULT?.colorClass ?? DEFAULT_COLOR_CLASS
