@@ -823,6 +823,7 @@
     "managerGrammar": {
         "title": "Quản lý ngữ pháp",
         "description": "Theo dõi và chọn lọc các mẫu ngữ pháp dùng trong bài học.",
+        "createButton": "Thêm ngữ pháp",
         "searchPlaceholder": "Tìm kiếm cấu trúc ngữ pháp...",
         "levelLabel": "Cấp độ JLPT",
         "allLevels": "Tất cả cấp độ",
@@ -839,6 +840,36 @@
         "emptyState": {
             "title": "Không có ngữ pháp phù hợp",
             "subtitle": "Hãy thử điều chỉnh bộ lọc hoặc thêm mới ngữ pháp."
+        }
+    },
+    "createGrammar": {
+        "title": "Tạo cấu trúc ngữ pháp",
+        "description": "Nhập cấu trúc, cấp độ và lời giải thích cho từng ngôn ngữ.",
+        "requiredHint": "Các trường có dấu * là bắt buộc.",
+        "structureLabel": "Cấu trúc",
+        "structurePlaceholder": "Ví dụ: 〜ているところだ",
+        "levelLabel": "Cấp độ JLPT",
+        "levelPlaceholder": "Chọn cấp độ JLPT",
+        "exampleLabel": "Câu ví dụ (JP)",
+        "examplePlaceholder": "Ví dụ: 宿題をしているところだ。",
+        "translations": "Giải thích cách dùng",
+        "translationHint": "Thêm lời giải thích và ví dụ cho từng ngôn ngữ.",
+        "translationLanguage": "Ngôn ngữ",
+        "languagePlaceholder": "Chọn ngôn ngữ",
+        "translationExplanation": "Giải thích",
+        "translationExplanationPlaceholder": "Mô tả cách sử dụng cấu trúc này...",
+        "translationExample": "Ví dụ",
+        "translationExamplePlaceholder": "Nhập câu ví dụ bằng ngôn ngữ đã chọn...",
+        "addUsage": "Thêm bản dịch",
+        "removeUsage": "Xóa",
+        "submit": "Tạo ngữ pháp",
+        "submitting": "Đang tạo...",
+        "cancel": "Quay lại danh sách",
+        "success": "Tạo ngữ pháp thành công",
+        "languages": {
+            "vi": "Tiếng Việt",
+            "en": "Tiếng Anh",
+            "ja": "Tiếng Nhật"
         }
     },
     "pokemon": {

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { Input } from "@ui/Input";
 import { Card, CardContent, CardFooter, CardHeader } from "@ui/Card";
 import { Button } from "@ui/Button";
@@ -9,11 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import PaginationControls from "@ui/PaginationControls";
 import { Alert, AlertDescription, AlertTitle } from "@ui/Alert";
 import { Skeleton } from "@ui/Skeleton";
-import { ArrowUpDown, BookOpenCheck, ChevronDown, ChevronUp, RefreshCcw } from "lucide-react";
+import { BookOpenCheck, Plus, RefreshCcw } from "lucide-react";
 import { useGrammarList } from "@hooks/useGrammar";
 import { useDebounce } from "@hooks/useDebounce";
 import { formatDateTime } from "@utils/date";
 import HeaderAdmin from "@organisms/Header/Admin";
+import { ROUTES } from "@constants/route";
+import SortableTableHeader from "@ui/SortableTableHeader";
 
 type GrammarLevelValue = "all" | "N5" | "N4" | "N3" | "N2" | "N1";
 
@@ -105,17 +108,6 @@ const GrammarManagementPage = () => {
 
     const refreshList = () => {
         void refetch?.();
-    };
-
-    const renderSortIcon = (columnKey: SortColumn) => {
-        if (sortBy !== columnKey) {
-            return <ArrowUpDown className="h-4 w-4 text-muted-foreground" />;
-        }
-        return sortDirection === "asc" ? (
-            <ChevronUp className="h-4 w-4 text-primary" />
-        ) : (
-            <ChevronDown className="h-4 w-4 text-primary" />
-        );
     };
 
     const getLevelLabel = (grammar: GrammarItem) => {
@@ -211,17 +203,26 @@ const GrammarManagementPage = () => {
                             </div>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                            <div className="inline-flex items-center gap-2">
-                                <BookOpenCheck className="h-4 w-4 text-primary" />
-                                <span>{t("managerGrammar.totalItems", { count: totalItems })}</span>
+                        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                            <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                                <div className="inline-flex items-center gap-2">
+                                    <BookOpenCheck className="h-4 w-4 text-primary" />
+                                    <span>{t("managerGrammar.totalItems", { count: totalItems })}</span>
+                                </div>
+                                <Badge variant="outline" className="border-dashed text-muted-foreground">
+                                    {t("managerGrammar.pageStat", {
+                                        current: pagination.current ?? page,
+                                        total: pagination.totalPage ?? 1,
+                                    })}
+                                </Badge>
                             </div>
-                            <Badge variant="outline" className="border-dashed text-muted-foreground">
-                                {t("managerGrammar.pageStat", {
-                                    current: pagination.current ?? page,
-                                    total: pagination.totalPage ?? 1,
-                                })}
-                            </Badge>
+
+                            <Button asChild className="w-full sm:w-auto lg:w-auto">
+                                <Link to={ROUTES.MANAGER.GRAMMAR_CREATE}>
+                                    <Plus className="h-4 w-4" />
+                                    {t("managerGrammar.createButton")}
+                                </Link>
+                            </Button>
                         </div>
                     </CardHeader>
 
@@ -238,36 +239,28 @@ const GrammarManagementPage = () => {
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>{t("managerGrammar.columns.structure")}</TableHead>
-                                        <TableHead className="w-32">
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center gap-2 font-medium text-muted-foreground hover:text-foreground"
-                                                onClick={() => handleSort("level")}
-                                            >
-                                                {t("managerGrammar.columns.level")}
-                                                {renderSortIcon("level")}
-                                            </button>
-                                        </TableHead>
-                                        <TableHead>
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center gap-2 font-medium text-muted-foreground hover:text-foreground"
-                                                onClick={() => handleSort("createdAt")}
-                                            >
-                                                {t("managerGrammar.columns.createdAt")}
-                                                {renderSortIcon("createdAt")}
-                                            </button>
-                                        </TableHead>
-                                        <TableHead>
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center gap-2 font-medium text-muted-foreground hover:text-foreground"
-                                                onClick={() => handleSort("updatedAt")}
-                                            >
-                                                {t("managerGrammar.columns.updatedAt")}
-                                                {renderSortIcon("updatedAt")}
-                                            </button>
-                                        </TableHead>
+                                        <SortableTableHeader
+                                            title={t("managerGrammar.columns.level")}
+                                            sortKey="level"
+                                            currentSortBy={sortBy}
+                                            currentSort={sortDirection}
+                                            onSort={(key) => handleSort(key as SortColumn)}
+                                            className="w-32"
+                                        />
+                                        <SortableTableHeader
+                                            title={t("managerGrammar.columns.createdAt")}
+                                            sortKey="createdAt"
+                                            currentSortBy={sortBy}
+                                            currentSort={sortDirection}
+                                            onSort={(key) => handleSort(key as SortColumn)}
+                                        />
+                                        <SortableTableHeader
+                                            title={t("managerGrammar.columns.updatedAt")}
+                                            sortKey="updatedAt"
+                                            currentSortBy={sortBy}
+                                            currentSort={sortDirection}
+                                            onSort={(key) => handleSort(key as SortColumn)}
+                                        />
                                     </TableRow>
                                 </TableHeader>
 

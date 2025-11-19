@@ -813,6 +813,7 @@
     "managerGrammar": {
         "title": "文法ライブラリ",
         "description": "レッスンで使用する文法パターンを閲覧・整理します。",
+        "createButton": "文法を追加",
         "searchPlaceholder": "文法パターンを検索...",
         "levelLabel": "JLPTレベル",
         "allLevels": "すべてのレベル",
@@ -829,6 +830,36 @@
         "emptyState": {
             "title": "該当する文法がありません",
             "subtitle": "フィルターを調整するか、新しい文法を追加してください。"
+        }
+    },
+    "createGrammar": {
+        "title": "文法パターンを追加",
+        "description": "構造、レベル、多言語の解説を入力してください。",
+        "requiredHint": "※ は必須項目です。",
+        "structureLabel": "文型",
+        "structurePlaceholder": "例：〜ているところだ",
+        "levelLabel": "JLPTレベル",
+        "levelPlaceholder": "レベルを選択",
+        "exampleLabel": "例文（日本語）",
+        "examplePlaceholder": "例：宿題をしているところだ。",
+        "translations": "使用解説",
+        "translationHint": "各言語での解説と例文を入力してください。",
+        "translationLanguage": "言語",
+        "languagePlaceholder": "言語を選択",
+        "translationExplanation": "解説",
+        "translationExplanationPlaceholder": "この文法の使い方を説明してください...",
+        "translationExample": "例文",
+        "translationExamplePlaceholder": "選択した言語で例文を入力してください...",
+        "addUsage": "翻訳を追加",
+        "removeUsage": "削除",
+        "submit": "文法を作成",
+        "submitting": "作成中...",
+        "cancel": "一覧に戻る",
+        "success": "文法が正常に作成されました",
+        "languages": {
+            "vi": "ベトナム語",
+            "en": "英語",
+            "ja": "日本語"
         }
     },
     "pokemon": {
