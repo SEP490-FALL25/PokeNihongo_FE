@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
 import { Input } from "@ui/Input";
 import { Card, CardContent, CardFooter, CardHeader } from "@ui/Card";
 import { Button } from "@ui/Button";
@@ -15,8 +14,8 @@ import { useGrammarList } from "@hooks/useGrammar";
 import { useDebounce } from "@hooks/useDebounce";
 import { formatDateTime } from "@utils/date";
 import HeaderAdmin from "@organisms/Header/Admin";
-import { ROUTES } from "@constants/route";
 import SortableTableHeader from "@ui/SortableTableHeader";
+import CreateGrammarDialog from "./CreateGrammar";
 
 type GrammarLevelValue = "all" | "N5" | "N4" | "N3" | "N2" | "N1";
 
@@ -56,10 +55,11 @@ type SortColumn = "level" | "createdAt" | "updatedAt";
 
 const GrammarManagementPage = () => {
     const { t } = useTranslation();
-    const [searchValue, setSearchValue] = useState("");
+    const [searchValue, setSearchValue] = useState<string>("");
     const debouncedSearchValue = useDebounce(searchValue, 500);
-    const [page, setPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+    const [page, setPage] = useState<number>(1);
+    const [itemsPerPage, setItemsPerPage] = useState<number>(15);
     const [selectedLevel, setSelectedLevel] = useState<GrammarLevelValue>("all");
     const [sortBy, setSortBy] = useState<SortColumn>("createdAt");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
@@ -217,11 +217,9 @@ const GrammarManagementPage = () => {
                                 </Badge>
                             </div>
 
-                            <Button asChild className="w-full sm:w-auto lg:w-auto">
-                                <Link to={ROUTES.MANAGER.GRAMMAR_CREATE}>
-                                    <Plus className="h-4 w-4" />
-                                    {t("managerGrammar.createButton")}
-                                </Link>
+                            <Button className="w-full sm:w-auto lg:w-auto" onClick={() => setIsCreateDialogOpen(true)}>
+                                <Plus className="h-4 w-4" />
+                                {t("managerGrammar.createButton")}
                             </Button>
                         </div>
                     </CardHeader>
@@ -313,6 +311,7 @@ const GrammarManagementPage = () => {
                     </CardFooter>
                 </Card>
             </div>
+            <CreateGrammarDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} />
         </>
     );
 };
