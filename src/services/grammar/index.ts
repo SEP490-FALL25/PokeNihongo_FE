@@ -1,5 +1,6 @@
 import { axiosPrivate } from "@configs/axios";
 import { IQueryRequest } from "@models/common/request";
+import { ICreateGrammarRequest } from "@models/grammar/request";
 
 const grammarService = {
   getAllGrammars: async (data: IQueryRequest) => {
@@ -14,6 +15,10 @@ const grammarService = {
     if (data.lessonId) queryParams.append("lessonId", data.lessonId.toString());
 
     return await axiosPrivate.get(`/grammars?${queryParams.toString()}`);
+  },
+
+  createGrammar: async (data: ICreateGrammarRequest) => {
+    return await axiosPrivate.post("/grammars", data);
   },
 };
 

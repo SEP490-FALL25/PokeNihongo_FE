@@ -1,8 +1,10 @@
 import { IQueryRequest } from "@models/common/request";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import grammarService from "@services/grammar";
 import { useSelector } from "react-redux";
 import { selectCurrentLanguage } from "@redux/features/language/selector";
+import { ICreateGrammarRequest } from "@models/grammar/request";
+import { toast } from "react-toastify";
 
 /**
  * Handle Grammar List
@@ -32,3 +34,26 @@ export const useGrammarList = (params: IQueryRequest & { enabled?: boolean; dial
 
   return { data: data?.data?.data, isLoading, error };
 };
+//------------------End------------------//
+
+
+/**
+ * Handle Create Grammar
+ * @returns createGrammarMutation
+ */
+export const useCreateGrammar = () => {
+  const queryClient = useQueryClient();
+
+  const createGrammarMutation = useMutation({
+    mutationFn: (data: ICreateGrammarRequest) => grammarService.createGrammar(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["grammar-list"] });
+      // toast.success();
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Có lỗi xảy ra khi tạo ngữ pháp");
+    },
+  });
+  return createGrammarMutation;
+};
+//------------------End------------------//
