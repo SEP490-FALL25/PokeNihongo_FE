@@ -36,6 +36,7 @@ const QuestionBankManagement = lazy(() => import("@pages/AdminPage/QuestionBank"
 const TestSetManagement = lazy(() => import("@pages/AdminPage/TestSetManagement"))
 const SpeakingTestSetManagement = lazy(() => import("@pages/AdminPage/SpeakingTestSetPage"))
 const TestManagement = lazy(() => import("@pages/AdminPage/TestManagement"))
+const GrammarManagement = lazy(() => import("@pages/ManagerPage/Grammar"))
 const RouterComponent = () => {
     const router = createBrowserRouter([
         //#region Auth routes
@@ -81,6 +82,7 @@ const RouterComponent = () => {
                             children: [
                                 { path: ROUTES.MANAGER.ROOT, element: <LessonsManagement /> },
                                 { path: ROUTES.MANAGER.VOCABULARY, element: <VocabularyManagement /> },
+                                { path: ROUTES.MANAGER.GRAMMAR_MANAGEMENT, element: <GrammarManagement /> },
                                 { path: ROUTES.MANAGER.QUESTION_BANK, element: <QuestionBankManagement /> },
                                 { path: ROUTES.MANAGER.TESTSET_MANAGEMENT, element: <TestSetManagement /> },
                                 { path: ROUTES.MANAGER.TESTSET_SPEAKING_MANAGEMENT, element: <SpeakingTestSetManagement /> },

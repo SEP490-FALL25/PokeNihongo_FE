@@ -15,7 +15,7 @@ export const useGrammarList = (params: IQueryRequest & { enabled?: boolean; dial
   const language = useSelector(selectCurrentLanguage);
   const { page, limit, search, levelN, sortBy, sort, enabled = true, dialogKey, lessonId } = params;
 
-  const { data, isLoading, error } = useQuery({
+  const queryResult = useQuery({
     queryKey: [
       "grammar-list",
       page,
@@ -32,7 +32,13 @@ export const useGrammarList = (params: IQueryRequest & { enabled?: boolean; dial
     enabled,
   });
 
-  return { data: data?.data?.data, isLoading, error };
+  return {
+    data: queryResult.data?.data?.data,
+    isLoading: queryResult.isLoading,
+    isFetching: queryResult.isFetching,
+    error: queryResult.error,
+    refetch: queryResult.refetch,
+  };
 };
 //------------------End------------------//
 

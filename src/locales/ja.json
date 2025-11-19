@@ -244,6 +244,7 @@
         "users": "ユーザー管理",
         "lessons": "レッスン管理",
         "vocabulary": "語彙管理",
+        "grammar": "文法管理",
         "pokemon": "ポケモン管理",
         "dailyQuests": "デイリークエスト",
         "tournaments": "トーナメント",
@@ -808,6 +809,27 @@
         "vocabularyN5": "語彙N5",
         "vocabularyN4": "語彙N4",
         "vocabularyN3": "語彙N3"
+    },
+    "managerGrammar": {
+        "title": "文法ライブラリ",
+        "description": "レッスンで使用する文法パターンを閲覧・整理します。",
+        "searchPlaceholder": "文法パターンを検索...",
+        "levelLabel": "JLPTレベル",
+        "allLevels": "すべてのレベル",
+        "refresh": "更新",
+        "totalItems": "文法 {{count}} 件",
+        "pageStat": "{{current}} / {{total}} ページ",
+        "fallbackError": "文法リストを読み込めませんでした。もう一度お試しください。",
+        "columns": {
+            "structure": "文型",
+            "level": "レベル",
+            "createdAt": "作成日",
+            "updatedAt": "更新日"
+        },
+        "emptyState": {
+            "title": "該当する文法がありません",
+            "subtitle": "フィルターを調整するか、新しい文法を追加してください。"
+        }
     },
     "pokemon": {
         "title": "ポケモン管理",

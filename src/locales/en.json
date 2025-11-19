@@ -282,7 +282,8 @@
         "permissionManagement": "Permission Management",
         "test": "Test Management",
         "configAI": "Config AI",
-        "customAI": "Custom AI"
+        "customAI": "Custom AI",
+        "grammar": "Grammar Management"
     },
     "aiCommon": {
         "inSystem": "In system",
@@ -830,6 +831,27 @@
         "vocabularyN5": "Vocabulary N5",
         "vocabularyN4": "Vocabulary N4",
         "vocabularyN3": "Vocabulary N3"
+    },
+    "managerGrammar": {
+        "title": "Grammar Library",
+        "description": "Review and curate grammar patterns used across lessons.",
+        "searchPlaceholder": "Search grammar structures...",
+        "levelLabel": "JLPT level",
+        "allLevels": "All levels",
+        "refresh": "Refresh",
+        "totalItems": "{{count}} grammar items",
+        "pageStat": "Page {{current}} / {{total}}",
+        "fallbackError": "Unable to load grammar list. Please try again.",
+        "columns": {
+            "structure": "Structure",
+            "level": "Level",
+            "createdAt": "Created at",
+            "updatedAt": "Updated at"
+        },
+        "emptyState": {
+            "title": "No grammar found",
+            "subtitle": "Try adjusting the filters or add a new grammar item."
+        }
     },
     "pokemon": {
         "title": "Pokémon Management",

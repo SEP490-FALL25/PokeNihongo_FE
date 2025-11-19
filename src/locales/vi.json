@@ -253,6 +253,7 @@
         "users": "Quản lý người dùng",
         "lessons": "Quản lý bài học",
         "vocabulary": "Quản lý từ vựng",
+        "grammar": "Quản lý ngữ pháp",
         "pokemon": "Quản lý Pokemon",
         "dailyQuests": "Nhiệm vụ hàng ngày",
         "tournaments": "Giải đấu",
@@ -818,6 +819,27 @@
         "vocabularyN5": "Từ vựng N5",
         "vocabularyN4": "Từ vựng N4",
         "vocabularyN3": "Từ vựng N3"
+    },
+    "managerGrammar": {
+        "title": "Quản lý ngữ pháp",
+        "description": "Theo dõi và chọn lọc các mẫu ngữ pháp dùng trong bài học.",
+        "searchPlaceholder": "Tìm kiếm cấu trúc ngữ pháp...",
+        "levelLabel": "Cấp độ JLPT",
+        "allLevels": "Tất cả cấp độ",
+        "refresh": "Làm mới",
+        "totalItems": "{{count}} mẫu ngữ pháp",
+        "pageStat": "Trang {{current}} / {{total}}",
+        "fallbackError": "Không thể tải danh sách ngữ pháp. Vui lòng thử lại.",
+        "columns": {
+            "structure": "Cấu trúc",
+            "level": "Cấp độ",
+            "createdAt": "Ngày tạo",
+            "updatedAt": "Cập nhật"
+        },
+        "emptyState": {
+            "title": "Không có ngữ pháp phù hợp",
+            "subtitle": "Hãy thử điều chỉnh bộ lọc hoặc thêm mới ngữ pháp."
+        }
     },
     "pokemon": {
         "title": "Quản lý Pokémon",
