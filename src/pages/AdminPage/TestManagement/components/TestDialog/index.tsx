@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@ui/Select";
 import { Switch } from "@ui/Switch";
+import { useTranslation } from "react-i18next";
 import { TestCreateRequest } from "@models/test/request";
 import LinkedTestSetsSection from "../LinkedTestSetsSection";
 import { TestSetEntity } from "@models/testSet/entity";
@@ -63,6 +64,7 @@ const TestDialog: React.FC<TestDialogProps> = ({
   onCancel,
   isSaving,
 }) => {
+  const { t } = useTranslation();
   return (
     <Dialog
       open={open}
@@ -75,14 +77,14 @@ const TestDialog: React.FC<TestDialogProps> = ({
       <DialogContent className="max-w-2xl bg-white">
         <DialogHeader>
           <DialogTitle>
-            {selectedId ? "Chỉnh sửa Test" : "Tạo Test"}
+            {selectedId ? t("testManagement.editTest") : t("testManagement.createTest")}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="text-sm font-medium">Name (vi)</label>
+              <label className="text-sm font-medium">{t("testManagement.nameVi")}</label>
               <Input
                 value={form.nameVi}
                 onChange={(e) =>
@@ -91,7 +93,7 @@ const TestDialog: React.FC<TestDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Name (en)</label>
+              <label className="text-sm font-medium">{t("testManagement.nameEn")}</label>
               <Input
                 value={form.nameEn}
                 onChange={(e) =>
@@ -100,7 +102,7 @@ const TestDialog: React.FC<TestDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Description (vi)</label>
+              <label className="text-sm font-medium">{t("testManagement.descriptionVi")}</label>
               <Input
                 value={form.descriptionVi}
                 onChange={(e) =>
@@ -109,7 +111,7 @@ const TestDialog: React.FC<TestDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Description (en)</label>
+              <label className="text-sm font-medium">{t("testManagement.descriptionEn")}</label>
               <Input
                 value={form.descriptionEn}
                 onChange={(e) =>
@@ -121,7 +123,7 @@ const TestDialog: React.FC<TestDialogProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium">Có phí</label>
+              <label className="text-sm font-medium">{t("testManagement.hasPrice")}</label>
               <Switch
                 checked={form.price === 1}
                 onCheckedChange={(checked) =>
@@ -130,7 +132,7 @@ const TestDialog: React.FC<TestDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium">LevelN</label>
+              <label className="text-sm font-medium">{t("testManagement.levelN")}</label>
               <Select
                 value={String(form.levelN)}
                 onValueChange={(v) =>
@@ -138,20 +140,20 @@ const TestDialog: React.FC<TestDialogProps> = ({
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Chọn cấp độ" />
+                  <SelectValue placeholder={t("testManagement.selectLevel")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="0">N0 (Tất cả cấp)</SelectItem>
-                  <SelectItem value="1">N1</SelectItem>
-                  <SelectItem value="2">N2</SelectItem>
-                  <SelectItem value="3">N3</SelectItem>
-                  <SelectItem value="4">N4</SelectItem>
-                  <SelectItem value="5">N5</SelectItem>
+                  <SelectItem value="0">{t("testManagement.levels.N0")}</SelectItem>
+                  <SelectItem value="1">{t("testManagement.levels.N1")}</SelectItem>
+                  <SelectItem value="2">{t("testManagement.levels.N2")}</SelectItem>
+                  <SelectItem value="3">{t("testManagement.levels.N3")}</SelectItem>
+                  <SelectItem value="4">{t("testManagement.levels.N4")}</SelectItem>
+                  <SelectItem value="5">{t("testManagement.levels.N5")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium">Test Type</label>
+              <label className="text-sm font-medium">{t("testManagement.testType")}</label>
               <Select
                 value={form.testType}
                 onValueChange={(v) =>
@@ -162,24 +164,24 @@ const TestDialog: React.FC<TestDialogProps> = ({
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Chọn loại" />
+                  <SelectValue placeholder={t("testManagement.selectTestType")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="READING_TEST">Reading test</SelectItem>
-                  <SelectItem value="LISTENING_TEST">Listening test</SelectItem>
-                  <SelectItem value="SPEAKING_TEST">Speaking test</SelectItem>
-                  <SelectItem value="MATCH_TEST">Match test</SelectItem>
-                  <SelectItem value="QUIZ_TEST">Quiz test</SelectItem>
-                  <SelectItem value="REVIEW_TEST">Review test</SelectItem>
-                  <SelectItem value="PRACTICE_TEST">Practice test</SelectItem>
+                  <SelectItem value="READING_TEST">{t("testManagement.testTypes.READING_TEST")}</SelectItem>
+                  <SelectItem value="LISTENING_TEST">{t("testManagement.testTypes.LISTENING_TEST")}</SelectItem>
+                  <SelectItem value="SPEAKING_TEST">{t("testManagement.testTypes.SPEAKING_TEST")}</SelectItem>
+                  <SelectItem value="MATCH_TEST">{t("testManagement.testTypes.MATCH_TEST")}</SelectItem>
+                  <SelectItem value="QUIZ_TEST">{t("testManagement.testTypes.QUIZ_TEST")}</SelectItem>
+                  <SelectItem value="REVIEW_TEST">{t("testManagement.testTypes.REVIEW_TEST")}</SelectItem>
+                  <SelectItem value="PRACTICE_TEST">{t("testManagement.testTypes.PRACTICE_TEST")}</SelectItem>
                   <SelectItem value="PLACEMENT_TEST_DONE">
-                    Placement test
+                    {t("testManagement.testTypes.PLACEMENT_TEST_DONE")}
                   </SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium">Status</label>
+              <label className="text-sm font-medium">{t("testManagement.status")}</label>
               <Select
                 value={form.status}
                 onValueChange={(v) =>
@@ -190,7 +192,7 @@ const TestDialog: React.FC<TestDialogProps> = ({
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Chọn trạng thái" />
+                  <SelectValue placeholder={t("testManagement.selectStatus")} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ACTIVE">ACTIVE</SelectItem>
@@ -202,11 +204,11 @@ const TestDialog: React.FC<TestDialogProps> = ({
           </div>
           <div>
             <label className="text-sm font-medium">
-              Giới hạn số lần làm (Limit)
+              {t("testManagement.limit")}
             </label>
             <Input
               type="number"
-              placeholder="Để trống nếu không giới hạn"
+              placeholder={t("testManagement.limitPlaceholder")}
               value={form.limit ?? ""}
               onChange={(e) => {
                 const value = e.target.value;
@@ -218,8 +220,7 @@ const TestDialog: React.FC<TestDialogProps> = ({
               min="0"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Số lần tối đa người dùng có thể làm test này. Để trống nếu không
-              giới hạn.
+              {t("testManagement.limitDescription")}
             </p>
           </div>
           {selectedId && (
@@ -240,13 +241,13 @@ const TestDialog: React.FC<TestDialogProps> = ({
               onClick={onCreateTestSet}
               disabled={!selectedId}
             >
-              Thêm bộ đề
+              {t("testManagement.addTestSet")}
             </Button>
             <Button variant="ghost" onClick={onCancel}>
-              Hủy
+              {t("testManagement.close")}
             </Button>
             <Button onClick={onSave} disabled={isSaving}>
-              {isSaving ? "Đang lưu..." : "Lưu"}
+              {isSaving ? t("testManagement.saving") : t("testManagement.save")}
             </Button>
           </div>
         </div>

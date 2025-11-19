@@ -129,6 +129,8 @@ const geminiService = {
     createGeminiConfigModels: async (data: ICreateGeminiConfigModelsRequest) => {
         return await axiosPrivate.post('/gemini-config/config-models', data);
     },
+
+    
 }
 
 export default geminiService;

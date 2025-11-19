@@ -7,6 +7,7 @@ import PaginationControls from "@ui/PaginationControls";
 import { TestSetEntity } from "@models/testSet/entity";
 import { Select, SelectValue, SelectContent, SelectItem, SelectTrigger } from "@ui/Select";
 import { Switch } from "@ui/Switch";
+import { useTranslation } from "react-i18next";
 import { TestSetListRequest } from "@models/testSet/request";
 
 interface AddTestSetsDialogProps {
@@ -64,17 +65,18 @@ const AddTestSetsDialog: React.FC<AddTestSetsDialogProps> = ({
   onLinkSelected,
   isLinking,
 }) => {
+  const { t } = useTranslation();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl bg-white">
         <DialogHeader>
-          <DialogTitle>Thêm bộ đề vào Test #{selectedId}</DialogTitle>
+          <DialogTitle>{t("testManagement.addTestSetsToTest", { id: selectedId })}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="flex items-center gap-3 flex-wrap">
             <Input
-              placeholder="Tìm kiếm bộ đề..."
+              placeholder={t("testManagement.searchTestSets")}
               value={tsSearch}
               onChange={(e) => {
                 onSearchChange(e.target.value);
@@ -83,7 +85,7 @@ const AddTestSetsDialog: React.FC<AddTestSetsDialogProps> = ({
               className="flex-1"
             />
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium">Cấp độ:</label>
+              <label className="text-sm font-medium">{t("testManagement.levelN")}:</label>
               <Select
                 value={tsLevelN === undefined ? "0" : String(tsLevelN)}
                 onValueChange={(v) => {
@@ -93,20 +95,20 @@ const AddTestSetsDialog: React.FC<AddTestSetsDialogProps> = ({
                 }}
               >
                 <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="Chọn cấp độ" />
+                  <SelectValue placeholder={t("testManagement.selectLevel")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="0">Tất cả cấp</SelectItem>
-                  <SelectItem value="1">N1</SelectItem>
-                  <SelectItem value="2">N2</SelectItem>
-                  <SelectItem value="3">N3</SelectItem>
-                  <SelectItem value="4">N4</SelectItem>
-                  <SelectItem value="5">N5</SelectItem>
+                  <SelectItem value="0">{t("testManagement.allLevels")}</SelectItem>
+                  <SelectItem value="1">{t("testManagement.levels.N1")}</SelectItem>
+                  <SelectItem value="2">{t("testManagement.levels.N2")}</SelectItem>
+                  <SelectItem value="3">{t("testManagement.levels.N3")}</SelectItem>
+                  <SelectItem value="4">{t("testManagement.levels.N4")}</SelectItem>
+                  <SelectItem value="5">{t("testManagement.levels.N5")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium">Loại đề:</label>
+              <label className="text-sm font-medium">{t("testManagement.testType")}:</label>
               <Select
                 value={tsTestType || "all"}
                 onValueChange={(v) => {
@@ -116,23 +118,23 @@ const AddTestSetsDialog: React.FC<AddTestSetsDialogProps> = ({
                 }}
               >
                 <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="Chọn loại" />
+                  <SelectValue placeholder={t("testManagement.selectTestType")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tất cả loại</SelectItem>
-                  <SelectItem value="VOCABULARY">Từ vựng</SelectItem>
-                  <SelectItem value="GRAMMAR">Ngữ pháp</SelectItem>
-                  <SelectItem value="KANJI">Hán tự</SelectItem>
-                  <SelectItem value="LISTENING">Nghe</SelectItem>
-                  <SelectItem value="READING">Đọc</SelectItem>
-                  <SelectItem value="SPEAKING">Nói</SelectItem>
-                  <SelectItem value="GENERAL">Tổng hợp</SelectItem>
-                  <SelectItem value="PLACEMENT_TEST_DONE">Bài test xếp lớp</SelectItem>
+                  <SelectItem value="all">{t("testManagement.allTypes")}</SelectItem>
+                  <SelectItem value="VOCABULARY">{t("testManagement.testSetTypes.VOCABULARY")}</SelectItem>
+                  <SelectItem value="GRAMMAR">{t("testManagement.testSetTypes.GRAMMAR")}</SelectItem>
+                  <SelectItem value="KANJI">{t("testManagement.testSetTypes.KANJI")}</SelectItem>
+                  <SelectItem value="LISTENING">{t("testManagement.testSetTypes.LISTENING")}</SelectItem>
+                  <SelectItem value="READING">{t("testManagement.testSetTypes.READING")}</SelectItem>
+                  <SelectItem value="SPEAKING">{t("testManagement.testSetTypes.SPEAKING")}</SelectItem>
+                  <SelectItem value="GENERAL">{t("testManagement.testSetTypes.GENERAL")}</SelectItem>
+                  <SelectItem value="PLACEMENT_TEST_DONE">{t("testManagement.testSetTypes.PLACEMENT_TEST_DONE")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium">Không có giá:</label>
+              <label className="text-sm font-medium">{t("testManagement.noPrice")}:</label>
               <Switch
                 checked={tsNoPrice === true}
                 onCheckedChange={(checked) => {
@@ -141,17 +143,17 @@ const AddTestSetsDialog: React.FC<AddTestSetsDialogProps> = ({
                 }}
               />
               <span className="text-sm text-muted-foreground">
-                {tsNoPrice === true ? "Có giá" : "Tất cả"}
+                {tsNoPrice === true ? t("testManagement.hasPriceFilter") : t("testManagement.all")}
               </span>
             </div>
           </div>
 
           <div className="border rounded">
             {tsLoading ? (
-              <div className="p-4 text-sm text-gray-500">Đang tải...</div>
+              <div className="p-4 text-sm text-gray-500">{t("testManagement.loading")}</div>
             ) : (tsItems || []).length === 0 ? (
               <div className="p-4 text-sm text-gray-500">
-                Không có bộ đề phù hợp
+                {t("testManagement.noMatchingTestSets")}
               </div>
             ) : (
               <div className="max-h-[50vh] overflow-auto">
@@ -203,13 +205,13 @@ const AddTestSetsDialog: React.FC<AddTestSetsDialogProps> = ({
 
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => onOpenChange(false)}>
-              Đóng
+              {t("testManagement.close")}
             </Button>
             <Button
               onClick={onLinkSelected}
               disabled={selectedTestSetIds.length === 0 || isLinking}
             >
-              {isLinking ? "Đang thêm..." : "Thêm vào Test"}
+              {isLinking ? t("testManagement.linking") : t("testManagement.addToTest")}
             </Button>
           </div>
         </div>
