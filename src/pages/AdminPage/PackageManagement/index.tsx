@@ -3,19 +3,35 @@
 import { useMemo, useState } from "react"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@ui/Card"
 import { Badge } from "@ui/Badge"
-import { Button } from "@ui/Button"
-import { Input } from "@ui/Input"
-import { Package, DollarSign, Users, TrendingUp, Plus, Search, Check, Sparkles, Loader2 } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select"
+import { Package, DollarSign, Users, TrendingUp, Check, Sparkles, Loader2 } from "lucide-react"
 import HeaderAdmin from "@organisms/Header/Admin"
 import { useTranslation } from "react-i18next"
-import { useGetDashboardSubscriptionPlan } from "@hooks/useDashboard"
+import { useGetDashboardRevenue, useGetDashboardSubscriptionPlan } from "@hooks/useDashboard"
+
+const monthOptions = Array.from({ length: 12 }, (_, index) => ({
+    value: index + 1,
+    label: `Tháng ${index + 1}`,
+}));
+
+const buildYearOptions = (currentYear: number, range = 5) =>
+    Array.from({ length: range }, (_, index) => {
+        const year = currentYear - Math.floor(range / 2) + index;
+        return { value: year, label: `${year}` };
+    });
+
+const formatCurrency = (value: number) => value.toLocaleString("vi-VN");
 
 export default function PackageManagement() {
-    const { t } = useTranslation()
-    const [searchQuery, setSearchQuery] = useState("")
+    const { t } = useTranslation();
+    const now = new Date();
+    const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
+    const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+    const yearOptions = useMemo(() => buildYearOptions(now.getFullYear(), 6), [now]);
 
-    const { data: subscriptionStats, isLoading: isSubscriptionLoading } = useGetDashboardSubscriptionPlan()
-
+    const { data: subscriptionStats, isLoading: isSubscriptionLoading } = useGetDashboardSubscriptionPlan();
+    const { data: revenueStats, isLoading: isRevenueLoading } = useGetDashboardRevenue(selectedMonth, selectedYear);
+    console.log(revenueStats);
     const defaultPackages = useMemo(() => [
         {
             id: 1,
@@ -136,20 +152,27 @@ export default function PackageManagement() {
         })
     }, [subscriptionStats])
 
+    const subscriptionPlanMap = useMemo(() => {
+        if (!subscriptionStats) return {}
+        const map: Record<number, { name: string; color: string }> = {}
+        subscriptionStats.plans.forEach((plan) => {
+            const name =
+                getTranslationValue(plan.subscription.nameTranslations, "vi") ??
+                plan.subscription.nameTranslation ??
+                plan.subscription.nameKey
+            map[plan.planId] = {
+                name,
+                color: mapTagToColor(plan.subscription.tagName, plan.type),
+            }
+        })
+        return map
+    }, [subscriptionStats])
+
     const packages = remotePackages ?? defaultPackages
 
-    const filteredPackages = useMemo(() => {
-        if (!searchQuery.trim()) return packages
-        const query = searchQuery.toLowerCase()
-        return packages.filter(
-            (pkg) =>
-                pkg.name.toLowerCase().includes(query) ||
-                pkg.nameEn.toLowerCase().includes(query)
-        )
-    }, [packages, searchQuery])
 
     const packageGridColumns = useMemo(() => {
-        const count = filteredPackages.length
+        const count = packages.length
         if (count >= 4) {
             return "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
         }
@@ -160,13 +183,13 @@ export default function PackageManagement() {
             return "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2"
         }
         return "grid-cols-1 sm:grid-cols-1 lg:grid-cols-1"
-    }, [filteredPackages.length])
+    }, [packages.length])
 
     const stats = useMemo(() => [
         {
             label: "Tổng gói dịch vụ",
             value: remotePackages
-                ? String(subscriptionStats?.totalActivePlans ?? remotePackages.length)
+                ? String(subscriptionStats?.totalActivePlans ?? packages.length)
                 : defaultPackages.length.toString(),
             icon: Package,
             gradient: "from-blue-500/10 to-cyan-500/10",
@@ -176,7 +199,9 @@ export default function PackageManagement() {
         },
         {
             label: "Doanh thu tháng này",
-            value: "125M VND",
+            value: revenueStats
+                ? `${revenueStats.totalRevenue.month.toLocaleString()} VND`
+                : "—",
             icon: DollarSign,
             gradient: "from-green-500/10 to-emerald-500/10",
             iconBg: "bg-green-500/10",
@@ -184,8 +209,10 @@ export default function PackageManagement() {
             borderColor: "border-green-500/20"
         },
         {
-            label: "Tổng người đăng ký",
-            value: "902",
+            label: "Tổng người đăng ký (theo tháng)",
+            value: revenueStats
+                ? String(revenueStats.plans.reduce((sum, plan) => sum + plan.revenue.month.count, 0))
+                : "—",
             icon: Users,
             gradient: "from-purple-500/10 to-pink-500/10",
             iconBg: "bg-purple-500/10",
@@ -193,15 +220,17 @@ export default function PackageManagement() {
             borderColor: "border-purple-500/20"
         },
         {
-            label: "Tăng trưởng",
-            value: "+23%",
+            label: "Doanh thu năm",
+            value: revenueStats
+                ? `${revenueStats.totalRevenue.year.toLocaleString()} VND`
+                : "—",
             icon: TrendingUp,
             gradient: "from-yellow-500/10 to-amber-500/10",
             iconBg: "bg-yellow-500/10",
             iconColor: "text-yellow-500",
             borderColor: "border-yellow-500/20"
         },
-    ], [subscriptionStats, remotePackages, defaultPackages.length])
+    ], [subscriptionStats, packages.length, defaultPackages.length, revenueStats])
 
     const getColorClasses = (color: string) => {
         const colors: Record<string, { bg: string; text: string; border: string; gradient: string }> = {
@@ -263,47 +292,144 @@ export default function PackageManagement() {
                     ))}
                 </div>
 
-                {/* Search & Filters */}
-                <Card className="bg-gradient-to-br from-card via-card to-card/95 border-border shadow-md">
+                {/* Revenue Overview */}
+                <Card className="bg-gradient-to-br from-emerald-500/10 via-card to-card/95 border-emerald-500/20 shadow-lg">
                     <CardHeader className="pb-4">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-primary/10 rounded-lg">
-                                    <Package className="w-5 h-5 text-primary" />
-                                </div>
-                                <CardTitle className="text-xl font-bold text-foreground">Danh sách gói dịch vụ</CardTitle>
+                        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                            <div>
+                                <CardTitle className="text-xl font-bold text-foreground">Doanh thu gói dịch vụ</CardTitle>
+                                <p className="text-sm text-muted-foreground">Theo tháng và tổng năm hiện tại</p>
                             </div>
-                            <Button
-                                className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 shadow-lg"
-                                disabled
-                            >
-                                <Plus className="w-4 h-4 mr-2" />
-                                Tạo gói mới
-                            </Button>
-                        </div>
-                        <div className="flex-1 relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
-                            <Input
-                                type="text"
-                                placeholder="Tìm kiếm gói dịch vụ..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 bg-background border-border text-foreground h-11 shadow-sm focus:shadow-md transition-shadow"
-                            />
+                            <div className="flex flex-wrap gap-3">
+                                <Select
+                                    value={selectedMonth.toString()}
+                                    onValueChange={(value) => setSelectedMonth(Number(value))}
+                                >
+                                    <SelectTrigger className="w-[140px] bg-background border-border text-foreground h-10">
+                                        <SelectValue placeholder="Tháng" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-card border-border">
+                                        {monthOptions.map((option) => (
+                                            <SelectItem key={option.value} value={option.value.toString()}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <Select
+                                    value={selectedYear.toString()}
+                                    onValueChange={(value) => setSelectedYear(Number(value))}
+                                >
+                                    <SelectTrigger className="w-[140px] bg-background border-border text-foreground h-10">
+                                        <SelectValue placeholder="Năm" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-card border-border">
+                                        {yearOptions.map((option) => (
+                                            <SelectItem key={option.value} value={option.value.toString()}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                     </CardHeader>
+                    <CardContent>
+                        {isRevenueLoading ? (
+                            <div className="flex flex-col items-center justify-center py-12">
+                                <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+                                <p className="text-muted-foreground">{t('common.loading')}</p>
+                            </div>
+                        ) : revenueStats ? (
+                            <>
+                                <div className="grid gap-4 md:grid-cols-2">
+                                    <div className="p-4 bg-white/70 rounded-xl border border-emerald-200 shadow-sm">
+                                        <p className="text-sm text-muted-foreground font-medium">Doanh thu tháng</p>
+                                        <p className="text-2xl font-bold text-foreground mt-1">
+                                            {formatCurrency(revenueStats.totalRevenue.month)} VND
+                                        </p>
+                                    </div>
+                                    <div className="p-4 bg-white/70 rounded-xl border border-emerald-200 shadow-sm">
+                                        <p className="text-sm text-muted-foreground font-medium">Doanh thu năm</p>
+                                        <p className="text-2xl font-bold text-foreground mt-1">
+                                            {formatCurrency(revenueStats.totalRevenue.year)} VND
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="mt-6 space-y-4">
+                                    {revenueStats.plans.map((plan) => {
+                                        const planInfo = subscriptionPlanMap[plan.planId]
+                                        const colorClasses = getColorClasses(planInfo?.color || "blue")
+                                        return (
+                                            <Card key={plan.planId} className="border border-border/60 bg-card/90">
+                                                <CardContent className="p-4 space-y-4">
+                                                    <div className="flex flex-wrap items-center justify-between gap-3">
+                                                        <div>
+                                                            <p className="text-base font-semibold text-foreground">
+                                                                {planInfo?.name ?? `Plan #${plan.planId}`}
+                                                            </p>
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {plan.type === "LIFETIME"
+                                                                    ? "Trọn đời"
+                                                                    : plan.durationInDays
+                                                                        ? `${plan.durationInDays} ngày`
+                                                                        : "Không xác định"}
+                                                            </p>
+                                                        </div>
+                                                        <Badge className={`px-3 py-1 ${colorClasses.bg} ${colorClasses.text}`}>
+                                                            {plan.subscription.tagName}
+                                                        </Badge>
+                                                    </div>
+                                                    <div className="grid gap-3 sm:grid-cols-2">
+                                                        <div className="p-3 rounded-lg border border-border/50 bg-muted/30">
+                                                            <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                                                                Doanh thu tháng
+                                                            </p>
+                                                            <p className="text-lg font-semibold text-foreground">
+                                                                {formatCurrency(plan.revenue.month.total)} VND
+                                                            </p>
+                                                            <p className="text-xs text-muted-foreground">
+                                                                {plan.revenue.month.count} lượt mua
+                                                            </p>
+                                                        </div>
+                                                        <div className="p-3 rounded-lg border border-border/50 bg-muted/30">
+                                                            <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                                                                Doanh thu năm
+                                                            </p>
+                                                            <p className="text-lg font-semibold text-foreground">
+                                                                {formatCurrency(plan.revenue.year.total)} VND
+                                                            </p>
+                                                            <p className="text-xs text-muted-foreground">
+                                                                {plan.revenue.year.count} lượt mua
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </CardContent>
+                                            </Card>
+                                        )
+                                    })}
+                                </div>
+                            </>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center py-12 text-center gap-3">
+                                <Sparkles className="w-10 h-10 text-muted-foreground" />
+                                <p className="text-muted-foreground font-medium">Chưa có dữ liệu doanh thu</p>
+                            </div>
+                        )}
+                    </CardContent>
                 </Card>
 
                 {/* Packages Grid */}
                 <div className="w-full pb-16">
                     <div className={`grid ${packageGridColumns} gap-6 justify-items-center max-w-6xl mx-auto`}>
-                        {isSubscriptionLoading && !remotePackages ? (
+                        {isSubscriptionLoading && !packages ? (
                             <div className="col-span-full flex flex-col items-center justify-center py-16">
                                 <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
                                 <p className="text-muted-foreground">{t('common.loading')}</p>
                             </div>
-                        ) : filteredPackages.length > 0 ? (
-                            filteredPackages.map((pkg) => {
+                        ) : packages.length > 0 ? (
+                            packages.map((pkg) => {
                                 const colorClasses = getColorClasses(pkg.color)
                                 return (
                                     <Card
