@@ -13,6 +13,7 @@ import { ArrowUpDown, BookOpenCheck, ChevronDown, ChevronUp, RefreshCcw } from "
 import { useGrammarList } from "@hooks/useGrammar";
 import { useDebounce } from "@hooks/useDebounce";
 import { formatDateTime } from "@utils/date";
+import HeaderAdmin from "@organisms/Header/Admin";
 
 type GrammarLevelValue = "all" | "N5" | "N4" | "N3" | "N2" | "N1";
 
@@ -48,6 +49,8 @@ const LEVEL_BADGE_STYLES: Record<string, string> = {
     N1: "bg-purple-100 text-purple-700 border-purple-200",
 };
 
+type SortColumn = "level" | "createdAt" | "updatedAt";
+
 const GrammarManagementPage = () => {
     const { t } = useTranslation();
     const [searchValue, setSearchValue] = useState("");
@@ -55,14 +58,14 @@ const GrammarManagementPage = () => {
     const [page, setPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [selectedLevel, setSelectedLevel] = useState<GrammarLevelValue>("all");
-    const [sortBy, setSortBy] = useState<"createdAt" | "updatedAt">("createdAt");
+    const [sortBy, setSortBy] = useState<SortColumn>("createdAt");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
     const { data, isLoading, isFetching, error, refetch } = useGrammarList({
         page,
         limit: itemsPerPage,
         search: debouncedSearchValue || undefined,
-        levelN: selectedLevel === "all" ? undefined : Number(selectedLevel.replace("N", "")),
+        level: selectedLevel === "all" ? undefined : selectedLevel,
         sortBy,
         sort: sortDirection,
     });
@@ -90,7 +93,7 @@ const GrammarManagementPage = () => {
         setPage(1);
     };
 
-    const handleSort = (columnKey: "createdAt" | "updatedAt") => {
+    const handleSort = (columnKey: SortColumn) => {
         if (sortBy === columnKey) {
             setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
         } else {
@@ -104,7 +107,7 @@ const GrammarManagementPage = () => {
         void refetch?.();
     };
 
-    const renderSortIcon = (columnKey: "createdAt" | "updatedAt") => {
+    const renderSortIcon = (columnKey: SortColumn) => {
         if (sortBy !== columnKey) {
             return <ArrowUpDown className="h-4 w-4 text-muted-foreground" />;
         }
@@ -158,159 +161,166 @@ const GrammarManagementPage = () => {
     );
 
     return (
-        <div className="min-h-screen bg-muted/20 p-6 md:p-10 space-y-6">
-            <div className="space-y-2">
-                <h1 className="text-3xl font-bold text-foreground">{t("managerGrammar.title")}</h1>
-                <p className="text-muted-foreground">{t("managerGrammar.description")}</p>
-            </div>
+        <>
+            <HeaderAdmin title={t("managerGrammar.title")} description={t("managerGrammar.description")} />
+            <div className="p-8 mt-24 space-y-8">
+                <Card className="bg-white shadow-lg">
+                    <CardHeader className="pb-0 space-y-6">
+                        <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
+                            <Input
+                                value={searchValue}
+                                onChange={(event) => {
+                                    setSearchValue(event.target.value);
+                                    setPage(1);
+                                }}
+                                placeholder={t("managerGrammar.searchPlaceholder")}
+                                isSearch
+                                className="placeholder:text-muted-foreground"
+                            />
 
-            <Card className="border-border shadow-sm">
-                <CardHeader className="space-y-4">
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
-                        <Input
-                            value={searchValue}
-                            onChange={(event) => {
-                                setSearchValue(event.target.value);
-                                setPage(1);
-                            }}
-                            placeholder={t("managerGrammar.searchPlaceholder")}
-                            isSearch
-                            className="placeholder:text-muted-foreground"
-                        />
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-end">
+                                <div className="flex flex-col gap-2">
+                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                        {t("managerGrammar.levelLabel")}
+                                    </span>
+                                    <Select value={selectedLevel} onValueChange={handleLevelChange}>
+                                        <SelectTrigger className="w-full sm:w-48 bg-background border-border">
+                                            <SelectValue placeholder={t("managerGrammar.allLevels")} />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-card border-border">
+                                            {levelOptions.map((option) => (
+                                                <SelectItem key={option} value={option}>
+                                                    {option === "all" ? t("managerGrammar.allLevels") : option}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
 
-                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
-                            <div className="flex flex-col gap-2">
-                                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                                    {t("managerGrammar.levelLabel")}
-                                </span>
-                                <Select value={selectedLevel} onValueChange={handleLevelChange}>
-                                    <SelectTrigger className="w-full sm:w-48 bg-background border-border">
-                                        <SelectValue placeholder={t("managerGrammar.allLevels")} />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-card border-border">
-                                        {levelOptions.map((option) => (
-                                            <SelectItem key={option} value={option}>
-                                                {option === "all" ? t("managerGrammar.allLevels") : option}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-full sm:w-auto"
+                                    onClick={refreshList}
+                                    disabled={isFetching}
+                                >
+                                    <RefreshCcw className={`mr-2 h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
+                                    {t("managerGrammar.refresh")}
+                                </Button>
                             </div>
-
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                className="mt-2 sm:mt-6"
-                                onClick={refreshList}
-                                disabled={isFetching}
-                            >
-                                <RefreshCcw className={`mr-2 h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
-                                {t("managerGrammar.refresh")}
-                            </Button>
                         </div>
-                    </div>
 
-                    <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                        <div className="inline-flex items-center gap-2">
-                            <BookOpenCheck className="h-4 w-4 text-primary" />
-                            <span>{t("managerGrammar.totalItems", { count: totalItems })}</span>
-                        </div>
-                        <Badge variant="outline" className="border-dashed text-muted-foreground">
-                            {t("managerGrammar.pageStat", {
-                                current: pagination.current ?? page,
-                                total: pagination.totalPage ?? 1,
-                            })}
-                        </Badge>
-                    </div>
-                </CardHeader>
-
-                <CardContent className="space-y-4">
-                    {error ? (
-                        <Alert variant="destructive">
-                            <AlertTitle>{t("common.error")}</AlertTitle>
-                            <AlertDescription>{errorMessage}</AlertDescription>
-                        </Alert>
-                    ) : null}
-
-                    <div className="rounded-lg border border-border bg-card overflow-hidden">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>{t("managerGrammar.columns.structure")}</TableHead>
-                                    <TableHead className="w-32">{t("managerGrammar.columns.level")}</TableHead>
-                                    <TableHead>
-                                        <button
-                                            type="button"
-                                            className="inline-flex items-center gap-2 font-medium text-muted-foreground hover:text-foreground"
-                                            onClick={() => handleSort("createdAt")}
-                                        >
-                                            {t("managerGrammar.columns.createdAt")}
-                                            {renderSortIcon("createdAt")}
-                                        </button>
-                                    </TableHead>
-                                    <TableHead>
-                                        <button
-                                            type="button"
-                                            className="inline-flex items-center gap-2 font-medium text-muted-foreground hover:text-foreground"
-                                            onClick={() => handleSort("updatedAt")}
-                                        >
-                                            {t("managerGrammar.columns.updatedAt")}
-                                            {renderSortIcon("updatedAt")}
-                                        </button>
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
-
-                            {tableIsLoading ? (
-                                <SkeletonRows />
-                            ) : (
-                                <TableBody>
-                                    {grammars.map((grammar) => {
-                                        const levelLabel = getLevelLabel(grammar);
-                                        return (
-                                            <TableRow key={grammar.id}>
-                                                <TableCell className="font-semibold text-foreground">
-                                                    {grammar.structure || grammar.title || "—"}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Badge className={getLevelClassName(levelLabel)}>{levelLabel}</Badge>
-                                                </TableCell>
-                                                <TableCell>{formatDateTime(grammar.createdAt)}</TableCell>
-                                                <TableCell>{formatDateTime(grammar.updatedAt)}</TableCell>
-                                            </TableRow>
-                                        );
-                                    })}
-                                </TableBody>
-                            )}
-                        </Table>
-
-                        {showEmptyState ? (
-                            <div className="py-12 text-center space-y-2">
-                                <p className="text-lg font-semibold text-foreground">
-                                    {t("managerGrammar.emptyState.title")}
-                                </p>
-                                <p className="text-sm text-muted-foreground">
-                                    {t("managerGrammar.emptyState.subtitle")}
-                                </p>
+                        <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                            <div className="inline-flex items-center gap-2">
+                                <BookOpenCheck className="h-4 w-4 text-primary" />
+                                <span>{t("managerGrammar.totalItems", { count: totalItems })}</span>
                             </div>
+                            <Badge variant="outline" className="border-dashed text-muted-foreground">
+                                {t("managerGrammar.pageStat", {
+                                    current: pagination.current ?? page,
+                                    total: pagination.totalPage ?? 1,
+                                })}
+                            </Badge>
+                        </div>
+                    </CardHeader>
+
+                    <CardContent className="mt-6 space-y-4">
+                        {error ? (
+                            <Alert variant="destructive">
+                                <AlertTitle>{t("common.error")}</AlertTitle>
+                                <AlertDescription>{errorMessage}</AlertDescription>
+                            </Alert>
                         ) : null}
-                    </div>
-                </CardContent>
 
-                <CardFooter className="flex flex-col gap-4">
-                    <PaginationControls
-                        currentPage={pagination.current ?? page}
-                        totalPages={pagination.totalPage ?? 1}
-                        totalItems={totalItems}
-                        itemsPerPage={pagination.pageSize ?? itemsPerPage}
-                        onPageChange={setPage}
-                        onItemsPerPageChange={handleItemsPerPageChange}
-                        isLoading={tableIsLoading}
-                    />
-                </CardFooter>
-            </Card>
-        </div>
+                        <div className="rounded-lg border border-border bg-card overflow-hidden">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>{t("managerGrammar.columns.structure")}</TableHead>
+                                        <TableHead className="w-32">
+                                            <button
+                                                type="button"
+                                                className="inline-flex items-center gap-2 font-medium text-muted-foreground hover:text-foreground"
+                                                onClick={() => handleSort("level")}
+                                            >
+                                                {t("managerGrammar.columns.level")}
+                                                {renderSortIcon("level")}
+                                            </button>
+                                        </TableHead>
+                                        <TableHead>
+                                            <button
+                                                type="button"
+                                                className="inline-flex items-center gap-2 font-medium text-muted-foreground hover:text-foreground"
+                                                onClick={() => handleSort("createdAt")}
+                                            >
+                                                {t("managerGrammar.columns.createdAt")}
+                                                {renderSortIcon("createdAt")}
+                                            </button>
+                                        </TableHead>
+                                        <TableHead>
+                                            <button
+                                                type="button"
+                                                className="inline-flex items-center gap-2 font-medium text-muted-foreground hover:text-foreground"
+                                                onClick={() => handleSort("updatedAt")}
+                                            >
+                                                {t("managerGrammar.columns.updatedAt")}
+                                                {renderSortIcon("updatedAt")}
+                                            </button>
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+
+                                {tableIsLoading ? (
+                                    <SkeletonRows />
+                                ) : (
+                                    <TableBody>
+                                        {grammars.map((grammar) => {
+                                            const levelLabel = getLevelLabel(grammar);
+                                            return (
+                                                <TableRow key={grammar.id}>
+                                                    <TableCell className="font-semibold text-foreground">
+                                                        {grammar.structure || grammar.title || "—"}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Badge className={getLevelClassName(levelLabel)}>{levelLabel}</Badge>
+                                                    </TableCell>
+                                                    <TableCell>{formatDateTime(grammar.createdAt)}</TableCell>
+                                                    <TableCell>{formatDateTime(grammar.updatedAt)}</TableCell>
+                                                </TableRow>
+                                            );
+                                        })}
+                                    </TableBody>
+                                )}
+                            </Table>
+
+                            {showEmptyState ? (
+                                <div className="py-12 text-center space-y-2">
+                                    <p className="text-lg font-semibold text-foreground">
+                                        {t("managerGrammar.emptyState.title")}
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                        {t("managerGrammar.emptyState.subtitle")}
+                                    </p>
+                                </div>
+                            ) : null}
+                        </div>
+                    </CardContent>
+
+                    <CardFooter className="flex flex-col gap-4">
+                        <PaginationControls
+                            currentPage={pagination.current ?? page}
+                            totalPages={pagination.totalPage ?? 1}
+                            totalItems={totalItems}
+                            itemsPerPage={pagination.pageSize ?? itemsPerPage}
+                            onPageChange={setPage}
+                            onItemsPerPageChange={handleItemsPerPageChange}
+                            isLoading={tableIsLoading}
+                        />
+                    </CardFooter>
+                </Card>
+            </div>
+        </>
     );
 };
 

@@ -11,9 +11,11 @@ import { toast } from "react-toastify";
  * @param params
  * @returns
  */
-export const useGrammarList = (params: IQueryRequest & { enabled?: boolean; dialogKey?: number }) => {
+export const useGrammarList = (params: IQueryRequest & { level?: string; levelN?: number; enabled?: boolean; dialogKey?: number }) => {
   const language = useSelector(selectCurrentLanguage);
-  const { page, limit, search, levelN, sortBy, sort, enabled = true, dialogKey, lessonId } = params;
+  const { page, limit, search, level, levelN, sortBy, sort, enabled = true, dialogKey, lessonId } = params;
+
+  const resolvedLevel = level ?? (typeof levelN === "number" ? `N${levelN}` : undefined);
 
   const queryResult = useQuery({
     queryKey: [
@@ -21,14 +23,14 @@ export const useGrammarList = (params: IQueryRequest & { enabled?: boolean; dial
       page,
       limit,
       search,
-      levelN,
+      resolvedLevel,
       sortBy,
       sort,
       language,
       dialogKey,
       lessonId,
     ],
-    queryFn: () => grammarService.getAllGrammars(params),
+    queryFn: () => grammarService.getAllGrammars({ ...params, level: resolvedLevel }),
     enabled,
   });
 
