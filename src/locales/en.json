@@ -283,6 +283,7 @@
         "test": "Test Management",
         "configAI": "Config AI",
         "customAI": "Custom AI",
+        "aiService": "Service Config",
         "grammar": "Grammar Management"
     },
     "aiCommon": {
@@ -1276,6 +1277,34 @@
             "N3": "N3",
             "N4": "N4",
             "N5": "N5"
+        }
+    },
+    "aiService": {
+        "title": "Service Config Management",
+        "description": "Manage AI service configurations",
+        "addNew": "Add New",
+        "createServiceConfig": "Create Service Config",
+        "serviceType": "Service Type",
+        "selectServiceType": "Select service type",
+        "geminiConfigId": "Gemini Config",
+        "selectGeminiConfig": "Select Gemini Config",
+        "isDefault": "Default",
+        "isActive": "Active",
+        "loading": "Loading...",
+        "noServiceConfigs": "No service configs found",
+        "createSuccess": "Service config created successfully",
+        "createError": "An error occurred while creating service config",
+        "serviceTypes": {
+            "PERSONALIZED_RECOMMENDATIONS": "Personalized Recommendations",
+            "AI_KAIWA": "AI Conversation"
+        },
+        "columns": {
+            "id": "ID",
+            "serviceType": "Service Type",
+            "geminiConfig": "Gemini Config",
+            "isDefault": "Default",
+            "isActive": "Status",
+            "createdAt": "Created At"
         }
     }
 }

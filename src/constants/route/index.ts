@@ -29,6 +29,7 @@ const ADMIN = {
     AI_PROMPTS_MANAGEMENT: '/admin/ai-prompts-management',
     CUSTOM_AI_MANAGEMENT: '/admin/custom-ai-management',
     CUSTOM_AI_MANAGEMENT_DETAIL: '/admin/custom-ai-management/:modelId',
+    AI_SERVICE_MANAGEMENT: '/admin/ai-service-management',
     DAILY_QUEST_MANAGEMENT: '/admin/daily-quest-management',
     REWARD_MANAGEMENT: '/admin/reward-management',
     PERMISSION_MANAGEMENT: '/admin/permission-management',

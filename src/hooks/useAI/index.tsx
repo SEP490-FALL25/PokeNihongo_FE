@@ -5,6 +5,7 @@ import geminiService from "@services/ai";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 //--------------------------------------Config Prompts--------------------------------------//
 /**
@@ -304,14 +305,15 @@ export const useGetServiceConfigs = () => {
  */
 export const useCreateServiceConfig = () => {
     const queryClient = useQueryClient();
+    const { t } = useTranslation();
     const createServiceConfigMutation = useMutation({
         mutationFn: (data: ICreateServiceConfigRequest) => geminiService.createServiceConfig(data),
         onSuccess: (data: any) => {
             queryClient.invalidateQueries({ queryKey: ['gemini-service-configs'] });
-            toast.success(data?.message || 'Tạo service config thành công');
+            toast.success(data?.message || t('aiService.createSuccess'));
         },
         onError: (error: any) => {
-            toast.error(error?.response?.data?.message || 'Có lỗi xảy ra khi tạo service config');
+            toast.error(error?.response?.data?.message || t('aiService.createError'));
         },
     });
     return createServiceConfigMutation;
