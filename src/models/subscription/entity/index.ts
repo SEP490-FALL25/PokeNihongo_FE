@@ -47,6 +47,11 @@ export const DashboardSubscriptionPlanEntitySchema = z.object({
 /**
  * Dashboard Revenue Entity Schema
  */
+const RevenueSummarySchema = z.object({
+    total: z.number(),
+    count: z.number(),
+})
+
 export const DashboardRevenueEntitySchema = z.object({
     period: z.object({
         month: z.number(),
@@ -69,14 +74,8 @@ export const DashboardRevenueEntitySchema = z.object({
         price: z.number(),
         type: z.enum(SUBSCRIPTION.SUBSCRIPTION_TYPE),
         revenue: z.object({
-            month: z.object({
-                total: z.number(),
-                count: z.number(),
-            }),
-            year: z.object({
-                total: z.number(),
-                count: z.number(),
-            }),
+            month: RevenueSummarySchema,
+            year: RevenueSummarySchema,
         }),
     })),
 })

@@ -5,7 +5,9 @@ const dashboardService = {
         return axiosPrivate.get('/dashboard/subscription-stats');
     },
     getDashboardRevenue: async (month: number, year: number) => {
-        return axiosPrivate.get(`dashboard/subscription-stats/revennue?month=${month}&year=${year}`);
+        return axiosPrivate.get('/dashboard/subscription-stats/revennue', {
+            params: { month, year },
+        });
     },
 }
 
