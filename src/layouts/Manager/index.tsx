@@ -1,15 +1,13 @@
 import { Outlet, useLocation, NavLink, useNavigate } from "react-router-dom";
-import { BookOpen, Languages, LogOut, Menu, FileText, Layers, Book, Settings } from "lucide-react";
-import { useMemo, useState } from "react";
+import { BookOpen, Languages, LogOut, Menu, FileText, Layers, Book, Settings, BookOpenCheck } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@ui/Button";
 import { cn } from "@utils/CN";
 import { ROUTES } from "@constants/route";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../../components/Atoms/LanguageSwitcher";
 import { CookiesService } from "@utils/cookies";
-import { COOKIES, ROLE_ID } from "@constants/common";
-import { decodeJWT } from "@utils/token";
-import NotFoundPage from "@pages/NotFoundPage";
+import { COOKIES } from "@constants/common";
 
 interface NavigationItem {
     name: string;
@@ -33,6 +31,11 @@ const ManagerLayout = () => {
             name: t("navigation.questionBank"),
             href: ROUTES.MANAGER.QUESTION_BANK,
             icon: FileText,
+        },
+        {
+            name: t("navigation.grammar"),
+            href: ROUTES.MANAGER.GRAMMAR_MANAGEMENT,
+            icon: BookOpenCheck,
         },
         {
             name: t("navigation.testSets"),
@@ -60,17 +63,6 @@ const ManagerLayout = () => {
     }
     //-----------------------End--------------------//
 
-
-    /**
-     * Handle check role
-     */
-    //TODO: Remove this after testing
-    // const isManager = useMemo(() => decodeJWT()?.roleId === ROLE_ID.MANAGER, []);
-    // if (!isManager) {
-    //     CookiesService.remove(COOKIES.ACCESS_TOKEN);
-    //     return <NotFoundPage />;
-    // }
-    //-----------------------End--------------------//
 
     return (
         <div className="flex h-screen">

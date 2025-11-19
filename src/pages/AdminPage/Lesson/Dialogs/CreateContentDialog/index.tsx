@@ -134,11 +134,18 @@ const CreateContentDialog = ({
     lessonId: lessonId,
   });
 
+  const normalizedGrammarLevel =
+    selectedLevel === "all"
+      ? undefined
+      : selectedLevel.startsWith("N")
+        ? selectedLevel
+        : `N${selectedLevel}`;
+
   const { data: grammars, isLoading: grammarLoading } = useGrammarList({
     currentPage: page,
     pageSize: itemsPerPage,
     search: searchQuery || undefined,
-    level: selectedLevel === "all" ? undefined : parseInt(selectedLevel),
+    level: normalizedGrammarLevel,
     sortBy: "createdAt",
     sort: "desc",
     enabled: shouldFetch && contentType === QUESTION_TYPE.GRAMMAR,
@@ -415,11 +422,10 @@ const CreateContentDialog = ({
         return (
           <div
             key={vocab.id}
-            className={`flex items-center gap-4 p-3 rounded-lg border transition-colors ${
-              isSelected
+            className={`flex items-center gap-4 p-3 rounded-lg border transition-colors ${isSelected
                 ? "bg-primary/10 border-primary/20"
                 : "bg-background border-border hover:bg-muted/50"
-            }`}
+              }`}
             role="button"
             onClick={() => handleItemToggle(vocab.id)}
           >
@@ -466,11 +472,10 @@ const CreateContentDialog = ({
         return (
           <div
             key={grammar.id}
-            className={`flex items-center gap-4 p-3 rounded-lg border transition-colors ${
-              isSelected
+            className={`flex items-center gap-4 p-3 rounded-lg border transition-colors ${isSelected
                 ? "bg-primary/10 border-primary/20"
                 : "bg-background border-border hover:bg-muted/50"
-            }`}
+              }`}
             role="button"
             onClick={() => handleItemToggle(grammar.id)}
           >
@@ -500,11 +505,10 @@ const CreateContentDialog = ({
         return (
           <div
             key={kanji.id}
-            className={`flex items-center gap-4 p-3 rounded-lg border transition-colors ${
-              isSelected
+            className={`flex items-center gap-4 p-3 rounded-lg border transition-colors ${isSelected
                 ? "bg-primary/10 border-primary/20"
                 : "bg-background border-border hover:bg-muted/50"
-            }`}
+              }`}
             role="button"
             onClick={() => handleItemToggle(kanji.id)}
           >
@@ -571,10 +575,10 @@ const CreateContentDialog = ({
         contentType === QUESTION_TYPE.VOCABULARY
           ? "vocabulary"
           : contentType === QUESTION_TYPE.GRAMMAR
-          ? "grammar"
-          : contentType === QUESTION_TYPE.KANJI
-          ? "kanji"
-          : "content";
+            ? "grammar"
+            : contentType === QUESTION_TYPE.KANJI
+              ? "kanji"
+              : "content";
       toast.error(`Please select at least one ${contentTypeLabel}`);
       return;
     }
@@ -597,10 +601,10 @@ const CreateContentDialog = ({
         contentType === QUESTION_TYPE.VOCABULARY
           ? "vocabulary"
           : contentType === QUESTION_TYPE.GRAMMAR
-          ? "grammar"
-          : contentType === QUESTION_TYPE.KANJI
-          ? "kanji"
-          : "content";
+            ? "grammar"
+            : contentType === QUESTION_TYPE.KANJI
+              ? "kanji"
+              : "content";
       console.log(`Adding ${contentTypeLabel} to lesson:`, selectedItems);
 
       // Call the callback to refresh parent component
@@ -617,10 +621,10 @@ const CreateContentDialog = ({
         contentType === QUESTION_TYPE.VOCABULARY
           ? "vocabulary"
           : contentType === QUESTION_TYPE.GRAMMAR
-          ? "grammar"
-          : contentType === QUESTION_TYPE.KANJI
-          ? "kanji"
-          : "content";
+            ? "grammar"
+            : contentType === QUESTION_TYPE.KANJI
+              ? "kanji"
+              : "content";
       console.error(`Error adding ${contentTypeLabel}:`, error);
       toast.error(`Failed to add ${contentTypeLabel} to lesson`);
     } finally {

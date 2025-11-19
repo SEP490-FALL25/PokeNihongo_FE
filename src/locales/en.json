@@ -282,7 +282,8 @@
         "permissionManagement": "Permission Management",
         "test": "Test Management",
         "configAI": "Config AI",
-        "customAI": "Custom AI"
+        "customAI": "Custom AI",
+        "grammar": "Grammar Management"
     },
     "aiCommon": {
         "inSystem": "In system",
@@ -830,6 +831,68 @@
         "vocabularyN5": "Vocabulary N5",
         "vocabularyN4": "Vocabulary N4",
         "vocabularyN3": "Vocabulary N3"
+    },
+    "managerGrammar": {
+        "title": "Grammar Library",
+        "description": "Review and curate grammar patterns used across lessons.",
+        "createButton": "Add grammar",
+        "searchPlaceholder": "Search grammar structures...",
+        "levelLabel": "JLPT level",
+        "allLevels": "All levels",
+        "refresh": "Refresh",
+        "totalItems": "{{count}} grammar items",
+        "pageStat": "Page {{current}} / {{total}}",
+        "fallbackError": "Unable to load grammar list. Please try again.",
+        "columns": {
+            "structure": "Structure",
+            "level": "Level",
+            "createdAt": "Created at",
+            "updatedAt": "Updated at"
+        },
+        "emptyState": {
+            "title": "No grammar found",
+            "subtitle": "Try adjusting the filters or add a new grammar item."
+        }
+    },
+    "createGrammar": {
+        "title": "Create Grammar Pattern",
+        "description": "Document a new grammar structure with multilingual explanations.",
+        "requiredHint": "Fields marked with * are required.",
+        "quickGuideTitle": "Quick guide",
+        "quickGuideDescription": "1) Fill the Japanese structure and example. 2) Pick the JLPT level. 3) For each language, provide an explanation and a usage example. You can collapse the language cards to stay focused.",
+        "basicInfo": "Basic information",
+        "structureLabel": "Structure",
+        "structurePlaceholder": "e.g. 〜ているところだ",
+        "structureHint": "Use the exact grammar form that will appear in lessons.",
+        "levelLabel": "JLPT level",
+        "levelPlaceholder": "Select JLPT level",
+        "levelHint": "Choose the closest proficiency level where this grammar is taught.",
+        "exampleLabel": "Example sentence (JP)",
+        "examplePlaceholder": "例：宿題をしているところだ。",
+        "exampleHint": "Provide a short Japanese sentence showing the grammar in context.",
+        "translations": "Usage explanations",
+        "translationHint": "Add explanations and sample sentences for each language.",
+        "translationPanelTitle": "{{language}} explanation",
+        "translationLanguage": "Language",
+        "languagePlaceholder": "Select language",
+        "languageHint": "Pick which audience will see this explanation.",
+        "translationExplanation": "Explanation",
+        "translationExplanationPlaceholder": "Explain how to use this grammar point...",
+        "translationExplanationHint": "Describe the nuance or constraints in this language.",
+        "translationExample": "Example",
+        "translationExamplePlaceholder": "Provide a sample sentence in the selected language...",
+        "translationExampleHint": "Keep the sentence short and highlight the grammar usage.",
+        "addUsage": "Add translation",
+        "removeUsage": "Remove",
+        "submit": "Create grammar",
+        "submitting": "Creating...",
+        "cancel": "Back to list",
+        "success": "Grammar entry created successfully",
+        "languages": {
+            "vi": "Vietnamese",
+            "en": "English",
+            "ja": "Japanese"
+        }
     },
     "pokemon": {
         "title": "Pokémon Management",

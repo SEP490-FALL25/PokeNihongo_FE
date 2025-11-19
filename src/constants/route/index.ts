@@ -41,6 +41,7 @@ const ADMIN = {
 const MANAGER = {
     ROOT: '/manager/lessons/management',
     VOCABULARY: '/manager/vocabulary',
+    GRAMMAR_MANAGEMENT: '/manager/grammar-management',
     QUESTION_BANK: '/manager/question-bank',
     TESTSET_MANAGEMENT: '/manager/testset-management',
     TESTSET_SPEAKING_MANAGEMENT: '/manager/testset-speaking',
