@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@ui/Button";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card";
 import { Skeleton } from "@ui/Skeleton";
-import { Badge } from "@ui/Badge";
-import { FileText, Plus, Loader2, Sparkles, CheckCircle2, Clock, Target } from "lucide-react";
+import { FileText, Plus, Loader2, Sparkles } from "lucide-react";
 import HeaderAdmin from "@organisms/Header/Admin";
 import PaginationControls from "@ui/PaginationControls";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import { TestCreateRequest } from "@models/test/request";
 import {
   useCreateTest,
@@ -26,6 +26,7 @@ import TestDialog from "./components/TestDialog";
 import AddTestSetsDialog from "./components/AddTestSetsDialog";
 
 const TestManagement: React.FC = () => {
+  const { t } = useTranslation();
   const {
     tests,
     isLoading,
@@ -43,7 +44,7 @@ const TestManagement: React.FC = () => {
   const [isAddTestSetsOpen, setIsAddTestSetsOpen] = useState(false);
   const [selectedLinkedIds, setSelectedLinkedIds] = useState<number[]>([]);
   const [selectedTestSetIds, setSelectedTestSetIds] = useState<number[]>([]);
-  
+
   // Test service hooks
   const createTestMutation = useCreateTest();
   const updateTestMutation = useUpdateTest();
@@ -153,7 +154,7 @@ const TestManagement: React.FC = () => {
 
   const handleRemoveSelectedLinked = () => {
     if (selectedLinkedIds.length === 0 || !selectedId) {
-      toast.error("Hãy chọn ít nhất một bộ đề để xóa");
+      toast.error(t("testManagement.selectAtLeastOneToDelete"));
       return;
     }
     deleteLinkedTestSetsMutation.mutate(
@@ -212,10 +213,10 @@ const TestManagement: React.FC = () => {
   };
 
   // Add testSets dialog state
-  const [tsSearch, setTsSearch] = useState("");
-  const [tsPage, setTsPage] = useState(1);
-  const [tsPageSize, setTsPageSize] = useState(15);
-  const [tsForceKey, setTsForceKey] = useState(0);
+  const [tsSearch, setTsSearch] = useState<string>("");
+  const [tsPage, setTsPage] = useState<number>(1);
+  const [tsPageSize, setTsPageSize] = useState<number>(15);
+  const [tsForceKey, setTsForceKey] = useState<number>(0);
   const [tsLevelN, setTsLevelN] = useState<number | undefined>(undefined);
   const [tsTestType, setTsTestType] = useState<TestSetListRequest["testType"]>(undefined);
   const [tsNoPrice, setTsNoPrice] = useState<boolean | undefined>(undefined);
@@ -255,7 +256,7 @@ const TestManagement: React.FC = () => {
 
   const handleLinkSelected = () => {
     if (!selectedId || selectedTestSetIds.length === 0) {
-      toast.error("Hãy chọn ít nhất một bộ đề");
+      toast.error(t("testManagement.selectAtLeastOne"));
       return;
     }
     linkTestSetsMutation.mutate(
@@ -276,8 +277,8 @@ const TestManagement: React.FC = () => {
   return (
     <>
       <HeaderAdmin
-        title="Quản lý Test"
-        description="Quản lý các bài kiểm tra"
+        title={t("testManagement.title")}
+        description={t("testManagement.description")}
       />
 
       <div className="p-8 mt-24 space-y-8">
@@ -288,7 +289,7 @@ const TestManagement: React.FC = () => {
                 <div className="p-2 bg-primary/10 rounded-lg">
                   <FileText className="w-5 h-5 text-primary" />
                 </div>
-                <CardTitle className="text-xl font-bold text-foreground">Quản lý Test</CardTitle>
+                <CardTitle className="text-xl font-bold text-foreground">{t("testManagement.title")}</CardTitle>
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -301,21 +302,21 @@ const TestManagement: React.FC = () => {
                   {autoAddFreeTestSetsMutation.isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Đang thêm...
+                      {t("testManagement.adding")}
                     </>
                   ) : (
                     <>
                       <Sparkles className="h-4 w-4 mr-2" />
-                      Tự động thêm TestSet miễn phí
+                      {t("testManagement.autoAddFreeTestSets")}
                     </>
                   )}
                 </Button>
-                <Button 
+                <Button
                   onClick={openCreate}
                   className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 shadow-lg"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Thêm mới
+                  {t("testManagement.addNew")}
                 </Button>
               </div>
             </div>
@@ -355,7 +356,7 @@ const TestManagement: React.FC = () => {
                   <FileText className="w-8 h-8 text-muted-foreground" />
                 </div>
                 <p className="text-muted-foreground font-medium text-lg">
-                  Không có test
+                  {t("testManagement.noTests")}
                 </p>
               </div>
             ) : (

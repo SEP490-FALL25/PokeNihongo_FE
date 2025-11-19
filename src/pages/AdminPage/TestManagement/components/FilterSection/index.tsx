@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "@ui/Select";
 import { Search, Filter } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { TestCreateRequest } from "@models/test/request";
 
 interface FilterSectionProps {
@@ -32,17 +33,18 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   onTestTypeChange,
   onStatusChange,
 }) => {
+  const { t } = useTranslation();
   return (
     <div className="border-t border-border pt-4 mt-4">
       <div className="flex items-center gap-2 mb-4">
         <Filter className="h-4 w-4 text-muted-foreground" />
-        <span className="text-sm font-semibold text-foreground">Bộ lọc</span>
+        <span className="text-sm font-semibold text-foreground">{t("testManagement.filters")}</span>
       </div>
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
           <Input
-            placeholder="Tìm kiếm test ..."
+            placeholder={t("testManagement.searchPlaceholder")}
             defaultValue={filters.search || ""}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-10 bg-background border-border text-foreground h-11 shadow-sm focus:shadow-md transition-shadow"
@@ -55,16 +57,16 @@ const FilterSection: React.FC<FilterSectionProps> = ({
           }
         >
           <SelectTrigger className="w-[140px] bg-background border-border text-foreground h-11 shadow-sm">
-            <SelectValue placeholder="Cấp độ" />
+            <SelectValue placeholder={t("testManagement.selectLevel")} />
           </SelectTrigger>
           <SelectContent className="bg-card border-border">
-            <SelectItem value="ALL">Tất cả cấp</SelectItem>
-            <SelectItem value="0">Tất cả cấp</SelectItem>
-            <SelectItem value="1">N1</SelectItem>
-            <SelectItem value="2">N2</SelectItem>
-            <SelectItem value="3">N3</SelectItem>
-            <SelectItem value="4">N4</SelectItem>
-            <SelectItem value="5">N5</SelectItem>
+            <SelectItem value="ALL">{t("testManagement.allLevels")}</SelectItem>
+            <SelectItem value="0">{t("testManagement.allLevels")}</SelectItem>
+            <SelectItem value="1">{t("testManagement.levels.N1")}</SelectItem>
+            <SelectItem value="2">{t("testManagement.levels.N2")}</SelectItem>
+            <SelectItem value="3">{t("testManagement.levels.N3")}</SelectItem>
+            <SelectItem value="4">{t("testManagement.levels.N4")}</SelectItem>
+            <SelectItem value="5">{t("testManagement.levels.N5")}</SelectItem>
           </SelectContent>
         </Select>
         <Select
@@ -76,19 +78,19 @@ const FilterSection: React.FC<FilterSectionProps> = ({
           }
         >
           <SelectTrigger className="w-[180px] bg-background border-border text-foreground h-11 shadow-sm">
-            <SelectValue placeholder="Loại đề" />
+            <SelectValue placeholder={t("testManagement.selectTestType")} />
           </SelectTrigger>
           <SelectContent className="bg-card border-border">
-            <SelectItem value="ALL">Tất cả loại</SelectItem>
-            <SelectItem value="READING_TEST">Reading test</SelectItem>
-            <SelectItem value="LISTENING_TEST">Listening test</SelectItem>
-            <SelectItem value="SPEAKING_TEST">Speaking test</SelectItem>
-            <SelectItem value="MATCH_TEST">Match test</SelectItem>
-            <SelectItem value="QUIZ_TEST">Quiz test</SelectItem>
-            <SelectItem value="REVIEW_TEST">Review test</SelectItem>
-            <SelectItem value="PRACTICE_TEST">Practice test</SelectItem>
+            <SelectItem value="ALL">{t("testManagement.allTypes")}</SelectItem>
+            <SelectItem value="READING_TEST">{t("testManagement.testTypes.READING_TEST")}</SelectItem>
+            <SelectItem value="LISTENING_TEST">{t("testManagement.testTypes.LISTENING_TEST")}</SelectItem>
+            <SelectItem value="SPEAKING_TEST">{t("testManagement.testTypes.SPEAKING_TEST")}</SelectItem>
+            <SelectItem value="MATCH_TEST">{t("testManagement.testTypes.MATCH_TEST")}</SelectItem>
+            <SelectItem value="QUIZ_TEST">{t("testManagement.testTypes.QUIZ_TEST")}</SelectItem>
+            <SelectItem value="REVIEW_TEST">{t("testManagement.testTypes.REVIEW_TEST")}</SelectItem>
+            <SelectItem value="PRACTICE_TEST">{t("testManagement.testTypes.PRACTICE_TEST")}</SelectItem>
             <SelectItem value="PLACEMENT_TEST_DONE">
-              Placement test
+              {t("testManagement.testTypes.PLACEMENT_TEST_DONE")}
             </SelectItem>
           </SelectContent>
         </Select>
@@ -101,10 +103,10 @@ const FilterSection: React.FC<FilterSectionProps> = ({
           }
         >
           <SelectTrigger className="w-[160px] bg-background border-border text-foreground h-11 shadow-sm">
-            <SelectValue placeholder="Trạng thái" />
+            <SelectValue placeholder={t("testManagement.selectStatus")} />
           </SelectTrigger>
           <SelectContent className="bg-card border-border">
-            <SelectItem value="ALL">Tất cả</SelectItem>
+            <SelectItem value="ALL">{t("testManagement.allStatuses")}</SelectItem>
             <SelectItem value="DRAFT">DRAFT</SelectItem>
             <SelectItem value="ACTIVE">ACTIVE</SelectItem>
             <SelectItem value="INACTIVE">INACTIVE</SelectItem>

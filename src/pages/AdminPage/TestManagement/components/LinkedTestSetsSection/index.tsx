@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "@ui/Button";
 import { Checkbox } from "@ui/Checkbox";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { TestSetEntity } from "@models/testSet/entity";
 
 interface LinkedTestSetsSectionProps {
@@ -23,10 +24,11 @@ const LinkedTestSetsSection: React.FC<LinkedTestSetsSectionProps> = ({
   onRemove,
   onRemoveSelected,
 }) => {
+  const { t } = useTranslation();
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium">Bộ đề đã thêm</label>
+        <label className="text-sm font-medium">{t("testManagement.linkedTestSets")}</label>
         {selectedLinkedIds.length > 0 && (
           <Button
             type="button"
@@ -35,15 +37,15 @@ const LinkedTestSetsSection: React.FC<LinkedTestSetsSectionProps> = ({
             size="sm"
             onClick={onRemoveSelected}
           >
-            Xóa đã chọn ({selectedLinkedIds.length})
+            {t("testManagement.removeSelected")} ({selectedLinkedIds.length})
           </Button>
         )}
       </div>
       <div className="border rounded">
         {loadingLinked ? (
-          <div className="p-4 text-sm text-gray-500">Đang tải...</div>
+          <div className="p-4 text-sm text-gray-500">{t("testManagement.loading")}</div>
         ) : linkedTestSets.length === 0 ? (
-          <div className="p-4 text-sm text-gray-500">Chưa có bộ đề</div>
+          <div className="p-4 text-sm text-gray-500">{t("testManagement.noTestSets")}</div>
         ) : (
           <div className="max-h-[30vh] overflow-auto">
             {linkedTestSets.map((ts) => (
