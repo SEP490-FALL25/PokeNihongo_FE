@@ -1,4 +1,4 @@
-import { AI_POLICY_SCOPE } from "@constants/ai";
+import { AI_POLICY_SCOPE, SERVICE_TYPE } from "@constants/ai";
 import { at, byUser } from "@models/common/response";
 import z from "zod";
 
@@ -85,13 +85,16 @@ export const GeminiConfigModelsEntitySchema = z.object({
     systemInstruction: z.string(),
     safetySettings: z.record(z.string(), z.string()),
     extraParams: z.object({
-        purpose: z.string().optional(),
-        entities: z.array(z.object({
-            scope: z.enum(AI_POLICY_SCOPE),
-            entity: z.string(),
-            fields: z.array(z.string()),
-            limit: z.number().optional(),
-        })).optional(),
+        policy: z.object({
+            purpose: z.string(),
+            entities: z.array(z.object({
+                scope: z.enum(AI_POLICY_SCOPE),
+                entity: z.string(),
+                fields: z.array(z.string()),
+                limit: z.number().optional(),
+            })),
+            maskingRules: z.record(z.string(), z.string()).optional(),
+        }).optional(),
         responseMimeType: z.string(),
     }),
     presetId: z.number(),
@@ -99,10 +102,20 @@ export const GeminiConfigModelsEntitySchema = z.object({
     ...byUser,
     ...at,
     geminiModel: GeminiModelsEntitySchema,
-    preset: ConfigPresetsEntitySchema,
+    preset: ConfigPresetsEntitySchema.optional(),
 });
 
 export type IGeminiConfigModelsEntity = z.infer<typeof GeminiConfigModelsEntitySchema>;
+
+/**
+ * Gemini Config Prompts Entity Schema with nested geminiConfigModel
+ * This is used when the response includes the full geminiConfigModel object
+ */
+export const GeminiConfigPromptsWithModelEntitySchema = GeminiConfigPromptsEntitySchema.extend({
+    geminiConfigModel: GeminiConfigModelsEntitySchema,
+});
+
+export type GeminiConfigPromptsWithModelEntity = z.infer<typeof GeminiConfigPromptsWithModelEntitySchema>;
 //-----------------------End--------------------//
 //--------------------------------------End Gemini Config Models--------------------------------------//
 
@@ -127,3 +140,27 @@ export const ModelConfigsPolicySchemaFieldsEntitySchema = z.record(z.string(), z
 export type IModelConfigsPolicySchemaFieldsEntity = z.infer<typeof ModelConfigsPolicySchemaFieldsEntitySchema>;
 //-----------------------End--------------------//
 //--------------------------------------End Model Configs Policy Schema Fields--------------------------------------//
+
+
+
+
+
+
+
+//----------------------Service Configs Entity----------------------//
+/**
+ */
+export const ServiceConfigsEntitySchema = z.object({
+    id: z.number(),
+    serviceType: z.enum(SERVICE_TYPE),
+    geminiConfigId: z.number(),
+    isDefault: z.boolean(),
+    isActive: z.boolean(),
+    ...byUser,
+    ...at,
+    geminiConfig: GeminiConfigPromptsWithModelEntitySchema,
+});
+
+export type IServiceConfigsEntity = z.infer<typeof ServiceConfigsEntitySchema>;
+//-----------------------End--------------------//
+//--------------------------------------End Service Configs--------------------------------------//

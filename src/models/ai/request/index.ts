@@ -1,4 +1,4 @@
-import { AI_POLICY_SCOPE, PURPOSE_POLICY_AI } from "@constants/ai";
+import { AI_POLICY_SCOPE, PURPOSE_POLICY_AI, SERVICE_TYPE } from "@constants/ai";
 import { z } from "zod";
 
 /**
@@ -55,4 +55,19 @@ export const updateModelConfigsPolicySchemaSchema = () => z.object({
 });
 
 export type IUpdateModelConfigsPolicySchemaRequest = z.infer<ReturnType<typeof updateModelConfigsPolicySchemaSchema>>;
+//------------------------End------------------------//
+
+
+
+/**
+ * Create Service Config Request Schema
+ */
+export const createServiceConfigSchema = (t: (key: string, opts?: any) => string) => z.object({
+    serviceType: z.enum(SERVICE_TYPE),
+    geminiConfigId: z.number().min(1, t('validation.geminiConfigIdRequired')),
+    isDefault: z.boolean().default(false),
+    isActive: z.boolean().default(true),
+});
+
+export type ICreateServiceConfigRequest = z.infer<ReturnType<typeof createServiceConfigSchema>>;
 //------------------------End------------------------//

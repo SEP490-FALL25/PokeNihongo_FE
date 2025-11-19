@@ -999,6 +999,7 @@
         "responseMimeTypeRequired": "Response MIME type là bắt buộc",
         "presetIdRequired": "Preset là bắt buộc",
         "geminiConfigModelIdRequired": "Vui lòng chọn Model ID hợp lệ",
+        "geminiConfigIdRequired": "Vui lòng chọn Config ID hợp lệ",
         "promptRequired": "Vui lòng nhập nội dung prompt"
     },
     "conditionTypes": {

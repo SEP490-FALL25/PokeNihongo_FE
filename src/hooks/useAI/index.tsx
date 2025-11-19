@@ -1,7 +1,9 @@
-import { ICreateGeminiConfigModelsRequest, IUpdateGeminiConfigPromptsRequest, IUpdateModelConfigsPolicySchemaRequest } from "@models/ai/request";
+import { ICreateGeminiConfigModelsRequest, ICreateServiceConfigRequest, IUpdateGeminiConfigPromptsRequest, IUpdateModelConfigsPolicySchemaRequest } from "@models/ai/request";
 import { IQueryRequest } from "@models/common/request";
+import { selectCurrentLanguage } from "@redux/features/language/selector";
 import geminiService from "@services/ai";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
 //--------------------------------------Config Prompts--------------------------------------//
@@ -279,3 +281,40 @@ export const useUpdateModelConfigsPolicySchema = () => {
 }
 //-----------------------End-----------------------//
 //---------------------------------------------End Model Configs Policy Schema---------------------------------------------//
+
+
+
+//--------------------------------------Service Config--------------------------------------//
+/**
+ * Handle Get Service Configs
+ * @returns 
+ */
+export const useGetServiceConfigs = () => {
+    const language = useSelector(selectCurrentLanguage);
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['gemini-service-configs', language],
+        queryFn: () => geminiService.getServiceConfigs(),
+    });
+    return { data: data?.data?.data, isLoading, error };
+}
+//-----------------------End-----------------------//s
+
+/**
+ * Handle Create Service Config
+ */
+export const useCreateServiceConfig = () => {
+    const queryClient = useQueryClient();
+    const createServiceConfigMutation = useMutation({
+        mutationFn: (data: ICreateServiceConfigRequest) => geminiService.createServiceConfig(data),
+        onSuccess: (data: any) => {
+            queryClient.invalidateQueries({ queryKey: ['gemini-service-configs'] });
+            toast.success(data?.message || 'Tạo service config thành công');
+        },
+        onError: (error: any) => {
+            toast.error(error?.response?.data?.message || 'Có lỗi xảy ra khi tạo service config');
+        },
+    });
+    return createServiceConfigMutation;
+}
+//-----------------------End-----------------------//
+//---------------------------------------------End Service Config---------------------------------------------//

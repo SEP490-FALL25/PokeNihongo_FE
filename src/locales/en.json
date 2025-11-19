@@ -1021,6 +1021,7 @@
         "maxRequired": "Maximum quantity is required",
         "precreateBeforeEndDaysRequired": "Pre-create days before end date is required",
         "geminiConfigModelIdRequired": "Please provide a valid Model ID",
+        "geminiConfigIdRequired": "Please provide a valid Config ID",
         "promptRequired": "Please enter a prompt"
     },
     "conditionTypes": {

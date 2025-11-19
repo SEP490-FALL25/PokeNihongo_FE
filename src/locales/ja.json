@@ -982,6 +982,7 @@
         "maxRequired": "最大数量は必須です",
         "precreateBeforeEndDaysRequired": "終了日までの事前作成日数は必須です",
         "geminiConfigModelIdRequired": "有効なモデルIDを入力してください",
+        "geminiConfigIdRequired": "有効な設定IDを入力してください",
         "promptRequired": "プロンプトを入力してください"
     },
     "conditionTypes": {
