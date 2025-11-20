@@ -850,6 +850,50 @@
         "deleteSuccess": "Xóa từ vựng thành công",
         "deleteError": "Có lỗi xảy ra khi xóa từ vựng",
         "kanji": {
+            "title": "Quản lý Kanji",
+            "searchPlaceholder": "Tìm kiếm Kanji...",
+            "addNew": "Thêm mới",
+            "createKanji": {
+                "title": "Thêm Kanji mới",
+                "tabs": {
+                    "info": "Thông tin",
+                    "readings": "Cách đọc",
+                    "meanings": "Ý nghĩa"
+                },
+                "character": "Ký tự Kanji",
+                "characterPlaceholder": "日",
+                "strokeCount": "Số nét",
+                "strokeCountPlaceholder": "4",
+                "jlptLevel": "Cấp độ JLPT",
+                "selectLevel": "Chọn cấp độ",
+                "readingType": "Loại đọc",
+                "readingPlaceholder": "Đọc #{{index}}",
+                "readingTypes": {
+                    "onyomi": "Onyomi",
+                    "kunyomi": "Kunyomi"
+                },
+                "addReading": "Thêm cách đọc",
+                "vietnamese": "Tiếng Việt",
+                "vietnamesePlaceholder": "VD: mặt trời",
+                "english": "Tiếng Anh",
+                "englishPlaceholder": "VD: sun",
+                "addMeaning": "Thêm ý nghĩa",
+                "cancel": "Hủy",
+                "adding": "Đang thêm...",
+                "add": "Thêm",
+                "createSuccess": "Thêm Kanji thành công!",
+                "createError": "Đã có lỗi xảy ra."
+            },
+            "columns": {
+                "kanji": "Kanji",
+                "meaning": "Nghĩa",
+                "strokeCount": "Số nét",
+                "jlpt": "JLPT",
+                "onyomi": "On'yomi",
+                "kunyomi": "Kun'yomi",
+                "actions": "Hành động"
+            },
+            "itemsPerPage": "{{size}} / trang",
             "deleteDialog": {
                 "title": "Xác nhận xóa",
                 "message": "Bạn có chắc chắn muốn xóa kanji này? Hành động này không thể hoàn tác.",

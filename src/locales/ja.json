@@ -840,6 +840,50 @@
         "deleteSuccess": "語彙が正常に削除されました",
         "deleteError": "語彙の削除中にエラーが発生しました",
         "kanji": {
+            "title": "漢字管理",
+            "searchPlaceholder": "漢字を検索...",
+            "addNew": "新規追加",
+            "createKanji": {
+                "title": "新しい漢字を追加",
+                "tabs": {
+                    "info": "情報",
+                    "readings": "読み方",
+                    "meanings": "意味"
+                },
+                "character": "漢字",
+                "characterPlaceholder": "日",
+                "strokeCount": "画数",
+                "strokeCountPlaceholder": "4",
+                "jlptLevel": "JLPTレベル",
+                "selectLevel": "レベルを選択",
+                "readingType": "読み方の種類",
+                "readingPlaceholder": "読み方 #{{index}}",
+                "readingTypes": {
+                    "onyomi": "音読み",
+                    "kunyomi": "訓読み"
+                },
+                "addReading": "読み方を追加",
+                "vietnamese": "ベトナム語",
+                "vietnamesePlaceholder": "例：太陽",
+                "english": "英語",
+                "englishPlaceholder": "例：sun",
+                "addMeaning": "意味を追加",
+                "cancel": "キャンセル",
+                "adding": "追加中...",
+                "add": "追加",
+                "createSuccess": "漢字が正常に追加されました！",
+                "createError": "エラーが発生しました。"
+            },
+            "columns": {
+                "kanji": "漢字",
+                "meaning": "意味",
+                "strokeCount": "画数",
+                "jlpt": "JLPT",
+                "onyomi": "音読み",
+                "kunyomi": "訓読み",
+                "actions": "操作"
+            },
+            "itemsPerPage": "{{size}} / ページ",
             "deleteDialog": {
                 "title": "削除の確認",
                 "message": "この漢字を削除してもよろしいですか？この操作は元に戻せません。",

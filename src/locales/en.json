@@ -862,6 +862,50 @@
         "deleteSuccess": "Vocabulary deleted successfully",
         "deleteError": "An error occurred while deleting vocabulary",
         "kanji": {
+            "title": "Kanji Management",
+            "searchPlaceholder": "Search Kanji...",
+            "addNew": "Add New",
+            "createKanji": {
+                "title": "Add New Kanji",
+                "tabs": {
+                    "info": "Information",
+                    "readings": "Readings",
+                    "meanings": "Meanings"
+                },
+                "character": "Kanji Character",
+                "characterPlaceholder": "日",
+                "strokeCount": "Stroke Count",
+                "strokeCountPlaceholder": "4",
+                "jlptLevel": "JLPT Level",
+                "selectLevel": "Select level",
+                "readingType": "Reading Type",
+                "readingPlaceholder": "Reading #{{index}}",
+                "readingTypes": {
+                    "onyomi": "Onyomi",
+                    "kunyomi": "Kunyomi"
+                },
+                "addReading": "Add Reading",
+                "vietnamese": "Vietnamese",
+                "vietnamesePlaceholder": "E.g: sun",
+                "english": "English",
+                "englishPlaceholder": "E.g: sun",
+                "addMeaning": "Add Meaning",
+                "cancel": "Cancel",
+                "adding": "Adding...",
+                "add": "Add",
+                "createSuccess": "Kanji added successfully!",
+                "createError": "An error occurred."
+            },
+            "columns": {
+                "kanji": "Kanji",
+                "meaning": "Meaning",
+                "strokeCount": "Stroke Count",
+                "jlpt": "JLPT",
+                "onyomi": "On'yomi",
+                "kunyomi": "Kun'yomi",
+                "actions": "Actions"
+            },
+            "itemsPerPage": "{{size}} / page",
             "deleteDialog": {
                 "title": "Confirm Delete",
                 "message": "Are you sure you want to delete this kanji? This action cannot be undone.",
