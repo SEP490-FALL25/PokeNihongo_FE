@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@ui/Dialog";
 import { Button } from "@ui/Button";
-import { Input } from "@ui/Input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select";
 import { Switch } from "@ui/Switch";
 import { useTranslation } from "react-i18next";
@@ -27,7 +26,7 @@ const CreateAIService: React.FC<CreateAIServiceProps> = ({
 }) => {
   const { t } = useTranslation();
   const createServiceConfigMutation = useCreateServiceConfig();
-  
+
   // Get list of prompts for selection
   const { data: promptsData, isLoading: loadingPrompts } = useConfigPromptsCustom({
     page: 1,
@@ -42,7 +41,7 @@ const CreateAIService: React.FC<CreateAIServiceProps> = ({
     reset,
     watch,
     setValue,
-  } = useForm<ICreateServiceConfigRequest>({
+  } = useForm({
     resolver: zodResolver(createServiceConfigSchema(t)),
     defaultValues: {
       serviceType: SERVICE_TYPE.PERSONALIZED_RECOMMENDATIONS,

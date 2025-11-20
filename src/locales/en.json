@@ -1294,6 +1294,14 @@
         "noServiceConfigs": "No service configs found",
         "createSuccess": "Service config created successfully",
         "createError": "An error occurred while creating service config",
+        "deleteSuccess": "Service config deleted successfully",
+        "deleteError": "An error occurred while deleting service config",
+        "deleteDialog": {
+            "title": "Confirm Delete",
+            "message": "Are you sure you want to delete this service config? This action cannot be undone.",
+            "deleteButton": "Delete",
+            "deleting": "Deleting..."
+        },
         "serviceTypes": {
             "PERSONALIZED_RECOMMENDATIONS": "Personalized Recommendations",
             "AI_KAIWA": "AI Conversation"

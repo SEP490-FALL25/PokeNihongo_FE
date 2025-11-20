@@ -3,11 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card";
 import { Button } from "@ui/Button";
 import { Badge } from "@ui/Badge";
 import { Skeleton } from "@ui/Skeleton";
-import { Plus, Settings } from "lucide-react";
+import { Plus, Settings, Trash2 } from "lucide-react";
 import HeaderAdmin from "@organisms/Header/Admin";
 import { useTranslation } from "react-i18next";
 import { useGetServiceConfigs } from "@hooks/useAI";
 import CreateAIService from "./components/CreateAIService";
+import DeleteConfirmAIService from "./components/DeleteConfirmAIService";
 import { formatDate } from "@utils/date";
 import { getStatusBadgeColor } from "@atoms/BadgeStatusColor";
 import { getStatusLabel } from "@atoms/StatusLabel";
@@ -15,11 +16,16 @@ import { getStatusLabel } from "@atoms/StatusLabel";
 const AIServiceManagement: React.FC = () => {
     const { t } = useTranslation();
     const [showCreateDialog, setShowCreateDialog] = useState(false);
+    const [configIdToDelete, setConfigIdToDelete] = useState<number | null>(null);
 
     const { data: serviceConfigs, isLoading, error } = useGetServiceConfigs();
 
     const handleCreateSuccess = () => {
         setShowCreateDialog(false);
+    };
+
+    const handleDeleteClick = (id: number) => {
+        setConfigIdToDelete(id);
     };
 
     return (
@@ -93,23 +99,33 @@ const AIServiceManagement: React.FC = () => {
                                         <CardContent className="p-6">
                                             <div className="flex items-start justify-between gap-4">
                                                 <div className="flex-1 space-y-3">
-                                                    <div className="flex items-center gap-3">
-                                                        <Badge
-                                                            variant="outline"
-                                                            className="bg-primary/10 text-primary border-primary/30"
-                                                        >
-                                                            {t("aiService.columns.id")}: {config.id}
-                                                        </Badge>
-                                                        <Badge
-                                                            className={getStatusBadgeColor(config.isActive)}
-                                                        >
-                                                            {getStatusLabel(config.isActive)}
-                                                        </Badge>
-                                                        {config.isDefault && (
-                                                            <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/30">
-                                                                {t("aiService.isDefault")}
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-3">
+                                                            <Badge
+                                                                variant="outline"
+                                                                className="bg-primary/10 text-primary border-primary/30"
+                                                            >
+                                                                {t("aiService.columns.id")}: {config.id}
                                                             </Badge>
-                                                        )}
+                                                            <Badge
+                                                                className={getStatusBadgeColor(config.isActive)}
+                                                            >
+                                                                {getStatusLabel(config.isActive)}
+                                                            </Badge>
+                                                            {config.isDefault && (
+                                                                <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/30">
+                                                                    {t("aiService.isDefault")}
+                                                                </Badge>
+                                                            )}
+                                                        </div>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => handleDeleteClick(config.id)}
+                                                            className="text-error hover:text-white border border-error hover:bg-error"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
                                                     </div>
 
                                                     <div className="space-y-2">
@@ -157,6 +173,11 @@ const AIServiceManagement: React.FC = () => {
                     open={showCreateDialog}
                     onOpenChange={setShowCreateDialog}
                     onSuccess={handleCreateSuccess}
+                />
+
+                <DeleteConfirmAIService
+                    configIdToDelete={configIdToDelete}
+                    setConfigIdToDelete={setConfigIdToDelete}
                 />
             </div>
         </>

@@ -1272,6 +1272,14 @@
         "noServiceConfigs": "Không có service config nào",
         "createSuccess": "Tạo service config thành công",
         "createError": "Có lỗi xảy ra khi tạo service config",
+        "deleteSuccess": "Xóa service config thành công",
+        "deleteError": "Có lỗi xảy ra khi xóa service config",
+        "deleteDialog": {
+            "title": "Xác nhận xóa",
+            "message": "Bạn có chắc chắn muốn xóa service config này? Hành động này không thể hoàn tác.",
+            "deleteButton": "Xóa",
+            "deleting": "Đang xóa..."
+        },
         "serviceTypes": {
             "PERSONALIZED_RECOMMENDATIONS": "Gợi ý cá nhân hóa",
             "AI_KAIWA": "Hội thoại AI"

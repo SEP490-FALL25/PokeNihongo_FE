@@ -1255,6 +1255,14 @@
         "noServiceConfigs": "サービス設定が見つかりません",
         "createSuccess": "サービス設定が正常に作成されました",
         "createError": "サービス設定の作成中にエラーが発生しました",
+        "deleteSuccess": "サービス設定が正常に削除されました",
+        "deleteError": "サービス設定の削除中にエラーが発生しました",
+        "deleteDialog": {
+            "title": "削除の確認",
+            "message": "このサービス設定を削除してもよろしいですか？この操作は元に戻せません。",
+            "deleteButton": "削除",
+            "deleting": "削除中..."
+        },
         "serviceTypes": {
             "PERSONALIZED_RECOMMENDATIONS": "パーソナライズされた推奨",
             "AI_KAIWA": "AI会話"

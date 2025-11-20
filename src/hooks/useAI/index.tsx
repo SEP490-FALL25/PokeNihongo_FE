@@ -319,4 +319,26 @@ export const useCreateServiceConfig = () => {
     return createServiceConfigMutation;
 }
 //-----------------------End-----------------------//
+
+
+/**
+ * Handle Delete Service Config
+ * @returns useMutation to delete service config
+ */
+export const useDeleteServiceConfig = () => {
+    const queryClient = useQueryClient();
+    const { t } = useTranslation();
+    const deleteServiceConfigMutation = useMutation({
+        mutationFn: (id: number) => geminiService.deleteServiceConfig(id),
+        onSuccess: (data: any, variables: any) => {
+            queryClient.invalidateQueries({ queryKey: ['gemini-service-configs'] });
+            queryClient.invalidateQueries({ queryKey: ['gemini-service-configs-by-id', variables.id] });
+            toast.success(data?.message || t('aiService.deleteSuccess'));
+        },
+        onError: (error: any) => {
+            toast.error(error?.response?.data?.message || t('aiService.deleteError'));
+        },
+    });
+    return deleteServiceConfigMutation;
+}
 //---------------------------------------------End Service Config---------------------------------------------//

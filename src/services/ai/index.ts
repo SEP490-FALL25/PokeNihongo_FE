@@ -137,6 +137,10 @@ const geminiService = {
     createServiceConfig: async (data: ICreateServiceConfigRequest) => {
         return await axiosPrivate.post('/gemini-config/service-configs', data);
     },
+
+    deleteServiceConfig: async (id: number) => {
+        return await axiosPrivate.delete(`/gemini-config/service-configs/${id}`);
+    },
 }
 
 export default geminiService;
