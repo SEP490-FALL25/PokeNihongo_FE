@@ -30,6 +30,10 @@ const kanjiService = {
     createKanjiWithMeaning: async (data: IKanjiWithMeaningRequest) => {
         return axiosPrivate.post('/kanji/with-meanings', data);
     },
+
+    deleteKanji: async (id: number) => {
+        return axiosPrivate.delete(`/kanji/${id}`);
+    },
 };
 
 export default kanjiService;

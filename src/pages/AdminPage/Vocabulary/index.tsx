@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card";
 import { Badge } from "@ui/Badge";
 import { Skeleton } from "@ui/Skeleton";
-import { Languages, BookText, Sparkles, CheckCircle2, TrendingUp } from "lucide-react";
+import { Languages, BookText } from "lucide-react";
 import HeaderAdmin from "@organisms/Header/Admin";
 import { Switch } from "@ui/Switch";
 import KanjiVocabulary from "./components/Kanji";

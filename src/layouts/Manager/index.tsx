@@ -122,18 +122,6 @@ const ManagerLayout = () => {
                         </div>
                     )}
 
-                    <NavLink
-                        to={ROUTES.MANAGER.SETTINGS}
-                        className={cn(
-                            "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                            location.pathname === ROUTES.MANAGER.SETTINGS
-                                ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                        )}
-                    >
-                        <Settings className="h-5 w-5 flex-shrink-0" />
-                        {isSidebarOpen && <span>{t("navigation.settings")}</span>}
-                    </NavLink>
                     <button onClick={handleLogout} className="cursor-pointer flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
                         <LogOut className="h-5 w-5 flex-shrink-0" />
                         {isSidebarOpen && <span>{t("common.logout")}</span>}

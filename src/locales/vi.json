@@ -819,7 +819,144 @@
         "totalKanji": "Tổng Kanji",
         "vocabularyN5": "Từ vựng N5",
         "vocabularyN4": "Từ vựng N4",
-        "vocabularyN3": "Từ vựng N3"
+        "vocabularyN3": "Từ vựng N3",
+        "listVocabulary": {
+            "title": "Danh sách từ vựng",
+            "searchPlaceholder": "Tìm kiếm từ vựng...",
+            "addNew": "Thêm mới",
+            "columns": {
+                "wordJp": "Tiếng Nhật",
+                "reading": "Cách đọc",
+                "wordType": "Loại từ",
+                "level": "Cấp độ",
+                "media": "Media",
+                "actions": "Hành động"
+            },
+            "wordTypes": {
+                "noun": "Danh từ",
+                "verb": "Động từ",
+                "adjective": "Tính từ",
+                "adverb": "Trạng từ",
+                "particle": "Trợ từ",
+                "unknown": "Không xác định"
+            }
+        },
+        "createVocabulary": {
+            "title": "Thêm Từ vựng",
+            "modes": {
+                "manual": "Nhập tay",
+                "import": "Import file"
+            },
+            "import": {
+                "title": "Import Từ vựng từ file",
+                "description": "Tải lên file JSON theo cấu trúc dữ liệu Từ vựng",
+                "selectFile": "Chọn file để import",
+                "clickToSelect": "Nhấn để chọn file",
+                "dragAndDrop": "hoặc kéo thả file vào đây",
+                "maxSize": "Tối đa 5MB"
+            },
+            "basicInfo": {
+                "title": "Thông tin cơ bản",
+                "wordJp": "Từ tiếng Nhật",
+                "wordJpPlaceholder": "例: 食べる",
+                "reading": "Cách đọc",
+                "readingPlaceholder": "たべる",
+                "jlptLevel": "Cấp độ JLPT",
+                "jlptLevelPlaceholder": "Chọn cấp độ (N5 → N1)",
+                "wordType": "Loại từ",
+                "wordTypePlaceholder": "Chọn loại từ"
+            },
+            "translations": {
+                "title": "Bản dịch",
+                "addLanguage": "Thêm ngôn ngữ",
+                "meaning": "Nghĩa",
+                "meaningPlaceholder": "Nghĩa của từ",
+                "addMeaningLine": "Thêm dòng nghĩa"
+            },
+            "examples": {
+                "title": "Ví dụ",
+                "addExample": "Thêm ví dụ",
+                "language": "Ngôn ngữ",
+                "selectLanguage": "Chọn",
+                "originalSentence": "Câu gốc",
+                "originalSentencePlaceholder": "日本語の文",
+                "translation": "Bản dịch",
+                "translationPlaceholder": "Câu dịch",
+                "delete": "Xóa"
+            },
+            "attachments": {
+                "title": "Tệp đính kèm"
+            },
+            "cancel": "Hủy",
+            "creating": "Đang tạo...",
+            "create": "Tạo từ vựng",
+            "createSuccess": "Tạo từ vựng thành công",
+            "validationErrors": "Lỗi xác thực",
+            "validationError": "Có lỗi xác thực",
+            "generalError": "Đã có lỗi xảy ra"
+        },
+        "deleteDialog": {
+            "title": "Xác nhận xóa",
+            "message": "Bạn có chắc chắn muốn xóa từ vựng này? Hành động này không thể hoàn tác.",
+            "deleteButton": "Xóa",
+            "deleting": "Đang xóa..."
+        },
+        "deleteSuccess": "Xóa từ vựng thành công",
+        "deleteError": "Có lỗi xảy ra khi xóa từ vựng",
+        "kanji": {
+            "title": "Quản lý Kanji",
+            "searchPlaceholder": "Tìm kiếm Kanji...",
+            "addNew": "Thêm mới",
+            "createKanji": {
+                "title": "Thêm Kanji mới",
+                "tabs": {
+                    "info": "Thông tin",
+                    "readings": "Cách đọc",
+                    "meanings": "Ý nghĩa"
+                },
+                "character": "Ký tự Kanji",
+                "characterPlaceholder": "日",
+                "strokeCount": "Số nét",
+                "strokeCountPlaceholder": "4",
+                "jlptLevel": "Cấp độ JLPT",
+                "selectLevel": "Chọn cấp độ",
+                "readingType": "Loại đọc",
+                "readingPlaceholder": "Đọc #{{index}}",
+                "readingTypes": {
+                    "onyomi": "Onyomi",
+                    "kunyomi": "Kunyomi"
+                },
+                "addReading": "Thêm cách đọc",
+                "vietnamese": "Tiếng Việt",
+                "vietnamesePlaceholder": "VD: mặt trời",
+                "english": "Tiếng Anh",
+                "englishPlaceholder": "VD: sun",
+                "addMeaning": "Thêm ý nghĩa",
+                "cancel": "Hủy",
+                "adding": "Đang thêm...",
+                "add": "Thêm",
+                "createSuccess": "Thêm Kanji thành công!",
+                "createError": "Đã có lỗi xảy ra."
+            },
+            "columns": {
+                "kanji": "Kanji",
+                "meaning": "Nghĩa",
+                "strokeCount": "Số nét",
+                "jlpt": "JLPT",
+                "onyomi": "On'yomi",
+                "kunyomi": "Kun'yomi",
+                "actions": "Hành động"
+            },
+            "itemsPerPage": "{{size}} / trang",
+            "deleteDialog": {
+                "title": "Xác nhận xóa",
+                "message": "Bạn có chắc chắn muốn xóa kanji này? Hành động này không thể hoàn tác.",
+                "deleteButton": "Xóa",
+                "deleting": "Đang xóa..."
+            },
+            "deleteSuccess": "Xóa kanji thành công",
+            "deleteError": "Có lỗi xảy ra khi xóa kanji"
+        }
     },
     "managerGrammar": {
         "title": "Quản lý ngữ pháp",

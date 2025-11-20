@@ -2,6 +2,8 @@ import { IQueryRequest } from "@models/common/request";
 import { IKanjiWithMeaningRequest } from "@models/kanji/request";
 import kanjiService from "@services/kanji";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 /**
  * hanlde Kanji List
@@ -49,3 +51,22 @@ export const useCreateKanjiWithMeaning = () => {
     });
 };
 
+/**
+ * Handle Delete Kanji
+ * @returns useMutation to delete kanji
+ */
+export const useDeleteKanji = () => {
+    const queryClient = useQueryClient();
+    const { t } = useTranslation();
+    return useMutation({
+        mutationFn: (id: number) => kanjiService.deleteKanji(id),
+        onSuccess: (data: any) => {
+            queryClient.invalidateQueries({ queryKey: ['kanji-list'] });
+            queryClient.invalidateQueries({ queryKey: ['kanji-list-management'] });
+            toast.success(data?.message || t('vocabulary.kanji.deleteSuccess'));
+        },
+        onError: (error: any) => {
+            toast.error(error?.response?.data?.message || t('vocabulary.kanji.deleteError'));
+        },
+    });
+};

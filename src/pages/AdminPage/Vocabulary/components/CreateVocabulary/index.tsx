@@ -92,7 +92,7 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
             reset();
             setIsAddDialogOpen(false);
             setIsSubmitting(false);
-            toast.success(t('createVocabulary.createSuccess'));
+            toast.success(t('vocabulary.createVocabulary.createSuccess'));
         },
         onError: (error: any) => {
             setIsSubmitting(false);
@@ -102,12 +102,12 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
             if (error.response?.status === 422) {
                 const messages = error.response?.data?.message;
                 if (Array.isArray(messages)) {
-                    toast.error(`${t('createVocabulary.validationErrors')}: ${messages.join(', ')}`);
+                    toast.error(`${t('vocabulary.createVocabulary.validationErrors')}: ${messages.join(', ')}`);
                 } else {
-                    toast.error(messages || t('createVocabulary.validationError'));
+                    toast.error(messages || t('vocabulary.createVocabulary.validationError'));
                 }
             } else {
-                toast.error(error.response?.data?.message || t('createVocabulary.generalError'));
+                toast.error(error.response?.data?.message || t('vocabulary.createVocabulary.generalError'));
             }
         }
     });
@@ -127,7 +127,7 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
         } catch (error: any) {
             setIsSubmitting(false);
             console.error('Unexpected error:', error);
-            toast.error(error.response?.data?.message || t('createVocabulary.generalError'));
+            toast.error(error.response?.data?.message || t('vocabulary.createVocabulary.generalError'));
         }
     };
 
@@ -135,7 +135,7 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
         <>
             <DialogContent className="bg-white border-border max-w-4xl">
                 <DialogHeader>
-                    <DialogTitle className="text-foreground text-2xl">Thêm Từ vựng</DialogTitle>
+                    <DialogTitle className="text-foreground text-2xl">{t("vocabulary.createVocabulary.title")}</DialogTitle>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4 max-h-[70vh] overflow-y-auto pr-2 md:pr-6" noValidate>
@@ -152,7 +152,7 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                                 )}
                                 onClick={() => setCreationMode('manual')}
                             >
-                                <Plus className="h-4 w-4 mr-2" /> Nhập tay
+                                <Plus className="h-4 w-4 mr-2" /> {t("vocabulary.createVocabulary.modes.manual")}
                             </Button>
                             <Button
                                 type="button"
@@ -164,7 +164,7 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                                 )}
                                 onClick={() => setCreationMode('import')}
                             >
-                                <UploadCloud className="h-4 w-4 mr-2" /> Import file
+                                <UploadCloud className="h-4 w-4 mr-2" /> {t("vocabulary.createVocabulary.modes.import")}
                             </Button>
                         </div>
                     </div>
@@ -172,8 +172,8 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                     {creationMode === 'import' && (
                         <div className="space-y-6">
                             <div className="text-center mb-2">
-                                <h3 className="text-lg font-semibold text-foreground mb-1">Import Từ vựng từ file</h3>
-                                <p className="text-sm text-muted-foreground">Tải lên file JSON theo cấu trúc dữ liệu Từ vựng</p>
+                                <h3 className="text-lg font-semibold text-foreground mb-1">{t("vocabulary.createVocabulary.import.title")}</h3>
+                                <p className="text-sm text-muted-foreground">{t("vocabulary.createVocabulary.import.description")}</p>
                             </div>
 
                             <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 bg-muted/20">
@@ -182,13 +182,13 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                                         <div className="p-4 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors mb-4">
                                             <UploadCloud className="w-12 h-12 text-primary" />
                                         </div>
-                                        <h4 className="text-lg font-semibold text-foreground mb-2">Chọn file để import</h4>
+                                        <h4 className="text-lg font-semibold text-foreground mb-2">{t("vocabulary.createVocabulary.import.selectFile")}</h4>
                                         <p className="text-sm text-muted-foreground mb-4">
-                                            <span className="font-medium">Nhấn để chọn file</span> hoặc kéo thả file vào đây
+                                            <span className="font-medium">{t("vocabulary.createVocabulary.import.clickToSelect")}</span> {t("vocabulary.createVocabulary.import.dragAndDrop")}
                                         </p>
                                         <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                                             <span className="px-2 py-1 bg-muted rounded">JSON</span>
-                                            <span className="px-2 py-1 bg-muted rounded">Tối đa 5MB</span>
+                                            <span className="px-2 py-1 bg-muted rounded">{t("vocabulary.createVocabulary.import.maxSize")}</span>
                                         </div>
                                     </div>
                                     <Input
@@ -233,7 +233,7 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                         <>
                             <Card>
                                 <CardHeader className="pb-3">
-                                    <CardTitle className="text-base">Thông tin cơ bản</CardTitle>
+                                    <CardTitle className="text-base">{t("vocabulary.createVocabulary.basicInfo.title")}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="pt-0">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
@@ -243,7 +243,7 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                                                 name="word_jp"
                                                 control={control}
                                                 render={({ field }) => (
-                                                    <Input label="Từ tiếng Nhật" placeholder="例: 食べる" error={errors.word_jp?.message as string} {...field} />
+                                                    <Input label={t("vocabulary.createVocabulary.basicInfo.wordJp")} placeholder={t("vocabulary.createVocabulary.basicInfo.wordJpPlaceholder")} error={errors.word_jp?.message as string} {...field} />
                                                 )}
                                             />
 
@@ -251,7 +251,7 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                                                 name="reading"
                                                 control={control}
                                                 render={({ field }) => (
-                                                    <Input label="Cách đọc" placeholder="たべる" error={errors.reading?.message as string} {...field} />
+                                                    <Input label={t("vocabulary.createVocabulary.basicInfo.reading")} placeholder={t("vocabulary.createVocabulary.basicInfo.readingPlaceholder")} error={errors.reading?.message as string} {...field} />
                                                 )}
                                             />
                                         </div>
@@ -263,10 +263,10 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                                                 control={control}
                                                 render={({ field }) => (
                                                     <div className="flex flex-col gap-2">
-                                                        <label htmlFor="level_n">Cấp độ JLPT</label>
+                                                        <label htmlFor="level_n">{t("vocabulary.createVocabulary.basicInfo.jlptLevel")}</label>
                                                         <Select onValueChange={field.onChange} value={String(field.value)}>
                                                             <SelectTrigger>
-                                                                <SelectValue placeholder="Chọn cấp độ (N5 → N1)" />
+                                                                <SelectValue placeholder={t("vocabulary.createVocabulary.basicInfo.jlptLevelPlaceholder")} />
                                                             </SelectTrigger>
                                                             <SelectContent>
                                                                 <SelectItem value="5">N5</SelectItem>
@@ -286,10 +286,10 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                                                 control={control}
                                                 render={({ field }) => (
                                                     <div className="flex flex-col gap-2">
-                                                        <label htmlFor="word_type_id">Loại từ</label>
+                                                        <label htmlFor="word_type_id">{t("vocabulary.createVocabulary.basicInfo.wordType")}</label>
                                                         <Select onValueChange={field.onChange} value={String(field.value)}>
                                                             <SelectTrigger>
-                                                                <SelectValue placeholder="Chọn loại từ" />
+                                                                <SelectValue placeholder={t("vocabulary.createVocabulary.basicInfo.wordTypePlaceholder")} />
                                                             </SelectTrigger>
                                                             <SelectContent>
                                                                 {wordTypesData?.results?.map((t: any) => (
@@ -310,7 +310,7 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                             <Card>
                                 <CardHeader className="pb-3">
                                     <div className="flex items-center justify-between">
-                                        <CardTitle className="text-base">Bản dịch</CardTitle>
+                                        <CardTitle className="text-base">{t("vocabulary.createVocabulary.translations.title")}</CardTitle>
                                         <div className="flex items-center gap-2">
                                             <Select
                                                 onValueChange={(val) => {
@@ -321,7 +321,7 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                                                 }}
                                             >
                                                 <SelectTrigger className="w-52">
-                                                    <SelectValue placeholder="Thêm ngôn ngữ" />
+                                                    <SelectValue placeholder={t("vocabulary.createVocabulary.translations.addLanguage")} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {LANGUAGE_OPTIONS.filter((opt) => !Object.keys(meaningsByLang).includes(opt.code)).map((opt) => (
@@ -359,8 +359,8 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                                                 <div key={`${selectedMeaningLang}-${idx}`} className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
                                                     <div className="md:col-span-5">
                                                         <Input
-                                                            label={`Nghĩa (${selectedMeaningLang})`}
-                                                            placeholder="Nghĩa của từ"
+                                                            label={`${t("vocabulary.createVocabulary.translations.meaning")} (${selectedMeaningLang})`}
+                                                            placeholder={t("vocabulary.createVocabulary.translations.meaningPlaceholder")}
                                                             value={val}
                                                             onChange={(e) => {
                                                                 const newVal = e.target.value;
@@ -414,27 +414,27 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                                                 [selectedMeaningLang]: [...(prev[selectedMeaningLang] || []), '']
                                             }))}
                                         >
-                                            <Plus className="h-4 w-4 mr-1" /> Thêm dòng nghĩa
+                                            <Plus className="h-4 w-4 mr-1" /> {t("vocabulary.createVocabulary.translations.addMeaningLine")}
                                         </Button>
                                     </div>
                                 </CardContent>
                             </Card>
 
                             <div className="flex items-center justify-between pt-2">
-                                <h4 className="text-sm font-medium">Ví dụ</h4>
-                                <Button type="button" variant="outline" onClick={() => setExamples((prev) => [...prev, { language_code: 'vi', sentence: '', original_sentence: '' }])}>Thêm ví dụ</Button>
+                                <h4 className="text-sm font-medium">{t("vocabulary.createVocabulary.examples.title")}</h4>
+                                <Button type="button" variant="outline" onClick={() => setExamples((prev) => [...prev, { language_code: 'vi', sentence: '', original_sentence: '' }])}>{t("vocabulary.createVocabulary.examples.addExample")}</Button>
                             </div>
                             <div className="space-y-3">
                                 {examples.map((ex, idx) => (
                                     <div key={idx} className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
                                         <div className="md:col-span-1">
-                                            <label className="mb-2 block text-sm font-medium text-gray-700">Ngôn ngữ</label>
+                                            <label className="mb-2 block text-sm font-medium text-gray-700">{t("vocabulary.createVocabulary.examples.language")}</label>
                                             <Select
                                                 onValueChange={(val) => setExamples((prev) => prev.map((it, i) => i === idx ? { ...it, language_code: val } : it))}
                                                 defaultValue={ex.language_code}
                                             >
                                                 <SelectTrigger>
-                                                    <SelectValue placeholder="Chọn" />
+                                                    <SelectValue placeholder={t("vocabulary.createVocabulary.examples.selectLanguage")} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {LANGUAGE_OPTIONS.map((opt) => (
@@ -445,22 +445,22 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                                         </div>
                                         <div className="md:col-span-2">
                                             <Input
-                                                label="Câu gốc"
-                                                placeholder="日本語の文"
+                                                label={t("vocabulary.createVocabulary.examples.originalSentence")}
+                                                placeholder={t("vocabulary.createVocabulary.examples.originalSentencePlaceholder")}
                                                 value={ex.original_sentence}
                                                 onChange={(e) => setExamples((prev) => prev.map((it, i) => i === idx ? { ...it, original_sentence: e.target.value } : it))}
                                             />
                                         </div>
                                         <div className="md:col-span-2">
                                             <Input
-                                                label="Bản dịch"
-                                                placeholder="Câu dịch"
+                                                label={t("vocabulary.createVocabulary.examples.translation")}
+                                                placeholder={t("vocabulary.createVocabulary.examples.translationPlaceholder")}
                                                 value={ex.sentence}
                                                 onChange={(e) => setExamples((prev) => prev.map((it, i) => i === idx ? { ...it, sentence: e.target.value } : it))}
                                             />
                                         </div>
                                         <div className="md:col-span-1">
-                                            <Button type="button" variant="outline" onClick={() => setExamples((prev) => prev.filter((_, i) => i !== idx))}>Xóa</Button>
+                                            <Button type="button" variant="outline" onClick={() => setExamples((prev) => prev.filter((_, i) => i !== idx))}>{t("vocabulary.createVocabulary.examples.delete")}</Button>
                                         </div>
                                     </div>
                                 ))}
@@ -481,7 +481,7 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                             {/* Media upload */}
                             <Card>
                                 <CardHeader className="pb-3">
-                                    <CardTitle className="text-base">Tệp đính kèm</CardTitle>
+                                    <CardTitle className="text-base">{t("vocabulary.createVocabulary.attachments.title")}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="pt-0 grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <Controller
@@ -514,9 +514,9 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                     )}
 
                     <DialogFooter className="pt-4">
-                        <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)} disabled={isSubmitting}>Hủy</Button>
+                        <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)} disabled={isSubmitting}>{t("vocabulary.createVocabulary.cancel")}</Button>
                         <Button type="submit" className="bg-primary text-primary-foreground" disabled={isSubmitting}>
-                            {isSubmitting ? 'Đang tạo...' : 'Tạo từ vựng'}
+                            {isSubmitting ? t("vocabulary.createVocabulary.creating") : t("vocabulary.createVocabulary.create")}
                         </Button>
                     </DialogFooter>
                 </form>

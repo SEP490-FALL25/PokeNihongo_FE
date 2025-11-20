@@ -831,7 +831,144 @@
         "totalKanji": "Total Kanji",
         "vocabularyN5": "Vocabulary N5",
         "vocabularyN4": "Vocabulary N4",
-        "vocabularyN3": "Vocabulary N3"
+        "vocabularyN3": "Vocabulary N3",
+        "listVocabulary": {
+            "title": "Vocabulary List",
+            "searchPlaceholder": "Search vocabulary...",
+            "addNew": "Add New",
+            "columns": {
+                "wordJp": "Japanese",
+                "reading": "Reading",
+                "wordType": "Word Type",
+                "level": "Level",
+                "media": "Media",
+                "actions": "Actions"
+            },
+            "wordTypes": {
+                "noun": "Noun",
+                "verb": "Verb",
+                "adjective": "Adjective",
+                "adverb": "Adverb",
+                "particle": "Particle",
+                "unknown": "Unknown"
+            }
+        },
+        "createVocabulary": {
+            "title": "Add Vocabulary",
+            "modes": {
+                "manual": "Manual Entry",
+                "import": "Import File"
+            },
+            "import": {
+                "title": "Import Vocabulary from File",
+                "description": "Upload a JSON file with vocabulary data structure",
+                "selectFile": "Select file to import",
+                "clickToSelect": "Click to select file",
+                "dragAndDrop": "or drag and drop file here",
+                "maxSize": "Max 5MB"
+            },
+            "basicInfo": {
+                "title": "Basic Information",
+                "wordJp": "Japanese Word",
+                "wordJpPlaceholder": "E.g: 食べる",
+                "reading": "Reading",
+                "readingPlaceholder": "たべる",
+                "jlptLevel": "JLPT Level",
+                "jlptLevelPlaceholder": "Select level (N5 → N1)",
+                "wordType": "Word Type",
+                "wordTypePlaceholder": "Select word type"
+            },
+            "translations": {
+                "title": "Translations",
+                "addLanguage": "Add Language",
+                "meaning": "Meaning",
+                "meaningPlaceholder": "Word meaning",
+                "addMeaningLine": "Add Meaning Line"
+            },
+            "examples": {
+                "title": "Examples",
+                "addExample": "Add Example",
+                "language": "Language",
+                "selectLanguage": "Select",
+                "originalSentence": "Original Sentence",
+                "originalSentencePlaceholder": "Japanese sentence",
+                "translation": "Translation",
+                "translationPlaceholder": "Translated sentence",
+                "delete": "Delete"
+            },
+            "attachments": {
+                "title": "Attachments"
+            },
+            "cancel": "Cancel",
+            "creating": "Creating...",
+            "create": "Create Vocabulary",
+            "createSuccess": "Vocabulary created successfully",
+            "validationErrors": "Validation Errors",
+            "validationError": "Validation error",
+            "generalError": "An error occurred"
+        },
+        "deleteDialog": {
+            "title": "Confirm Delete",
+            "message": "Are you sure you want to delete this vocabulary? This action cannot be undone.",
+            "deleteButton": "Delete",
+            "deleting": "Deleting..."
+        },
+        "deleteSuccess": "Vocabulary deleted successfully",
+        "deleteError": "An error occurred while deleting vocabulary",
+        "kanji": {
+            "title": "Kanji Management",
+            "searchPlaceholder": "Search Kanji...",
+            "addNew": "Add New",
+            "createKanji": {
+                "title": "Add New Kanji",
+                "tabs": {
+                    "info": "Information",
+                    "readings": "Readings",
+                    "meanings": "Meanings"
+                },
+                "character": "Kanji Character",
+                "characterPlaceholder": "日",
+                "strokeCount": "Stroke Count",
+                "strokeCountPlaceholder": "4",
+                "jlptLevel": "JLPT Level",
+                "selectLevel": "Select level",
+                "readingType": "Reading Type",
+                "readingPlaceholder": "Reading #{{index}}",
+                "readingTypes": {
+                    "onyomi": "Onyomi",
+                    "kunyomi": "Kunyomi"
+                },
+                "addReading": "Add Reading",
+                "vietnamese": "Vietnamese",
+                "vietnamesePlaceholder": "E.g: sun",
+                "english": "English",
+                "englishPlaceholder": "E.g: sun",
+                "addMeaning": "Add Meaning",
+                "cancel": "Cancel",
+                "adding": "Adding...",
+                "add": "Add",
+                "createSuccess": "Kanji added successfully!",
+                "createError": "An error occurred."
+            },
+            "columns": {
+                "kanji": "Kanji",
+                "meaning": "Meaning",
+                "strokeCount": "Stroke Count",
+                "jlpt": "JLPT",
+                "onyomi": "On'yomi",
+                "kunyomi": "Kun'yomi",
+                "actions": "Actions"
+            },
+            "itemsPerPage": "{{size}} / page",
+            "deleteDialog": {
+                "title": "Confirm Delete",
+                "message": "Are you sure you want to delete this kanji? This action cannot be undone.",
+                "deleteButton": "Delete",
+                "deleting": "Deleting..."
+            },
+            "deleteSuccess": "Kanji deleted successfully",
+            "deleteError": "An error occurred while deleting kanji"
+        }
     },
     "managerGrammar": {
         "title": "Grammar Library",

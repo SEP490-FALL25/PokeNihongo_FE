@@ -809,7 +809,144 @@
         "totalKanji": "総漢字数",
         "vocabularyN5": "語彙N5",
         "vocabularyN4": "語彙N4",
-        "vocabularyN3": "語彙N3"
+        "vocabularyN3": "語彙N3",
+        "listVocabulary": {
+            "title": "語彙リスト",
+            "searchPlaceholder": "語彙を検索...",
+            "addNew": "新規追加",
+            "columns": {
+                "wordJp": "日本語",
+                "reading": "読み方",
+                "wordType": "品詞",
+                "level": "レベル",
+                "media": "メディア",
+                "actions": "操作"
+            },
+            "wordTypes": {
+                "noun": "名詞",
+                "verb": "動詞",
+                "adjective": "形容詞",
+                "adverb": "副詞",
+                "particle": "助詞",
+                "unknown": "不明"
+            }
+        },
+        "createVocabulary": {
+            "title": "語彙を追加",
+            "modes": {
+                "manual": "手入力",
+                "import": "ファイルインポート"
+            },
+            "import": {
+                "title": "ファイルから語彙をインポート",
+                "description": "語彙データ構造のJSONファイルをアップロード",
+                "selectFile": "インポートするファイルを選択",
+                "clickToSelect": "クリックしてファイルを選択",
+                "dragAndDrop": "またはここにファイルをドラッグ＆ドロップ",
+                "maxSize": "最大5MB"
+            },
+            "basicInfo": {
+                "title": "基本情報",
+                "wordJp": "日本語の単語",
+                "wordJpPlaceholder": "例：食べる",
+                "reading": "読み方",
+                "readingPlaceholder": "たべる",
+                "jlptLevel": "JLPTレベル",
+                "jlptLevelPlaceholder": "レベルを選択（N5 → N1）",
+                "wordType": "品詞",
+                "wordTypePlaceholder": "品詞を選択"
+            },
+            "translations": {
+                "title": "翻訳",
+                "addLanguage": "言語を追加",
+                "meaning": "意味",
+                "meaningPlaceholder": "単語の意味",
+                "addMeaningLine": "意味行を追加"
+            },
+            "examples": {
+                "title": "例文",
+                "addExample": "例文を追加",
+                "language": "言語",
+                "selectLanguage": "選択",
+                "originalSentence": "原文",
+                "originalSentencePlaceholder": "日本語の文",
+                "translation": "翻訳",
+                "translationPlaceholder": "翻訳文",
+                "delete": "削除"
+            },
+            "attachments": {
+                "title": "添付ファイル"
+            },
+            "cancel": "キャンセル",
+            "creating": "作成中...",
+            "create": "語彙を作成",
+            "createSuccess": "語彙が正常に作成されました",
+            "validationErrors": "検証エラー",
+            "validationError": "検証エラーが発生しました",
+            "generalError": "エラーが発生しました"
+        },
+        "deleteDialog": {
+            "title": "削除の確認",
+            "message": "この語彙を削除してもよろしいですか？この操作は元に戻せません。",
+            "deleteButton": "削除",
+            "deleting": "削除中..."
+        },
+        "deleteSuccess": "語彙が正常に削除されました",
+        "deleteError": "語彙の削除中にエラーが発生しました",
+        "kanji": {
+            "title": "漢字管理",
+            "searchPlaceholder": "漢字を検索...",
+            "addNew": "新規追加",
+            "createKanji": {
+                "title": "新しい漢字を追加",
+                "tabs": {
+                    "info": "情報",
+                    "readings": "読み方",
+                    "meanings": "意味"
+                },
+                "character": "漢字",
+                "characterPlaceholder": "日",
+                "strokeCount": "画数",
+                "strokeCountPlaceholder": "4",
+                "jlptLevel": "JLPTレベル",
+                "selectLevel": "レベルを選択",
+                "readingType": "読み方の種類",
+                "readingPlaceholder": "読み方 #{{index}}",
+                "readingTypes": {
+                    "onyomi": "音読み",
+                    "kunyomi": "訓読み"
+                },
+                "addReading": "読み方を追加",
+                "vietnamese": "ベトナム語",
+                "vietnamesePlaceholder": "例：太陽",
+                "english": "英語",
+                "englishPlaceholder": "例：sun",
+                "addMeaning": "意味を追加",
+                "cancel": "キャンセル",
+                "adding": "追加中...",
+                "add": "追加",
+                "createSuccess": "漢字が正常に追加されました！",
+                "createError": "エラーが発生しました。"
+            },
+            "columns": {
+                "kanji": "漢字",
+                "meaning": "意味",
+                "strokeCount": "画数",
+                "jlpt": "JLPT",
+                "onyomi": "音読み",
+                "kunyomi": "訓読み",
+                "actions": "操作"
+            },
+            "itemsPerPage": "{{size}} / ページ",
+            "deleteDialog": {
+                "title": "削除の確認",
+                "message": "この漢字を削除してもよろしいですか？この操作は元に戻せません。",
+                "deleteButton": "削除",
+                "deleting": "削除中..."
+            },
+            "deleteSuccess": "漢字が正常に削除されました",
+            "deleteError": "漢字の削除中にエラーが発生しました"
+        }
     },
     "managerGrammar": {
         "title": "文法ライブラリ",
