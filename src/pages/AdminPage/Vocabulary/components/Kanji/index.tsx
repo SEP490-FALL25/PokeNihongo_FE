@@ -17,6 +17,7 @@ import { Controller, useForm, useFieldArray } from "react-hook-form";
 import { IKanjiWithMeaningRequest } from "@models/kanji/request";
 import { toast } from "react-toastify";
 import TabListLevelJLBT from "@organisms/TabListLevelJLBT";
+import DeleteConfirmKanji from "./components/DeleteConfirmKanji";
 
 interface KanjiVocabulary {
     isAddKanjiDialogOpen: boolean;
@@ -35,6 +36,7 @@ const KanjiVocabulary = ({ isAddKanjiDialogOpen, setIsAddKanjiDialogOpen }: Kanj
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
     const [searchQuery, setSearchQuery] = useState<string>("");
     const debouncedSearchQuery = useDebounce(searchQuery, 500);
+    const [kanjiIdToDelete, setKanjiIdToDelete] = useState<number | null>(null);
     //--------------------End--------------------//
 
     /**
@@ -368,7 +370,14 @@ const KanjiVocabulary = ({ isAddKanjiDialogOpen, setIsAddKanjiDialogOpen }: Kanj
                                             <TableCell className="w-40">{k.kunyomi}</TableCell>
                                             <TableCell className="text-right w-28">
                                                 <Button variant="ghost" size="icon"><Edit className="w-4 h-4" /></Button>
-                                                <Button variant="ghost" size="icon"><Trash2 className="w-4 h-4 text-red-500" /></Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => setKanjiIdToDelete(k.id)}
+                                                    className="text-error hover:text-white hover:bg-error"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
                                             </TableCell>
                                         </TableRow>
                                     ))
@@ -403,6 +412,11 @@ const KanjiVocabulary = ({ isAddKanjiDialogOpen, setIsAddKanjiDialogOpen }: Kanj
                     />
                 )}
             </CardFooter>
+
+            <DeleteConfirmKanji
+                kanjiIdToDelete={kanjiIdToDelete}
+                setKanjiIdToDelete={setKanjiIdToDelete}
+            />
         </Card>
     )
 }

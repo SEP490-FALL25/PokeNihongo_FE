@@ -809,7 +809,17 @@
         "totalKanji": "総漢字数",
         "vocabularyN5": "語彙N5",
         "vocabularyN4": "語彙N4",
-        "vocabularyN3": "語彙N3"
+        "vocabularyN3": "語彙N3",
+        "kanji": {
+            "deleteDialog": {
+                "title": "削除の確認",
+                "message": "この漢字を削除してもよろしいですか？この操作は元に戻せません。",
+                "deleteButton": "削除",
+                "deleting": "削除中..."
+            },
+            "deleteSuccess": "漢字が正常に削除されました",
+            "deleteError": "漢字の削除中にエラーが発生しました"
+        }
     },
     "managerGrammar": {
         "title": "文法ライブラリ",

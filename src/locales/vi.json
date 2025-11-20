@@ -819,7 +819,17 @@
         "totalKanji": "Tổng Kanji",
         "vocabularyN5": "Từ vựng N5",
         "vocabularyN4": "Từ vựng N4",
-        "vocabularyN3": "Từ vựng N3"
+        "vocabularyN3": "Từ vựng N3",
+        "kanji": {
+            "deleteDialog": {
+                "title": "Xác nhận xóa",
+                "message": "Bạn có chắc chắn muốn xóa kanji này? Hành động này không thể hoàn tác.",
+                "deleteButton": "Xóa",
+                "deleting": "Đang xóa..."
+            },
+            "deleteSuccess": "Xóa kanji thành công",
+            "deleteError": "Có lỗi xảy ra khi xóa kanji"
+        }
     },
     "managerGrammar": {
         "title": "Quản lý ngữ pháp",
