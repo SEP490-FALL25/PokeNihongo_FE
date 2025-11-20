@@ -1,8 +1,11 @@
-import { ICreateGeminiConfigModelsRequest, IUpdateGeminiConfigPromptsRequest, IUpdateModelConfigsPolicySchemaRequest } from "@models/ai/request";
+import { ICreateGeminiConfigModelsRequest, ICreateServiceConfigRequest, IUpdateGeminiConfigPromptsRequest, IUpdateModelConfigsPolicySchemaRequest } from "@models/ai/request";
 import { IQueryRequest } from "@models/common/request";
+import { selectCurrentLanguage } from "@redux/features/language/selector";
 import geminiService from "@services/ai";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 //--------------------------------------Config Prompts--------------------------------------//
 /**
@@ -279,3 +282,63 @@ export const useUpdateModelConfigsPolicySchema = () => {
 }
 //-----------------------End-----------------------//
 //---------------------------------------------End Model Configs Policy Schema---------------------------------------------//
+
+
+
+//--------------------------------------Service Config--------------------------------------//
+/**
+ * Handle Get Service Configs
+ * @returns 
+ */
+export const useGetServiceConfigs = () => {
+    const language = useSelector(selectCurrentLanguage);
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['gemini-service-configs', language],
+        queryFn: () => geminiService.getServiceConfigs(),
+    });
+    return { data: data?.data?.data, isLoading, error };
+}
+//-----------------------End-----------------------//s
+
+/**
+ * Handle Create Service Config
+ */
+export const useCreateServiceConfig = () => {
+    const queryClient = useQueryClient();
+    const { t } = useTranslation();
+    const createServiceConfigMutation = useMutation({
+        mutationFn: (data: ICreateServiceConfigRequest) => geminiService.createServiceConfig(data),
+        onSuccess: (data: any) => {
+            queryClient.invalidateQueries({ queryKey: ['gemini-service-configs'] });
+            toast.success(data?.message || t('aiService.createSuccess'));
+        },
+        onError: (error: any) => {
+            toast.error(error?.response?.data?.message || t('aiService.createError'));
+        },
+    });
+    return createServiceConfigMutation;
+}
+//-----------------------End-----------------------//
+
+
+/**
+ * Handle Delete Service Config
+ * @returns useMutation to delete service config
+ */
+export const useDeleteServiceConfig = () => {
+    const queryClient = useQueryClient();
+    const { t } = useTranslation();
+    const deleteServiceConfigMutation = useMutation({
+        mutationFn: (id: number) => geminiService.deleteServiceConfig(id),
+        onSuccess: (data: any, variables: any) => {
+            queryClient.invalidateQueries({ queryKey: ['gemini-service-configs'] });
+            queryClient.invalidateQueries({ queryKey: ['gemini-service-configs-by-id', variables.id] });
+            toast.success(data?.message || t('aiService.deleteSuccess'));
+        },
+        onError: (error: any) => {
+            toast.error(error?.response?.data?.message || t('aiService.deleteError'));
+        },
+    });
+    return deleteServiceConfigMutation;
+}
+//---------------------------------------------End Service Config---------------------------------------------//

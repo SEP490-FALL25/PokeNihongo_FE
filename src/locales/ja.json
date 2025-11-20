@@ -263,7 +263,8 @@
         "permissionManagement": "権限管理",
         "test": "テスト管理",
         "configAI": "AI設定",
-        "customAI": "カスタムAI"
+        "customAI": "カスタムAI",
+        "aiService": "サービス設定"
     },
     "aiCommon": {
         "inSystem": "システム内",
@@ -982,6 +983,7 @@
         "maxRequired": "最大数量は必須です",
         "precreateBeforeEndDaysRequired": "終了日までの事前作成日数は必須です",
         "geminiConfigModelIdRequired": "有効なモデルIDを入力してください",
+        "geminiConfigIdRequired": "有効な設定IDを入力してください",
         "promptRequired": "プロンプトを入力してください"
     },
     "conditionTypes": {
@@ -1236,6 +1238,42 @@
             "N3": "N3",
             "N4": "N4",
             "N5": "N5"
+        }
+    },
+    "aiService": {
+        "title": "サービス設定管理",
+        "description": "AIサービス設定を管理",
+        "addNew": "新規追加",
+        "createServiceConfig": "サービス設定を作成",
+        "serviceType": "サービスタイプ",
+        "selectServiceType": "サービスタイプを選択",
+        "geminiConfigId": "Gemini設定",
+        "selectGeminiConfig": "Gemini設定を選択",
+        "isDefault": "デフォルト",
+        "isActive": "アクティブ",
+        "loading": "読み込み中...",
+        "noServiceConfigs": "サービス設定が見つかりません",
+        "createSuccess": "サービス設定が正常に作成されました",
+        "createError": "サービス設定の作成中にエラーが発生しました",
+        "deleteSuccess": "サービス設定が正常に削除されました",
+        "deleteError": "サービス設定の削除中にエラーが発生しました",
+        "deleteDialog": {
+            "title": "削除の確認",
+            "message": "このサービス設定を削除してもよろしいですか？この操作は元に戻せません。",
+            "deleteButton": "削除",
+            "deleting": "削除中..."
+        },
+        "serviceTypes": {
+            "PERSONALIZED_RECOMMENDATIONS": "パーソナライズされた推奨",
+            "AI_KAIWA": "AI会話"
+        },
+        "columns": {
+            "id": "ID",
+            "serviceType": "サービスタイプ",
+            "geminiConfig": "Gemini設定",
+            "isDefault": "デフォルト",
+            "isActive": "ステータス",
+            "createdAt": "作成日"
         }
     }
 }

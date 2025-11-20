@@ -1,5 +1,5 @@
 import { axiosPrivate } from "@configs/axios";
-import { ICreateGeminiConfigModelsRequest, IUpdateGeminiConfigPromptsRequest, IUpdateModelConfigsPolicySchemaRequest } from "@models/ai/request";
+import { ICreateGeminiConfigModelsRequest, ICreateServiceConfigRequest, IUpdateGeminiConfigPromptsRequest, IUpdateModelConfigsPolicySchemaRequest } from "@models/ai/request";
 import { IQueryRequest } from "@models/common/request";
 
 const geminiService = {
@@ -130,7 +130,17 @@ const geminiService = {
         return await axiosPrivate.post('/gemini-config/config-models', data);
     },
 
-    
+    getServiceConfigs: async () => {
+        return await axiosPrivate.get('/gemini-config/service-configs');
+    },
+
+    createServiceConfig: async (data: ICreateServiceConfigRequest) => {
+        return await axiosPrivate.post('/gemini-config/service-configs', data);
+    },
+
+    deleteServiceConfig: async (id: number) => {
+        return await axiosPrivate.delete(`/gemini-config/service-configs/${id}`);
+    },
 }
 
 export default geminiService;

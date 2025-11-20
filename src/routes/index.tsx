@@ -30,6 +30,7 @@ const TournamentManagement = lazy(() => import("@pages/AdminPage/Tournaments"))
 const AIPromptManagement = lazy(() => import("@pages/AdminPage/AIPrompts"))
 const CustomAIManagement = lazy(() => import("@pages/AdminPage/AICustom"))
 const CustomAIDetail = lazy(() => import("@pages/AdminPage/AICustom/components/CustomAIDetail"))
+const AIServiceManagement = lazy(() => import("@pages/AdminPage/AIService"))
 const DailyQuestManagement = lazy(() => import("@pages/AdminPage/DailyQuest"))
 const RewardManagement = lazy(() => import("@pages/AdminPage/Reward"))
 const QuestionBankManagement = lazy(() => import("@pages/AdminPage/QuestionBank"))
@@ -68,6 +69,7 @@ const RouterComponent = () => {
                                 { path: ROUTES.ADMIN.CUSTOM_AI_MANAGEMENT, element: <CustomAIManagement /> },
                                 { path: `${ROUTES.ADMIN.CUSTOM_AI_MANAGEMENT}/:configId`, element: <CustomAIDetail /> },
                                 { path: ROUTES.ADMIN.CUSTOM_AI_MANAGEMENT_DETAIL, element: <CustomAIDetail /> },
+                                { path: ROUTES.ADMIN.AI_SERVICE_MANAGEMENT, element: <AIServiceManagement /> },
                                 { path: ROUTES.ADMIN.DAILY_QUEST_MANAGEMENT, element: <DailyQuestManagement /> },
                                 { path: ROUTES.ADMIN.REWARD_MANAGEMENT, element: <RewardManagement /> },
                                 { path: ROUTES.ADMIN.CONFIG_SHOP, element: <ConfigShop /> },

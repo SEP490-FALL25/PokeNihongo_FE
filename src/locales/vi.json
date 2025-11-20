@@ -264,6 +264,7 @@
         "aiPrompts": "AI Prompts",
         "configAI": "Cấu hình AI",
         "customAI": "Custom AI",
+        "aiService": "Service Config",
         "rewards": "Phần thưởng",
         "lessonManagement": "Danh sách bài học",
         "lessonTypes": "Loại bài học",
@@ -999,6 +1000,7 @@
         "responseMimeTypeRequired": "Response MIME type là bắt buộc",
         "presetIdRequired": "Preset là bắt buộc",
         "geminiConfigModelIdRequired": "Vui lòng chọn Model ID hợp lệ",
+        "geminiConfigIdRequired": "Vui lòng chọn Config ID hợp lệ",
         "promptRequired": "Vui lòng nhập nội dung prompt"
     },
     "conditionTypes": {
@@ -1253,6 +1255,42 @@
             "N3": "N3",
             "N4": "N4",
             "N5": "N5"
+        }
+    },
+    "aiService": {
+        "title": "Quản lý Service Config",
+        "description": "Quản lý cấu hình dịch vụ AI",
+        "addNew": "Thêm mới",
+        "createServiceConfig": "Tạo Service Config",
+        "serviceType": "Loại dịch vụ",
+        "selectServiceType": "Chọn loại dịch vụ",
+        "geminiConfigId": "Gemini Config",
+        "selectGeminiConfig": "Chọn Gemini Config",
+        "isDefault": "Mặc định",
+        "isActive": "Kích hoạt",
+        "loading": "Đang tải...",
+        "noServiceConfigs": "Không có service config nào",
+        "createSuccess": "Tạo service config thành công",
+        "createError": "Có lỗi xảy ra khi tạo service config",
+        "deleteSuccess": "Xóa service config thành công",
+        "deleteError": "Có lỗi xảy ra khi xóa service config",
+        "deleteDialog": {
+            "title": "Xác nhận xóa",
+            "message": "Bạn có chắc chắn muốn xóa service config này? Hành động này không thể hoàn tác.",
+            "deleteButton": "Xóa",
+            "deleting": "Đang xóa..."
+        },
+        "serviceTypes": {
+            "PERSONALIZED_RECOMMENDATIONS": "Gợi ý cá nhân hóa",
+            "AI_KAIWA": "Hội thoại AI"
+        },
+        "columns": {
+            "id": "ID",
+            "serviceType": "Loại dịch vụ",
+            "geminiConfig": "Gemini Config",
+            "isDefault": "Mặc định",
+            "isActive": "Trạng thái",
+            "createdAt": "Ngày tạo"
         }
     }
 }
