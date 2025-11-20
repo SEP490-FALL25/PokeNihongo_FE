@@ -841,6 +841,60 @@
                 "unknown": "Không xác định"
             }
         },
+        "createVocabulary": {
+            "title": "Thêm Từ vựng",
+            "modes": {
+                "manual": "Nhập tay",
+                "import": "Import file"
+            },
+            "import": {
+                "title": "Import Từ vựng từ file",
+                "description": "Tải lên file JSON theo cấu trúc dữ liệu Từ vựng",
+                "selectFile": "Chọn file để import",
+                "clickToSelect": "Nhấn để chọn file",
+                "dragAndDrop": "hoặc kéo thả file vào đây",
+                "maxSize": "Tối đa 5MB"
+            },
+            "basicInfo": {
+                "title": "Thông tin cơ bản",
+                "wordJp": "Từ tiếng Nhật",
+                "wordJpPlaceholder": "例: 食べる",
+                "reading": "Cách đọc",
+                "readingPlaceholder": "たべる",
+                "jlptLevel": "Cấp độ JLPT",
+                "jlptLevelPlaceholder": "Chọn cấp độ (N5 → N1)",
+                "wordType": "Loại từ",
+                "wordTypePlaceholder": "Chọn loại từ"
+            },
+            "translations": {
+                "title": "Bản dịch",
+                "addLanguage": "Thêm ngôn ngữ",
+                "meaning": "Nghĩa",
+                "meaningPlaceholder": "Nghĩa của từ",
+                "addMeaningLine": "Thêm dòng nghĩa"
+            },
+            "examples": {
+                "title": "Ví dụ",
+                "addExample": "Thêm ví dụ",
+                "language": "Ngôn ngữ",
+                "selectLanguage": "Chọn",
+                "originalSentence": "Câu gốc",
+                "originalSentencePlaceholder": "日本語の文",
+                "translation": "Bản dịch",
+                "translationPlaceholder": "Câu dịch",
+                "delete": "Xóa"
+            },
+            "attachments": {
+                "title": "Tệp đính kèm"
+            },
+            "cancel": "Hủy",
+            "creating": "Đang tạo...",
+            "create": "Tạo từ vựng",
+            "createSuccess": "Tạo từ vựng thành công",
+            "validationErrors": "Lỗi xác thực",
+            "validationError": "Có lỗi xác thực",
+            "generalError": "Đã có lỗi xảy ra"
+        },
         "deleteDialog": {
             "title": "Xác nhận xóa",
             "message": "Bạn có chắc chắn muốn xóa từ vựng này? Hành động này không thể hoàn tác.",

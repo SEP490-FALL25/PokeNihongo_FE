@@ -831,6 +831,60 @@
                 "unknown": "不明"
             }
         },
+        "createVocabulary": {
+            "title": "語彙を追加",
+            "modes": {
+                "manual": "手入力",
+                "import": "ファイルインポート"
+            },
+            "import": {
+                "title": "ファイルから語彙をインポート",
+                "description": "語彙データ構造のJSONファイルをアップロード",
+                "selectFile": "インポートするファイルを選択",
+                "clickToSelect": "クリックしてファイルを選択",
+                "dragAndDrop": "またはここにファイルをドラッグ＆ドロップ",
+                "maxSize": "最大5MB"
+            },
+            "basicInfo": {
+                "title": "基本情報",
+                "wordJp": "日本語の単語",
+                "wordJpPlaceholder": "例：食べる",
+                "reading": "読み方",
+                "readingPlaceholder": "たべる",
+                "jlptLevel": "JLPTレベル",
+                "jlptLevelPlaceholder": "レベルを選択（N5 → N1）",
+                "wordType": "品詞",
+                "wordTypePlaceholder": "品詞を選択"
+            },
+            "translations": {
+                "title": "翻訳",
+                "addLanguage": "言語を追加",
+                "meaning": "意味",
+                "meaningPlaceholder": "単語の意味",
+                "addMeaningLine": "意味行を追加"
+            },
+            "examples": {
+                "title": "例文",
+                "addExample": "例文を追加",
+                "language": "言語",
+                "selectLanguage": "選択",
+                "originalSentence": "原文",
+                "originalSentencePlaceholder": "日本語の文",
+                "translation": "翻訳",
+                "translationPlaceholder": "翻訳文",
+                "delete": "削除"
+            },
+            "attachments": {
+                "title": "添付ファイル"
+            },
+            "cancel": "キャンセル",
+            "creating": "作成中...",
+            "create": "語彙を作成",
+            "createSuccess": "語彙が正常に作成されました",
+            "validationErrors": "検証エラー",
+            "validationError": "検証エラーが発生しました",
+            "generalError": "エラーが発生しました"
+        },
         "deleteDialog": {
             "title": "削除の確認",
             "message": "この語彙を削除してもよろしいですか？この操作は元に戻せません。",
