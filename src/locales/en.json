@@ -832,6 +832,35 @@
         "vocabularyN5": "Vocabulary N5",
         "vocabularyN4": "Vocabulary N4",
         "vocabularyN3": "Vocabulary N3",
+        "listVocabulary": {
+            "title": "Vocabulary List",
+            "searchPlaceholder": "Search vocabulary...",
+            "addNew": "Add New",
+            "columns": {
+                "wordJp": "Japanese",
+                "reading": "Reading",
+                "wordType": "Word Type",
+                "level": "Level",
+                "media": "Media",
+                "actions": "Actions"
+            },
+            "wordTypes": {
+                "noun": "Noun",
+                "verb": "Verb",
+                "adjective": "Adjective",
+                "adverb": "Adverb",
+                "particle": "Particle",
+                "unknown": "Unknown"
+            }
+        },
+        "deleteDialog": {
+            "title": "Confirm Delete",
+            "message": "Are you sure you want to delete this vocabulary? This action cannot be undone.",
+            "deleteButton": "Delete",
+            "deleting": "Deleting..."
+        },
+        "deleteSuccess": "Vocabulary deleted successfully",
+        "deleteError": "An error occurred while deleting vocabulary",
         "kanji": {
             "deleteDialog": {
                 "title": "Confirm Delete",

@@ -820,6 +820,35 @@
         "vocabularyN5": "Từ vựng N5",
         "vocabularyN4": "Từ vựng N4",
         "vocabularyN3": "Từ vựng N3",
+        "listVocabulary": {
+            "title": "Danh sách từ vựng",
+            "searchPlaceholder": "Tìm kiếm từ vựng...",
+            "addNew": "Thêm mới",
+            "columns": {
+                "wordJp": "Tiếng Nhật",
+                "reading": "Cách đọc",
+                "wordType": "Loại từ",
+                "level": "Cấp độ",
+                "media": "Media",
+                "actions": "Hành động"
+            },
+            "wordTypes": {
+                "noun": "Danh từ",
+                "verb": "Động từ",
+                "adjective": "Tính từ",
+                "adverb": "Trạng từ",
+                "particle": "Trợ từ",
+                "unknown": "Không xác định"
+            }
+        },
+        "deleteDialog": {
+            "title": "Xác nhận xóa",
+            "message": "Bạn có chắc chắn muốn xóa từ vựng này? Hành động này không thể hoàn tác.",
+            "deleteButton": "Xóa",
+            "deleting": "Đang xóa..."
+        },
+        "deleteSuccess": "Xóa từ vựng thành công",
+        "deleteError": "Có lỗi xảy ra khi xóa từ vựng",
         "kanji": {
             "deleteDialog": {
                 "title": "Xác nhận xóa",

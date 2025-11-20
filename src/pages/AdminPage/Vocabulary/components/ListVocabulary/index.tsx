@@ -15,6 +15,8 @@ import PaginationControls from "@ui/PaginationControls";
 import { useState } from "react";
 import { Skeleton } from "@ui/Skeleton";
 import TabListLevelJLBT from "@organisms/TabListLevelJLBT";
+import DeleteConfirmVocabulary from "./components/DeleteConfirmVocabulary";
+import { useTranslation } from "react-i18next";
 
 interface Vocabulary {
     isAddVocabularyDialogOpen: boolean;
@@ -22,6 +24,7 @@ interface Vocabulary {
 }
 
 const ListVocabulary = ({ isAddVocabularyDialogOpen, setIsAddVocabularyDialogOpen }: Vocabulary) => {
+    const { t } = useTranslation();
 
     /**
      * Handle Vocabulary List Hook
@@ -33,6 +36,7 @@ const ListVocabulary = ({ isAddVocabularyDialogOpen, setIsAddVocabularyDialogOpe
     const [itemsPerPage, setItemsPerPage] = useState<number>(15);
     const [sortBy, setSortBy] = useState<string | undefined>(undefined);
     const [sort, setSort] = useState<"asc" | "desc" | undefined>(undefined);
+    const [vocabularyIdToDelete, setVocabularyIdToDelete] = useState<number | null>(null);
     const { data: vocabularies, isLoading } = useVocabularyList({
         page: page,
         limit: itemsPerPage,
@@ -111,13 +115,13 @@ const ListVocabulary = ({ isAddVocabularyDialogOpen, setIsAddVocabularyDialogOpe
         <Table>
             <TableHeader>
                 <TableRow className="border-gray-200 hover:bg-gray-50">
-                    <TableHead className="text-gray-600 font-semibold">Tiếng Nhật</TableHead>
-                    <TableHead className="text-gray-600 font-semibold">Cách đọc</TableHead>
-                    <TableHead className="text-gray-600 font-semibold">Loại từ</TableHead>
-                    <TableHead className="text-gray-600 font-semibold">Cấp độ</TableHead>
-                    <TableHead className="text-gray-600 font-semibold">Media</TableHead>
+                    <TableHead className="text-gray-600 font-semibold">{t("vocabulary.listVocabulary.columns.wordJp")}</TableHead>
+                    <TableHead className="text-gray-600 font-semibold">{t("vocabulary.listVocabulary.columns.reading")}</TableHead>
+                    <TableHead className="text-gray-600 font-semibold">{t("vocabulary.listVocabulary.columns.wordType")}</TableHead>
+                    <TableHead className="text-gray-600 font-semibold">{t("vocabulary.listVocabulary.columns.level")}</TableHead>
+                    <TableHead className="text-gray-600 font-semibold">{t("vocabulary.listVocabulary.columns.media")}</TableHead>
                     <TableHead>
-                        <div className="text-center font-semibold text-gray-600">Hành động</div>
+                        <div className="text-center font-semibold text-gray-600">{t("vocabulary.listVocabulary.columns.actions")}</div>
                     </TableHead>
                 </TableRow>
             </TableHeader>
@@ -155,13 +159,13 @@ const ListVocabulary = ({ isAddVocabularyDialogOpen, setIsAddVocabularyDialogOpe
         <Card className="bg-white shadow-lg">
             <CardHeader className="pb-0">
                 <div className="flex items-center justify-between mt-2">
-                    <CardTitle className="text-2xl font-bold text-gray-800">Danh sách từ vựng</CardTitle>
+                    <CardTitle className="text-2xl font-bold text-gray-800">{t("vocabulary.listVocabulary.title")}</CardTitle>
                 </div>
 
                 <div className="flex items-center justify-between">
                     <div className="mt-4 pb-4 flex-1 mr-4 focus:ring-primary focus:ring-2">
                         <Input
-                            placeholder="Tìm kiếm từ vựng..."
+                            placeholder={t("vocabulary.listVocabulary.searchPlaceholder")}
                             value={searchQuery}
                             isSearch
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -171,7 +175,7 @@ const ListVocabulary = ({ isAddVocabularyDialogOpen, setIsAddVocabularyDialogOpe
                     <Dialog open={isAddVocabularyDialogOpen} onOpenChange={setIsAddVocabularyDialogOpen}>
                         <DialogTrigger asChild>
                             <Button className="bg-primary text-white hover:bg-primary/90 rounded-full shadow-md transition-transform transform hover:scale-105">
-                                <Plus className="h-5 w-5 mr-2" /> Thêm mới
+                                <Plus className="h-5 w-5 mr-2" /> {t("vocabulary.listVocabulary.addNew")}
                             </Button>
                         </DialogTrigger>
                         <CreateVocabulary setIsAddDialogOpen={setIsAddVocabularyDialogOpen} />
@@ -191,19 +195,19 @@ const ListVocabulary = ({ isAddVocabularyDialogOpen, setIsAddVocabularyDialogOpe
                                     <TableRow className="border-gray-200 hover:bg-gray-50">
                                         <TableHead className="text-gray-600 font-semibold w-40">
                                             <span className="inline-flex items-center gap-1 text-gray-600">
-                                                Tiếng Nhật
+                                                {t("vocabulary.listVocabulary.columns.wordJp")}
                                                 <Minus className="w-4 h-4 text-gray-300" />
                                             </span>
                                         </TableHead>
                                         <TableHead className="text-gray-600 font-semibold w-36">
                                             <span className="inline-flex items-center gap-1 text-gray-600">
-                                                Cách đọc
+                                                {t("vocabulary.listVocabulary.columns.reading")}
                                                 <Minus className="w-4 h-4 text-gray-300" />
                                             </span>
                                         </TableHead>
                                         <TableHead className="text-gray-600 font-semibold w-28">
                                             <span className="inline-flex items-center gap-1 text-gray-600">
-                                                Loại từ
+                                                {t("vocabulary.listVocabulary.columns.wordType")}
                                                 <Minus className="w-4 h-4 text-gray-300" />
                                             </span>
                                         </TableHead>
@@ -212,7 +216,7 @@ const ListVocabulary = ({ isAddVocabularyDialogOpen, setIsAddVocabularyDialogOpe
                                                 className="inline-flex items-center gap-1 hover:text-gray-900"
                                                 onClick={() => toggleSort("levelN")}
                                             >
-                                                Cấp độ
+                                                {t("vocabulary.listVocabulary.columns.level")}
                                                 <span className="inline-block w-4 h-4">
                                                     {sortBy === "levelN" ? (
                                                         sort === "asc" ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
@@ -224,13 +228,13 @@ const ListVocabulary = ({ isAddVocabularyDialogOpen, setIsAddVocabularyDialogOpe
                                         </TableHead>
                                         <TableHead className="text-gray-600 font-semibold w-24">
                                             <span className="inline-flex items-center gap-1 text-gray-600">
-                                                Media
+                                                {t("vocabulary.listVocabulary.columns.media")}
                                                 <Minus className="w-4 h-4 text-gray-300" />
                                             </span>
                                         </TableHead>
                                         <TableHead className="text-right w-28">
                                             <div className="inline-flex items-center gap-1 justify-end w-full text-gray-600 font-semibold">
-                                                Hành động
+                                                {t("vocabulary.listVocabulary.columns.actions")}
                                                 <Minus className="w-4 h-4 text-gray-300" />
                                             </div>
                                         </TableHead>
@@ -244,7 +248,7 @@ const ListVocabulary = ({ isAddVocabularyDialogOpen, setIsAddVocabularyDialogOpe
                                             <TableCell className="w-28 whitespace-nowrap">
                                                 {(() => {
                                                     const typeName = (vocab?.wordType?.name as string | undefined) || "unknown";
-                                                    const label = typeName ? typeName.charAt(0).toUpperCase() + typeName.slice(1) : "-";
+                                                    const label = t(`vocabulary.listVocabulary.wordTypes.${typeName}`, typeName);
                                                     return (
                                                         <Badge className={getTypeBadgeColor(typeName) + " font-semibold"}>
                                                             {label}
@@ -273,8 +277,13 @@ const ListVocabulary = ({ isAddVocabularyDialogOpen, setIsAddVocabularyDialogOpe
                                                 <Button variant="ghost" size="icon">
                                                     <Edit className="h-4 w-4" />
                                                 </Button>
-                                                <Button variant="ghost" size="icon">
-                                                    <Trash2 className="h-4 w-4 text-red-500" />
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => setVocabularyIdToDelete(vocab.id)}
+                                                    className="text-error hover:text-white hover:bg-error"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
                                                 </Button>
                                             </TableCell>
                                         </TableRow>
@@ -297,6 +306,11 @@ const ListVocabulary = ({ isAddVocabularyDialogOpen, setIsAddVocabularyDialogOpe
                     isLoading={isLoading}
                 />
             </CardFooter>
+
+            <DeleteConfirmVocabulary
+                vocabularyIdToDelete={vocabularyIdToDelete}
+                setVocabularyIdToDelete={setVocabularyIdToDelete}
+            />
         </Card>
     )
 }

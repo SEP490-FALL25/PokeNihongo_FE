@@ -810,6 +810,35 @@
         "vocabularyN5": "語彙N5",
         "vocabularyN4": "語彙N4",
         "vocabularyN3": "語彙N3",
+        "listVocabulary": {
+            "title": "語彙リスト",
+            "searchPlaceholder": "語彙を検索...",
+            "addNew": "新規追加",
+            "columns": {
+                "wordJp": "日本語",
+                "reading": "読み方",
+                "wordType": "品詞",
+                "level": "レベル",
+                "media": "メディア",
+                "actions": "操作"
+            },
+            "wordTypes": {
+                "noun": "名詞",
+                "verb": "動詞",
+                "adjective": "形容詞",
+                "adverb": "副詞",
+                "particle": "助詞",
+                "unknown": "不明"
+            }
+        },
+        "deleteDialog": {
+            "title": "削除の確認",
+            "message": "この語彙を削除してもよろしいですか？この操作は元に戻せません。",
+            "deleteButton": "削除",
+            "deleting": "削除中..."
+        },
+        "deleteSuccess": "語彙が正常に削除されました",
+        "deleteError": "語彙の削除中にエラーが発生しました",
         "kanji": {
             "deleteDialog": {
                 "title": "削除の確認",
