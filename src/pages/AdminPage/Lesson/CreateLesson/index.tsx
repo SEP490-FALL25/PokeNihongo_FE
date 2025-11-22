@@ -44,7 +44,7 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
         titleJp: '',
         levelJlpt: 5,
         estimatedTimeMinutes: 45,
-        isPublished: false,
+        isPublished: true,
         version: '1.0.0',
         lessonCategoryId: 1, // Will be auto-calculated from levelJlpt
         rewardIds: [],
@@ -321,7 +321,7 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
 
     return (
         <>
-            <DialogContent className="bg-gradient-to-br from-white to-gray-50 border-border max-w-4xl max-h-[95vh] overflow-hidden">
+            <DialogContent className="bg-gradient-to-br from-white to-gray-50 border-border max-w-4xl max-h-[90vh] overflow-hidden">
                 <DialogHeader className="pb-6">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-primary/10 rounded-lg">
@@ -338,7 +338,7 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
                     </div>
                 </DialogHeader>
 
-                <div className="overflow-y-auto max-h-[calc(95vh-200px)] pr-2">
+                <div className="overflow-y-auto max-h-[calc(95vh-300px)] pr-2">
                     <div className="space-y-6">
                         {/* Thông tin cơ bản */}
                         <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
@@ -463,7 +463,7 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
                                     </p>}
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {/* Thời lượng */}
                                     <div className="space-y-2">
                                         <label className="text-sm font-semibold text-foreground flex items-center gap-2">
@@ -481,6 +481,25 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
                                         {errors.estimatedTimeMinutes && <p className="text-sm text-red-500 flex items-center gap-1">
                                             <X className="h-3 w-3" />
                                             {errors.estimatedTimeMinutes}
+                                        </p>}
+                                    </div>
+
+                                    {/* Phiên bản */}
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                                            <FileText className="h-4 w-4 text-primary" />
+                                            Phiên bản *
+                                        </label>
+                                        <Input
+                                            placeholder="1.0.0"
+                                            className="bg-background border-border text-foreground h-11"
+                                            value={formData.version}
+                                            onChange={(e) => handleInputChange('version', e.target.value)}
+                                            onBlur={() => handleBlur('version')}
+                                        />
+                                        {errors.version && <p className="text-sm text-red-500 flex items-center gap-1">
+                                            <X className="h-3 w-3" />
+                                            {errors.version}
                                         </p>}
                                     </div>
                                 </div>
@@ -531,25 +550,6 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
                                             Đã chọn {formData.rewardIds.length} phần thưởng
                                         </p>
                                     )}
-                                </div>
-
-                                {/* Phiên bản */}
-                                <div className="space-y-2">
-                                    <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                                        <FileText className="h-4 w-4 text-primary" />
-                                        Phiên bản *
-                                    </label>
-                                    <Input
-                                        placeholder="1.0.0"
-                                        className="bg-background border-border text-foreground h-11"
-                                        value={formData.version}
-                                        onChange={(e) => handleInputChange('version', e.target.value)}
-                                        onBlur={() => handleBlur('version')}
-                                    />
-                                    {errors.version && <p className="text-sm text-red-500 flex items-center gap-1">
-                                        <X className="h-3 w-3" />
-                                        {errors.version}
-                                    </p>}
                                 </div>
                             </CardContent>
                         </Card>
