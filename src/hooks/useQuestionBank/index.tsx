@@ -313,44 +313,30 @@ export const useQuestionBank = (
 
     // Meanings (translations) are optional - no validation needed
 
-    // Validate answers (required for all types except MATCHING)
-    if (data.questionType !== "MATCHING") {
-      if (!data.answers || data.answers.length === 0) {
-        const error = "Ít nhất một câu trả lời là bắt buộc";
-        errors.push(error);
-        fieldErrors.answers = [error];
-      } else {
-        // Check if at least one answer is marked as correct
-        const hasCorrectAnswer = data.answers.some(
-          (answer) => answer.isCorrect
-        );
-        if (!hasCorrectAnswer) {
-          const error = "Ít nhất một câu trả lời phải được đánh dấu là đúng";
-          errors.push(error);
-          fieldErrors.answers = [...(fieldErrors.answers || []), error];
-        }
-
-        // Check if all answers have Japanese text
-        const hasEmptyAnswers = data.answers.some(
-          (answer) => !answer.answerJp || answer.answerJp.trim() === ""
-        );
-        if (hasEmptyAnswers) {
-          const error = "Tất cả câu trả lời phải có nội dung tiếng Nhật";
-          errors.push(error);
-          fieldErrors.answers = [...(fieldErrors.answers || []), error];
-        }
-      }
+    // Validate answers (required for all types)
+    if (!data.answers || data.answers.length === 0) {
+      const error = "Ít nhất một câu trả lời là bắt buộc";
+      errors.push(error);
+      fieldErrors.answers = [error];
     } else {
-      // For MATCHING type, validate single answer
-      if (
-        !data.answers ||
-        data.answers.length === 0 ||
-        !data.answers[0]?.answerJp ||
-        data.answers[0].answerJp.trim() === ""
-      ) {
-        const error = "Câu trả lời tiếng Nhật là bắt buộc cho loại MATCHING";
+      // Check if at least one answer is marked as correct
+      const hasCorrectAnswer = data.answers.some(
+        (answer) => answer.isCorrect
+      );
+      if (!hasCorrectAnswer) {
+        const error = "Ít nhất một câu trả lời phải được đánh dấu là đúng";
         errors.push(error);
-        fieldErrors.answers = [error];
+        fieldErrors.answers = [...(fieldErrors.answers || []), error];
+      }
+
+      // Check if all answers have Japanese text
+      const hasEmptyAnswers = data.answers.some(
+        (answer) => !answer.answerJp || answer.answerJp.trim() === ""
+      );
+      if (hasEmptyAnswers) {
+        const error = "Tất cả câu trả lời phải có nội dung tiếng Nhật";
+        errors.push(error);
+        fieldErrors.answers = [...(fieldErrors.answers || []), error];
       }
     }
 
@@ -681,26 +667,22 @@ export const useQuestionBank = (
                 },
               ];
 
-        // For non-MATCHING, ensure exactly 4 answer slots by padding blanks
-        if (question.questionType !== "MATCHING") {
-          const padded = [...base];
-          while (padded.length < 4) {
-            padded.push({
-              id: undefined,
-              answerJp: "",
-              isCorrect: false,
-              translations: {
-                meaning: [
-                  { language_code: "vi", value: "" },
-                  { language_code: "en", value: "" },
-                ],
-              },
-            });
-          }
-          return { ...prev, answers: padded.slice(0, 4) };
+        // Ensure exactly 4 answer slots by padding blanks
+        const padded = [...base];
+        while (padded.length < 4) {
+          padded.push({
+            id: undefined,
+            answerJp: "",
+            isCorrect: false,
+            translations: {
+              meaning: [
+                { language_code: "vi", value: "" },
+                { language_code: "en", value: "" },
+              ],
+            },
+          });
         }
-
-        return { ...prev, answers: base.slice(0, 1) };
+        return { ...prev, answers: padded.slice(0, 4) };
       });
     } catch (error) {
       console.error("Error fetching answers:", error);

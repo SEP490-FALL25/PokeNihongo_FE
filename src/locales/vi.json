@@ -1036,7 +1036,9 @@
     },
     "createLesson": {
         "title": "Tạo bài học mới",
+        "editTitle": "Chỉnh sửa bài học",
         "description": "Điền thông tin để tạo bài học mới cho hệ thống",
+        "editDescription": "Chỉnh sửa thông tin bài học",
         "basicInfo": "Thông tin cơ bản",
         "titleJp": "Tiêu đề tiếng Nhật",
         "translations": "Dịch thuật",
@@ -1058,7 +1060,10 @@
         "checkInfo": "Vui lòng kiểm tra lại thông tin",
         "publishedSuccess": "Bài học đã được xuất bản",
         "draftSuccess": "Bài học đã được lưu nháp",
-        "createError": "Có lỗi xảy ra khi tạo bài học"
+        "updatePublishedSuccess": "Bài học đã được cập nhật và xuất bản",
+        "updateDraftSuccess": "Bài học đã được cập nhật và lưu nháp",
+        "createError": "Có lỗi xảy ra khi tạo bài học",
+        "updateError": "Có lỗi xảy ra khi cập nhật bài học"
     },
     "createPokemon": {
         "createSuccess": "Tạo Pokémon thành công",

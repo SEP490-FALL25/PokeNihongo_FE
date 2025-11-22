@@ -5,16 +5,25 @@ export const TestListRequestSchema = z.object({
   pageSize: z.number().optional(),
   search: z.string().optional(),
   levelN: z.number().optional(),
-  testType: z.enum(['PLACEMENT_TEST_DONE', 'MATCH_TEST', 'QUIZ_TEST', 'REVIEW_TEST', 'PRACTICE_TEST','READING_TEST', 'LISTENING_TEST', 'SPEAKING_TEST']).optional(),
+  testType: z.enum(['PLACEMENT_TEST_DONE', 'MATCH_TEST', 'QUIZ_TEST', 'REVIEW_TEST', 'PRACTICE_TEST','READING_TEST', 'LISTENING_TEST', 'SPEAKING_TEST', 'LESSON_REVIEW']).optional(),
   status: z.enum(['DRAFT', 'ACTIVE', 'INACTIVE']).optional(),
 });
 
 export type TestListRequest = z.infer<typeof TestListRequestSchema>;
 
 export const TestCreateRequestSchema = z.object({
+  meanings: z.array(z.object({
+    field: z.string(),
+    translations: z.object({
+      vi: z.string().optional(),
+      en: z.string().optional(),
+      ja: z.string().optional(),
+    })
+  })).optional(),
   price: z.number().optional(),
+  levelN: z.number().optional(),
   limit: z.number().optional(),
-  testType: z.enum(['PLACEMENT_TEST_DONE', 'MATCH_TEST', 'QUIZ_TEST', 'REVIEW_TEST', 'PRACTICE_TEST','READING_TEST', 'LISTENING_TEST', 'SPEAKING_TEST']),
+  testType: z.enum(['PLACEMENT_TEST_DONE', 'MATCH_TEST', 'QUIZ_TEST', 'REVIEW_TEST', 'PRACTICE_TEST','READING_TEST', 'LISTENING_TEST', 'SPEAKING_TEST', 'LESSON_REVIEW']),
   status: z.enum(['DRAFT', 'ACTIVE', 'INACTIVE'])
 });
 

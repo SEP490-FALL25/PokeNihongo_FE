@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@ui/Select";
-import { Search, Plus, Trash2, Eye, BookOpen, BookOpen as BookOpenIcon, FileText, Target, ArrowRight, Loader2, CheckCircle2, Clock, Users } from "lucide-react";
+import { Search, Plus, Trash2, Eye, BookOpen, BookOpen as BookOpenIcon, FileText, Target, ArrowRight, Loader2, CheckCircle2, Clock, Users, Edit } from "lucide-react";
 import { Tabs } from "@ui/Tabs";
 import HeaderAdmin from "@organisms/Header/Admin";
 import PaginationControls from "@ui/PaginationControls";
@@ -41,6 +41,7 @@ const LessonsManagement = () => {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState<boolean>(false);
+  const [editingLessonId, setEditingLessonId] = useState<number | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<LessonItem | null>(null);
   const [activeStep, setActiveStep] = useState<string>("content"); // content, exercises
   const [activeJlptTab, setActiveJlptTab] = useState<string>("all");
@@ -324,8 +325,11 @@ const LessonsManagement = () => {
                     </CardTitle>
                   </div>
                   <Dialog
-                    open={isAddDialogOpen}
-                    onOpenChange={setIsAddDialogOpen}
+                    open={isAddDialogOpen || editingLessonId !== null}
+                    onOpenChange={(open) => {
+                      setIsAddDialogOpen(open);
+                      if (!open) setEditingLessonId(null);
+                    }}
                   >
                     <DialogTrigger asChild>
                       <Button className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 shadow-lg">
@@ -333,7 +337,13 @@ const LessonsManagement = () => {
                         {t("lesson.addLesson")}
                       </Button>
                     </DialogTrigger>
-                    <CreateLesson setIsAddDialogOpen={setIsAddDialogOpen} />
+                    <CreateLesson 
+                      setIsAddDialogOpen={(open) => {
+                        setIsAddDialogOpen(open);
+                        if (!open) setEditingLessonId(null);
+                      }} 
+                      lessonId={editingLessonId}
+                    />
                   </Dialog>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4">
@@ -511,6 +521,14 @@ const LessonsManagement = () => {
                               >
                                 <Eye className="h-4 w-4 mr-2" />
                                 {t("lesson.manage")}
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="border-border text-foreground hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition-all shadow-sm"
+                                onClick={() => setEditingLessonId(lesson.id)}
+                              >
+                                <Edit className="h-4 w-4" />
                               </Button>
                               <Button
                                 variant="outline"

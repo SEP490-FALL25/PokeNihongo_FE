@@ -4,8 +4,7 @@ export const QUESTION_TYPE = {
     KANJI: 'KANJI',
     LISTENING: 'LISTENING',
     READING: 'READING',
-    SPEAKING: 'SPEAKING',
-    MATCHING: 'MATCHING'
+    SPEAKING: 'SPEAKING'
 } as const;
 
 export const JLPT_LEVEL = {
@@ -30,8 +29,7 @@ export const QUESTION_TYPE_LABELS = {
         [QUESTION_TYPE.KANJI]: 'Hán tự',
         [QUESTION_TYPE.LISTENING]: 'Nghe hiểu',
         [QUESTION_TYPE.READING]: 'Đọc hiểu',
-        [QUESTION_TYPE.SPEAKING]: 'Nói',
-        [QUESTION_TYPE.MATCHING]: 'Ghép cặp'
+        [QUESTION_TYPE.SPEAKING]: 'Nói'
     },
     en: {
         [QUESTION_TYPE.VOCABULARY]: 'Vocabulary',
@@ -39,8 +37,7 @@ export const QUESTION_TYPE_LABELS = {
         [QUESTION_TYPE.KANJI]: 'Kanji',
         [QUESTION_TYPE.LISTENING]: 'Listening',
         [QUESTION_TYPE.READING]: 'Reading',
-        [QUESTION_TYPE.SPEAKING]: 'Speaking',
-        [QUESTION_TYPE.MATCHING]: 'Matching'
+        [QUESTION_TYPE.SPEAKING]: 'Speaking'
     },
     ja: {
         [QUESTION_TYPE.VOCABULARY]: '語彙',
@@ -48,8 +45,7 @@ export const QUESTION_TYPE_LABELS = {
         [QUESTION_TYPE.KANJI]: '漢字',
         [QUESTION_TYPE.LISTENING]: '聴解',
         [QUESTION_TYPE.READING]: '読解',
-        [QUESTION_TYPE.SPEAKING]: '会話',
-        [QUESTION_TYPE.MATCHING]: 'マッチング'
+        [QUESTION_TYPE.SPEAKING]: '会話'
     }
 } as const;
 

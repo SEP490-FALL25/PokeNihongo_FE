@@ -9,6 +9,7 @@ import {
   BookOpen,
   FileText,
   BookMarked,
+  CheckCircle2,
 } from "lucide-react";
 import SelectTestSetDialog from "../../Dialogs/SelectTestSetDialog";
 import { useLessonExercises } from "@hooks/useLessonExercises";
@@ -17,6 +18,9 @@ import { useTranslation } from "react-i18next";
 import { ExerciseResponseType } from "@models/exercise/response";
 import { TestSetEntity } from "@models/testSet/entity";
 import { QUESTION_TYPE } from "@constants/questionBank";
+import { useLinkTestSets } from "@hooks/useTest";
+import { useGetLessonById } from "@hooks/useLesson";
+import { toast } from "react-toastify";
 
 interface LessonItem {
   id: number;
@@ -50,6 +54,15 @@ const LessonExercisesStep = ({
   const [updateTarget, setUpdateTarget] = useState<ExerciseResponseType | null>(
     null
   );
+
+  // Get full lesson data to access testId
+  const { data: lessonData } = useGetLessonById(lesson.id);
+  const testId = lessonData && typeof lessonData === 'object' && 'testId' in lessonData 
+    ? (lessonData as { testId?: number }).testId 
+    : undefined;
+
+  // Hook for linking testSets to test
+  const linkTestSetsMutation = useLinkTestSets();
 
   const handleSelectTestSet = (testSet: TestSetEntity) => {
     if (updateTarget) {
@@ -107,6 +120,39 @@ const LessonExercisesStep = ({
     return map;
   }, [exercises]);
 
+  // Check if all 3 exercise types exist
+  const hasAllExercises = useMemo(() => {
+    return (
+      exerciseByType[QUESTION_TYPE.VOCABULARY] !== null &&
+      exerciseByType[QUESTION_TYPE.GRAMMAR] !== null &&
+      exerciseByType[QUESTION_TYPE.KANJI] !== null
+    );
+  }, [exerciseByType]);
+
+  // Handle creating final test by linking all testSets
+  const handleCreateFinalTest = () => {
+    if (!testId) {
+      toast.error("Bài học chưa có Test ID. Vui lòng tạo Test trước.");
+      return;
+    }
+
+    const testSetIds = [
+      exerciseByType[QUESTION_TYPE.VOCABULARY]?.testSetId,
+      exerciseByType[QUESTION_TYPE.GRAMMAR]?.testSetId,
+      exerciseByType[QUESTION_TYPE.KANJI]?.testSetId,
+    ].filter((id): id is number => id !== undefined && id !== null);
+
+    if (testSetIds.length !== 3) {
+      toast.error("Không thể lấy đầy đủ TestSet IDs từ các bài tập.");
+      return;
+    }
+
+    linkTestSetsMutation.mutate({
+      testId,
+      data: { testSetIds },
+    });
+  };
+
   return (
     <div className="space-y-6 min-h-screen p-6">
       <div className="flex items-center justify-between">
@@ -132,6 +178,47 @@ const LessonExercisesStep = ({
           </Button>
         </div>
       </div>
+
+      {/* Button to create final test when all 3 exercises exist - Prominent position */}
+      {hasAllExercises && (
+        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-green-600 rounded-full shadow-md">
+                  <CheckCircle2 className="h-8 w-8 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-xl font-bold text-foreground">
+                    Đã có đầy đủ 3 loại bài tập
+                  </h4>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Bạn có thể tạo bài tập cuối cùng bằng cách liên kết tất cả TestSet vào Test
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={handleCreateFinalTest}
+                disabled={linkTestSetsMutation.isPending || !testId}
+                size="lg"
+                className="bg-green-600 text-white hover:bg-green-700 shadow-lg px-6 py-3 text-base font-semibold"
+              >
+                {linkTestSetsMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    Đang tạo...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="h-5 w-5 mr-2" />
+                    Tạo bài tập cuối cùng
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="bg-card border-border">
         <CardContent className="p-6">

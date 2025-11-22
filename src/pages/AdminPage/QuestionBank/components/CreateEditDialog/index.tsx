@@ -95,37 +95,22 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                     
                     // Only reset answers structure when creating new question, keep answers when editing
                     if (!isEditMode) {
-                      if (newQuestionType === "MATCHING") {
-                        newFormData.answers = [
-                          {
-                            answerJp: "",
-                            isCorrect: true,
-                            translations: {
-                              meaning: [
-                                { language_code: "vi", value: "" },
-                                { language_code: "en", value: "" },
-                              ],
-                            },
-                          },
-                        ];
-                      } else {
-                        const blankAnswer = () => ({
-                          answerJp: "",
-                          isCorrect: false,
-                          translations: {
-                            meaning: [
-                              { language_code: "vi", value: "" },
-                              { language_code: "en", value: "" },
-                            ],
-                          },
-                        });
-                        newFormData.answers = [
-                          { ...blankAnswer(), isCorrect: true },
-                          blankAnswer(),
-                          blankAnswer(),
-                          blankAnswer(),
-                        ];
-                      }
+                      const blankAnswer = () => ({
+                        answerJp: "",
+                        isCorrect: false,
+                        translations: {
+                          meaning: [
+                            { language_code: "vi", value: "" },
+                            { language_code: "en", value: "" },
+                          ],
+                        },
+                      });
+                      newFormData.answers = [
+                        { ...blankAnswer(), isCorrect: true },
+                        blankAnswer(),
+                        blankAnswer(),
+                        blankAnswer(),
+                      ];
                     }
                     // When editing, keep existing answers as is (don't reset)
                     return newFormData;
@@ -321,11 +306,10 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
             </div>
           </div>
 
-          {formData.questionType !== "MATCHING" && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t("questionBank.createDialog.answersLabel")}
-              </label>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t("questionBank.createDialog.answersLabel")}
+            </label>
               {fieldErrors.answers && (
                 <div className="mt-1 text-sm text-red-600">
                   {fieldErrors.answers.map((error, index) => (
@@ -621,148 +605,6 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                 </Button>
               )}
             </div>
-          )}
-
-          {formData.questionType === "MATCHING" && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t("questionBank.createDialog.answerLabel")} (Required for MATCHING)
-              </label>
-              {fieldErrors.answers && (
-                <div className="mt-1 text-sm text-red-600">
-                  {fieldErrors.answers.map((error, index) => (
-                    <div key={index}>{error}</div>
-                  ))}
-                </div>
-              )}
-              <div className="border rounded-lg p-4 bg-gray-50">
-                <div className="flex items-center justify-end mb-3">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Clear all fields for MATCHING answer
-                      setAnswerExtras((prev) => {
-                        const newExtras = { ...prev };
-                        delete newExtras[0];
-                        return newExtras;
-                      });
-                      setFormData((prev: any) => ({
-                        ...prev,
-                        answers: [
-                          {
-                            answerJp: "",
-                            isCorrect: true,
-                            translations: {
-                              meaning: [
-                                { language_code: "vi", value: "" },
-                                { language_code: "en", value: "" },
-                              ],
-                            },
-                          },
-                        ],
-                      }));
-                    }}
-                    className="text-gray-600 hover:text-red-600"
-                    title="Clear all fields for this option"
-                  >
-                    <X className="h-4 w-4 mr-1" />
-                    Clear
-                  </Button>
-                </div>
-                <div className="space-y-3">
-                  <Input
-                    label="Japanese Answer"
-                    value={formData.answers?.[0]?.answerJp || ""}
-                    onChange={(e) => {
-                      setFormData((prev: any) => ({
-                        ...prev,
-                        answers: [
-                          {
-                            answerJp: e.target.value,
-                            isCorrect: true,
-                            translations: {
-                              meaning: [
-                                { language_code: "vi", value: prev.answers?.[0]?.translations?.meaning[0]?.value || "" },
-                              ],
-                            },
-                          },
-                        ],
-                      }));
-                      if (fieldErrors.answers) {
-                        setFieldErrors((prev: Record<string, string[]>) => {
-                          const newErrors = { ...prev } as Record<string, string[]>;
-                          delete newErrors.answers;
-                          return newErrors;
-                        });
-                      }
-                    }}
-                    placeholder="Enter Japanese answer"
-                    required
-                  />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Vietnamese Translation</label>
-                      <Input
-                        value={
-                          formData.answers?.[0]?.translations?.meaning?.find((m: any) => m && m.language_code === "vi")?.value || ""
-                        }
-                        onChange={(e) =>
-                          setFormData((prev: any) => ({
-                            ...prev,
-                            answers: [
-                              {
-                                answerJp: prev.answers?.[0]?.answerJp || "",
-                                isCorrect: true,
-                                translations: {
-                                  meaning: (() => {
-                                    const existingMeanings = prev.answers?.[0]?.translations?.meaning || [];
-                                    const enMeaning = existingMeanings.find((m: any) => m && m.language_code === "en");
-                                    return [ { language_code: "vi", value: e.target.value }, { language_code: "en", value: enMeaning?.value || "" } ];
-                                  })(),
-                                },
-                              },
-                            ],
-                          }))
-                        }
-                        placeholder="Vietnamese translation"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">English Translation</label>
-                      <Input
-                        value={
-                          formData.answers?.[0]?.translations?.meaning?.find((m: any) => m && m.language_code === "en")?.value || ""
-                        }
-                        onChange={(e) =>
-                          setFormData((prev: any) => ({
-                            ...prev,
-                            answers: [
-                              {
-                                answerJp: prev.answers?.[0]?.answerJp || "",
-                                isCorrect: true,
-                                translations: {
-                                  meaning: (() => {
-                                    const existingMeanings = prev.answers?.[0]?.translations?.meaning || [];
-                                    const viMeaning = existingMeanings.find((m: any) => m && m.language_code === "vi");
-                                    return [ { language_code: "vi", value: viMeaning?.value || "" }, { language_code: "en", value: e.target.value } ];
-                                  })(),
-                                },
-                              },
-                            ],
-                          }))
-                        }
-                        placeholder="English translation"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         <DialogFooter className="flex flex-col gap-3">

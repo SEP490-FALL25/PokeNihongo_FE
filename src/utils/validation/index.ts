@@ -128,7 +128,12 @@ export const commonValidationRules = {
     }
   },
   lessonCategoryId: { required: true, min: 1 },
-  rewardId: { required: true, min: 1 },
+  rewardIds: { required: true, min: 1, custom: (value: any[]) => {
+    if (!Array.isArray(value) || value.length === 0) {
+      return 'Phải chọn ít nhất một phần thưởng';
+    }
+    return null;
+  } },
   type: { required: true },
   difficulty: { required: true },
   lessonId: { required: true, min: 1 },
@@ -136,7 +141,7 @@ export const commonValidationRules = {
     required: true, 
     custom: (value: any[]) => {
       if (!Array.isArray(value) || value.length === 0) {
-        return 'Please select at least one item';
+          return 'Phải chọn ít nhất một item';
       }
       return null;
     }
@@ -157,7 +162,7 @@ export const validateCreateLesson = (data: any): ValidationErrors => {
   validator.addRule('estimatedTimeMinutes', commonValidationRules.estimatedTimeMinutes);
   validator.addRule('version', commonValidationRules.version);
   validator.addRule('lessonCategoryId', commonValidationRules.lessonCategoryId);
-  validator.addRule('rewardId', commonValidationRules.rewardId);
+  validator.addRule('rewardIds', commonValidationRules.rewardIds);
   
   // Validate translations
   if (data.translations?.meaning) {
