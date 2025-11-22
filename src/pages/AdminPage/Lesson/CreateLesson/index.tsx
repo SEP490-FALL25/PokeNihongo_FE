@@ -1,4 +1,4 @@
-import { DialogContent, DialogHeader, DialogTitle } from '@ui/Dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/Dialog';
 import { Input } from '@ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/Select';
 import { Button } from '@ui/Button';
@@ -9,12 +9,16 @@ import { Separator } from '@ui/Separator';
 import { Checkbox } from '@ui/Checkbox';
 import { useCreateLesson } from '@hooks/useLesson';
 import { ICreateLessonRequest } from '@models/lesson/request';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { validateCreateLesson, useFormValidation, commonValidationRules } from '@utils/validation';
 import testService from '@services/test';
 import { useGetRewardListAdmin } from '@hooks/useReward';
+import { useDebounce } from '@hooks/useDebounce';
+import { REWARD_TYPE, REWARD_TARGET } from '@constants/reward';
+import { IRewardEntityType } from '@models/reward/entity';
+import { Search, Loader2 } from 'lucide-react';
 import {
     BookOpen,
     Clock,
@@ -52,15 +56,55 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
         }
     });
 
-    // Fetch reward list
+    // Modal state for selecting rewards
+    const [isRewardModalOpen, setIsRewardModalOpen] = useState(false);
+    const [rewardSearchQuery, setRewardSearchQuery] = useState('');
+    const [rewardTypeFilter, setRewardTypeFilter] = useState('all');
+    const [rewardTargetFilter, setRewardTargetFilter] = useState('all');
+    const [rewardCurrentPage, setRewardCurrentPage] = useState(1);
+    const debouncedRewardSearchQuery = useDebounce(rewardSearchQuery, 500);
+
+    // Fetch reward list for modal (with filters)
     const { data: rewardListData, isLoading: isLoadingRewards } = useGetRewardListAdmin({
-        page: 1,
-        limit: 100,
+        page: rewardCurrentPage,
+        limit: 20,
         sortBy: 'id',
-        sort: 'desc'
+        sort: 'desc',
+        name: debouncedRewardSearchQuery || undefined,
+        rewardType: rewardTypeFilter !== 'all' ? rewardTypeFilter : undefined,
+        rewardTarget: rewardTargetFilter !== 'all' ? rewardTargetFilter : undefined,
     });
 
     const rewards = rewardListData?.results || [];
+    
+    // Store selected rewards for display
+    const [selectedRewardsMap, setSelectedRewardsMap] = useState<Record<number, IRewardEntityType>>({});
+    
+    // Sync selected rewards map when modal opens or rewards data changes
+    useEffect(() => {
+        const currentRewards = rewardListData?.results || [];
+        if (isRewardModalOpen && currentRewards.length > 0 && formData.rewardIds && formData.rewardIds.length > 0) {
+            setSelectedRewardsMap(prev => {
+                const newMap = { ...prev };
+                let hasChanges = false;
+                currentRewards.forEach((reward: IRewardEntityType) => {
+                    if (formData.rewardIds?.includes(reward.id) && !newMap[reward.id]) {
+                        newMap[reward.id] = reward;
+                        hasChanges = true;
+                    }
+                });
+                return hasChanges ? newMap : prev;
+            });
+        }
+    }, [isRewardModalOpen, rewardListData?.results, formData.rewardIds]);
+    
+    // Get selected rewards for chips display
+    const getSelectedRewards = (): IRewardEntityType[] => {
+        if (!formData.rewardIds || formData.rewardIds.length === 0) return [];
+        return formData.rewardIds
+            .map(id => selectedRewardsMap[id])
+            .filter(Boolean) as IRewardEntityType[];
+    };
 
     // Map levelJlpt to lessonCategoryId: 5→1, 4→2, 3→3, 2→4, 1→5
     const getLessonCategoryIdFromLevel = (levelJlpt: number): number => {
@@ -79,7 +123,7 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
 
     const { validateField } = useFormValidation(validationRules);
 
-    const handleInputChange = (field: string, value: any) => {
+    const handleInputChange = (field: string, value: unknown) => {
         setFormData(prev => ({
             ...prev,
             [field]: value
@@ -118,16 +162,32 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
         }
     };
 
-    const handleRewardToggle = (rewardId: number) => {
+    const handleRewardToggle = (rewardId: number, reward?: IRewardEntityType) => {
         setFormData(prev => {
             const currentRewardIds = prev.rewardIds || [];
             const isSelected = currentRewardIds.includes(rewardId);
             
+            const newRewardIds = isSelected
+                ? currentRewardIds.filter(id => id !== rewardId)
+                : [...currentRewardIds, rewardId];
+            
+            // Update selected rewards map
+            if (reward && !isSelected) {
+                setSelectedRewardsMap(prev => ({
+                    ...prev,
+                    [rewardId]: reward
+                }));
+            } else if (isSelected) {
+                setSelectedRewardsMap(prev => {
+                    const newMap = { ...prev };
+                    delete newMap[rewardId];
+                    return newMap;
+                });
+            }
+            
             return {
                 ...prev,
-                rewardIds: isSelected
-                    ? currentRewardIds.filter(id => id !== rewardId)
-                    : [...currentRewardIds, rewardId]
+                rewardIds: newRewardIds
             };
         });
 
@@ -140,9 +200,49 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
         }
     };
 
+    const handleRemoveReward = (rewardId: number) => {
+        handleRewardToggle(rewardId);
+    };
+
+    const getRewardTypeLabel = (type: string) => {
+        switch (type) {
+            case REWARD_TYPE.LESSON: return 'LESSON';
+            case REWARD_TYPE.DAILY_REQUEST: return 'DAILY_REQUEST';
+            case REWARD_TYPE.EVENT: return 'EVENT';
+            case REWARD_TYPE.ACHIEVEMENT: return 'ACHIEVEMENT';
+            case REWARD_TYPE.LEVEL: return 'LEVEL';
+            default: return type;
+        }
+    };
+
+    const getRewardTargetLabel = (target: string) => {
+        switch (target) {
+            case REWARD_TARGET.EXP: return 'EXP';
+            case REWARD_TARGET.POKEMON: return 'POKEMON';
+            case REWARD_TARGET.POKE_COINS: return 'POKE_COINS';
+            case REWARD_TARGET.SPARKLES: return 'SPARKLES';
+            default: return target;
+        }
+    };
+
+    const getRewardName = (reward: IRewardEntityType) => {
+        // For admin API, rewards may have nameTranslations array or nameTranslation string
+        const rewardWithTranslations = reward as IRewardEntityType & { 
+            nameTranslations?: Array<{ key: string; value: string }> 
+        };
+        
+        if (rewardWithTranslations.nameTranslations) {
+            return rewardWithTranslations.nameTranslations.find((t) => t.key === 'vi')?.value 
+                || rewardWithTranslations.nameTranslations.find((t) => t.key === 'en')?.value 
+                || rewardWithTranslations.nameKey;
+        }
+        
+        return reward.nameTranslation || reward.nameKey || `Reward #${reward.id}`;
+    };
+
     // Real-time validation on blur
     const handleBlur = (field: string) => {
-        const error = validateField(field, (formData as any)[field]);
+        const error = validateField(field, (formData as Record<string, unknown>)[field]);
         if (error) {
             setErrors(prev => ({ ...prev, [field]: error }));
         } else {
@@ -276,25 +376,17 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
                                     </label>
                                     <div className="space-y-3">
                                         {formData.translations.meaning.map((translation, index) => (
-                                            <div key={index} className="flex gap-3">
-                                                <div className="flex-1">
-                                                    <Input
-                                                        placeholder="vi, en, ja..."
-                                                        value={translation.language_code}
-                                                        onChange={(e) => handleTranslationChange(index, 'language_code', e.target.value)}
-                                                        onBlur={() => { }}
-                                                        className="bg-background border-border text-foreground h-10"
-                                                    />
-                                                </div>
-                                                <div className="flex-[3]">
-                                                    <Input
-                                                        placeholder={index === 0 ? "Cách chào hỏi cơ bản" : "Basic Greetings"}
-                                                        value={translation.value}
-                                                        onChange={(e) => handleTranslationChange(index, 'value', e.target.value)}
-                                                        onBlur={() => { }}
-                                                        className="bg-background border-border text-foreground h-10"
-                                                    />
-                                                </div>
+                                            <div key={index} className="space-y-2">
+                                                <label className="text-xs font-medium text-muted-foreground uppercase">
+                                                    {translation.language_code}
+                                                </label>
+                                                <Input
+                                                    placeholder={index === 0 ? "Cách chào hỏi cơ bản" : "Basic Greetings"}
+                                                    value={translation.value}
+                                                    onChange={(e) => handleTranslationChange(index, 'value', e.target.value)}
+                                                    onBlur={() => { }}
+                                                    className="bg-background border-border text-foreground h-10"
+                                                />
                                             </div>
                                         ))}
                                     </div>
@@ -322,8 +414,8 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
                                 {/* Cấp độ JLPT */}
                                 <div className="space-y-2">
                                     <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                                        <Badge variant="outline" className="text-xs">JLPT</Badge>
                                         {t('createLesson.level')} *
+                                        <Badge variant="outline" className="text-xs bg-gray-700 text-gray-700 font-medium border border-gray-200">JLPT</Badge>
                                     </label>
                                     <Select value={formData.levelJlpt.toString()} onValueChange={(value) => handleInputChange('levelJlpt', parseInt(value))}>
                                         <SelectTrigger
@@ -399,71 +491,33 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
                                         <Gift className="h-4 w-4 text-primary" />
                                         Phần thưởng *
                                     </label>
-                                    <div className="border-2 border-gray-200 rounded-lg bg-gray-50/50 max-h-60 overflow-y-auto shadow-sm">
-                                        {isLoadingRewards ? (
-                                            <div className="text-sm text-gray-600 text-center py-8">
-                                                Đang tải danh sách phần thưởng...
-                                            </div>
-                                        ) : rewards.length === 0 ? (
-                                            <div className="text-sm text-gray-600 text-center py-8">
-                                                Không có phần thưởng nào
+                                    <div 
+                                        className="min-h-[60px] w-full rounded-lg border-2 border-gray-200 bg-background p-3 cursor-pointer hover:border-primary/50 transition-colors"
+                                        onClick={() => setIsRewardModalOpen(true)}
+                                    >
+                                        {formData.rewardIds && formData.rewardIds.length > 0 ? (
+                                            <div className="flex flex-wrap gap-2">
+                                                {getSelectedRewards().map((reward) => (
+                                                    <Badge
+                                                        key={reward.id}
+                                                        variant="secondary"
+                                                        className="flex items-center gap-1 bg-blue-100 text-blue-900 border-blue-300 px-2 py-1 pr-1"
+                                                    >
+                                                        <span className="text-sm font-medium">{getRewardName(reward)}</span>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleRemoveReward(reward.id);
+                                                            }}
+                                                            className="ml-1 hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+                                                        >
+                                                            <X className="h-3 w-3" />
+                                                        </button>
+                                                    </Badge>
+                                                ))}
                                             </div>
                                         ) : (
-                                            <div className="p-2 space-y-2">
-                                                {rewards.map((reward: any) => {
-                                                    const isSelected = (formData.rewardIds || []).includes(reward.id);
-                                                    const nameTranslation = reward.nameTranslations?.find((t: any) => t.key === 'vi')?.value 
-                                                        || reward.nameTranslations?.find((t: any) => t.key === 'en')?.value 
-                                                        || reward.nameKey;
-                                                    
-                                                    return (
-                                                        <div
-                                                            key={reward.id}
-                                                            className={`flex items-start space-x-3 p-3 rounded-lg border-2 transition-all cursor-pointer ${
-                                                                isSelected 
-                                                                    ? 'bg-blue-50 border-blue-300 shadow-sm' 
-                                                                    : 'bg-white border-gray-200 hover:border-blue-200 hover:bg-blue-50/50'
-                                                            }`}
-                                                            onClick={() => handleRewardToggle(reward.id)}
-                                                        >
-                                                            <div className="mt-0.5">
-                                                                <Checkbox
-                                                                    checked={isSelected}
-                                                                    onCheckedChange={() => handleRewardToggle(reward.id)}
-                                                                />
-                                                            </div>
-                                                            <div className="flex-1 min-w-0">
-                                                                <div className="flex flex-col gap-2">
-                                                                    <span className={`text-sm font-semibold ${
-                                                                        isSelected ? 'text-blue-900' : 'text-gray-900'
-                                                                    }`}>
-                                                                        {nameTranslation}
-                                                                    </span>
-                                                                    <div className="flex items-center gap-2 flex-wrap">
-                                                                        <Badge 
-                                                                            variant="outline" 
-                                                                            className="text-xs bg-gray-700 text-gray-700 font-medium border border-gray-200"
-                                                                        >
-                                                                            {reward.rewardType}
-                                                                        </Badge>
-                                                                        <Badge 
-                                                                            variant="secondary" 
-                                                                            className="text-xs bg-gray-100 text-gray-700 font-medium border border-gray-200"
-                                                                        >
-                                                                            {reward.rewardTarget}
-                                                                        </Badge>
-                                                                        {reward.rewardItem && (
-                                                                            <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">
-                                                                                {reward.rewardItem}
-                                                                            </span>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
+                                            <span className="text-sm text-muted-foreground">Nhấn để chọn phần thưởng...</span>
                                         )}
                                     </div>
                                     {errors.rewardIds && (
@@ -564,6 +618,174 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
                     </div>
                 </div>
             </DialogContent>
+
+            {/* Reward Selection Modal */}
+            <Dialog open={isRewardModalOpen} onOpenChange={setIsRewardModalOpen}>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden bg-white">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-xl">
+                            <Gift className="h-5 w-5 text-primary" />
+                            Chọn phần thưởng
+                        </DialogTitle>
+                    </DialogHeader>
+
+                    <div className="space-y-4">
+                        {/* Search and Filters */}
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="flex-1 relative">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+                                <Input
+                                    placeholder="Tìm kiếm phần thưởng..."
+                                    value={rewardSearchQuery}
+                                    onChange={(e) => {
+                                        setRewardSearchQuery(e.target.value);
+                                        setRewardCurrentPage(1);
+                                    }}
+                                    className="pl-10 bg-background border-border text-foreground h-11 shadow-sm focus:shadow-md transition-shadow"
+                                />
+                            </div>
+                            <Select
+                                value={rewardTypeFilter}
+                                onValueChange={(value) => {
+                                    setRewardTypeFilter(value);
+                                    setRewardCurrentPage(1);
+                                }}
+                            >
+                                <SelectTrigger className="w-full sm:w-[180px] bg-background border-border text-foreground h-11 shadow-sm">
+                                    <SelectValue placeholder="Loại phần thưởng" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-card border-border">
+                                    <SelectItem value="all">Tất cả loại</SelectItem>
+                                    <SelectItem value={REWARD_TYPE.LESSON}>LESSON</SelectItem>
+                                    <SelectItem value={REWARD_TYPE.DAILY_REQUEST}>DAILY_REQUEST</SelectItem>
+                                    <SelectItem value={REWARD_TYPE.EVENT}>EVENT</SelectItem>
+                                    <SelectItem value={REWARD_TYPE.ACHIEVEMENT}>ACHIEVEMENT</SelectItem>
+                                    <SelectItem value={REWARD_TYPE.LEVEL}>LEVEL</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Select
+                                value={rewardTargetFilter}
+                                onValueChange={(value) => {
+                                    setRewardTargetFilter(value);
+                                    setRewardCurrentPage(1);
+                                }}
+                            >
+                                <SelectTrigger className="w-full sm:w-[180px] bg-background border-border text-foreground h-11 shadow-sm">
+                                    <SelectValue placeholder="Mục tiêu" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-card border-border">
+                                    <SelectItem value="all">Tất cả mục tiêu</SelectItem>
+                                    <SelectItem value={REWARD_TARGET.EXP}>EXP</SelectItem>
+                                    <SelectItem value={REWARD_TARGET.POKEMON}>POKEMON</SelectItem>
+                                    <SelectItem value={REWARD_TARGET.POKE_COINS}>POKE_COINS</SelectItem>
+                                    <SelectItem value={REWARD_TARGET.SPARKLES}>SPARKLES</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* Rewards List */}
+                        <div className="border-2 border-gray-200 rounded-lg bg-gray-50/50 max-h-[50vh] overflow-y-auto shadow-sm">
+                            {isLoadingRewards ? (
+                                <div className="flex flex-col items-center justify-center py-12">
+                                    <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+                                    <p className="text-sm text-gray-600">Đang tải danh sách phần thưởng...</p>
+                                </div>
+                            ) : rewards.length === 0 ? (
+                                <div className="text-sm text-gray-600 text-center py-12">
+                                    Không có phần thưởng nào
+                                </div>
+                            ) : (
+                                <div className="p-2 space-y-2">
+                                    {rewards.map((reward: IRewardEntityType) => {
+                                        const isSelected = (formData.rewardIds || []).includes(reward.id);
+                                        
+                                        return (
+                                            <div
+                                                key={reward.id}
+                                                className={`flex items-start space-x-3 p-3 rounded-lg border-2 transition-all cursor-pointer ${
+                                                    isSelected 
+                                                        ? 'bg-blue-50 border-blue-300 shadow-sm' 
+                                                        : 'bg-white border-gray-200 hover:border-blue-200 hover:bg-blue-50/50'
+                                                }`}
+                                                onClick={() => handleRewardToggle(reward.id, reward)}
+                                            >
+                                                <div className="mt-0.5">
+                                                    <Checkbox
+                                                        checked={isSelected}
+                                                        onCheckedChange={() => handleRewardToggle(reward.id, reward)}
+                                                    />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex flex-col gap-2">
+                                                        <span className={`text-sm font-semibold ${
+                                                            isSelected ? 'text-blue-900' : 'text-gray-900'
+                                                        }`}>
+                                                            {getRewardName(reward)}
+                                                        </span>
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            <Badge 
+                                                                variant="outline" 
+                                                                className="text-xs bg-gray-700 text-gray-700 font-medium border border-gray-200"
+                                                            >
+                                                                {getRewardTypeLabel(reward.rewardType)}
+                                                            </Badge>
+                                                            <Badge 
+                                                                variant="secondary" 
+                                                                className="text-xs bg-gray-100 text-gray-700 font-medium border border-gray-200"
+                                                            >
+                                                                {getRewardTargetLabel(reward.rewardTarget)}
+                                                            </Badge>
+                                                            {reward.rewardItem && (
+                                                                <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">
+                                                                    {reward.rewardItem}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Pagination */}
+                        {rewardListData?.pagination && rewardListData.pagination.totalPage > 1 && (
+                            <div className="flex items-center justify-between pt-2 border-t border-border">
+                                <p className="text-sm text-muted-foreground">
+                                    Trang {rewardListData.pagination.currentPage} / {rewardListData.pagination.totalPage}
+                                </p>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setRewardCurrentPage(prev => Math.max(1, prev - 1))}
+                                        disabled={rewardCurrentPage === 1 || isLoadingRewards}
+                                    >
+                                        Trước
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setRewardCurrentPage(prev => Math.min(rewardListData.pagination.totalPage, prev + 1))}
+                                        disabled={rewardCurrentPage === rewardListData.pagination.totalPage || isLoadingRewards}
+                                    >
+                                        Sau
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Selected Count */}
+                        {(formData.rewardIds && formData.rewardIds.length > 0) && (
+                            <div className="text-sm text-muted-foreground pt-2 border-t border-border">
+                                Đã chọn: <span className="font-semibold text-primary">{formData.rewardIds.length}</span> phần thưởng
+                            </div>
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </>
     )
 }
