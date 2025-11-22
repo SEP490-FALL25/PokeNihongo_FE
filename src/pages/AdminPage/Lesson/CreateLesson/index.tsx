@@ -6,12 +6,15 @@ import { Switch } from '@ui/Switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/Card';
 import { Badge } from '@ui/Badge';
 import { Separator } from '@ui/Separator';
+import { Checkbox } from '@ui/Checkbox';
 import { useCreateLesson } from '@hooks/useLesson';
 import { ICreateLessonRequest } from '@models/lesson/request';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { validateCreateLesson, useFormValidation, commonValidationRules } from '@utils/validation';
+import testService from '@services/test';
+import { useGetRewardListAdmin } from '@hooks/useReward';
 import {
     BookOpen,
     Clock,
@@ -40,7 +43,7 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
         isPublished: false,
         version: '1.0.0',
         lessonCategoryId: 1, // Will be auto-calculated from levelJlpt
-        rewardId: 1,
+        rewardIds: [],
         translations: {
             meaning: [
                 { language_code: 'vi', value: '' },
@@ -48,6 +51,16 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
             ]
         }
     });
+
+    // Fetch reward list
+    const { data: rewardListData, isLoading: isLoadingRewards } = useGetRewardListAdmin({
+        page: 1,
+        limit: 100,
+        sortBy: 'id',
+        sort: 'desc'
+    });
+
+    const rewards = rewardListData?.results || [];
 
     // Map levelJlpt to lessonCategoryId: 5→1, 4→2, 3→3, 2→4, 1→5
     const getLessonCategoryIdFromLevel = (levelJlpt: number): number => {
@@ -62,7 +75,6 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
         levelJlpt: commonValidationRules.levelJlpt,
         estimatedTimeMinutes: commonValidationRules.estimatedTimeMinutes,
         version: commonValidationRules.version,
-        rewardId: commonValidationRules.rewardId,
     };
 
     const { validateField } = useFormValidation(validationRules);
@@ -106,6 +118,28 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
         }
     };
 
+    const handleRewardToggle = (rewardId: number) => {
+        setFormData(prev => {
+            const currentRewardIds = prev.rewardIds || [];
+            const isSelected = currentRewardIds.includes(rewardId);
+            
+            return {
+                ...prev,
+                rewardIds: isSelected
+                    ? currentRewardIds.filter(id => id !== rewardId)
+                    : [...currentRewardIds, rewardId]
+            };
+        });
+
+        // Clear error when user selects/deselects
+        if (errors.rewardIds) {
+            setErrors(prev => ({
+                ...prev,
+                rewardIds: ''
+            }));
+        }
+    };
+
     // Real-time validation on blur
     const handleBlur = (field: string) => {
         const error = validateField(field, (formData as any)[field]);
@@ -137,18 +171,50 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
             return;
         }
 
-        // Auto-calculate lessonCategoryId from levelJlpt
-        const submitData = {
-            ...formData,
-            lessonCategoryId: getLessonCategoryIdFromLevel(formData.levelJlpt),
-            isPublished: isPublish
-        };
-
         try {
+            // Tạo test trước với meanings
+            const testNameVi = `Kiểm tra cuối bài học N${formData.levelJlpt}`;
+            const testNameEn = `N${formData.levelJlpt} Final Lesson Test`;
+            const testNameJa = `N${formData.levelJlpt}レッスンフィナルテスト`;
+
+            const testType = "LESSON_REVIEW" as const;
+            const testStatus = isPublish ? ("ACTIVE" as const) : ("DRAFT" as const);
+
+            const testBody = {
+                meanings: [
+                    {
+                        field: "name",
+                        translations: {
+                            vi: testNameVi,
+                            en: testNameEn,
+                            ja: testNameJa
+                        }
+                    }
+                ],
+                price: 0,
+                levelN: formData.levelJlpt,
+                limit: 0,
+                testType,
+                status: testStatus
+            };
+
+            const testResponse = await testService.createTestWithMeanings(testBody);
+            const testId = testResponse.data.id;
+
+            // Auto-calculate lessonCategoryId from levelJlpt
+            const submitData = {
+                ...formData,
+                lessonCategoryId: getLessonCategoryIdFromLevel(formData.levelJlpt),
+                isPublished: isPublish,
+                testId: testId,
+                rewardIds: formData.rewardIds && formData.rewardIds.length > 0 ? formData.rewardIds : undefined
+            };
+
             await createLessonMutation.mutateAsync(submitData);
             toast.success(isPublish ? t('createLesson.publishedSuccess') : t('createLesson.draftSuccess'));
             setIsAddDialogOpen(false);
         } catch (error) {
+            console.error('Error creating lesson:', error);
             toast.error(t('createLesson.createError'));
         }
     };
@@ -325,26 +391,92 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
                                             {errors.estimatedTimeMinutes}
                                         </p>}
                                     </div>
+                                </div>
 
-                                    {/* ID phần thưởng */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                                            <Gift className="h-4 w-4 text-primary" />
-                                            ID phần thưởng *
-                                        </label>
-                                        <Input
-                                            type="number"
-                                            placeholder="1"
-                                            className="bg-background border-border text-foreground h-11"
-                                            value={formData.rewardId}
-                                            onChange={(e) => handleInputChange('rewardId', parseInt(e.target.value) || 0)}
-                                            onBlur={() => handleBlur('rewardId')}
-                                        />
-                                        {errors.rewardId && <p className="text-sm text-red-500 flex items-center gap-1">
-                                            <X className="h-3 w-3" />
-                                            {errors.rewardId}
-                                        </p>}
+                                {/* Phần thưởng */}
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                                        <Gift className="h-4 w-4 text-primary" />
+                                        Phần thưởng *
+                                    </label>
+                                    <div className="border-2 border-gray-200 rounded-lg bg-gray-50/50 max-h-60 overflow-y-auto shadow-sm">
+                                        {isLoadingRewards ? (
+                                            <div className="text-sm text-gray-600 text-center py-8">
+                                                Đang tải danh sách phần thưởng...
+                                            </div>
+                                        ) : rewards.length === 0 ? (
+                                            <div className="text-sm text-gray-600 text-center py-8">
+                                                Không có phần thưởng nào
+                                            </div>
+                                        ) : (
+                                            <div className="p-2 space-y-2">
+                                                {rewards.map((reward: any) => {
+                                                    const isSelected = (formData.rewardIds || []).includes(reward.id);
+                                                    const nameTranslation = reward.nameTranslations?.find((t: any) => t.key === 'vi')?.value 
+                                                        || reward.nameTranslations?.find((t: any) => t.key === 'en')?.value 
+                                                        || reward.nameKey;
+                                                    
+                                                    return (
+                                                        <div
+                                                            key={reward.id}
+                                                            className={`flex items-start space-x-3 p-3 rounded-lg border-2 transition-all cursor-pointer ${
+                                                                isSelected 
+                                                                    ? 'bg-blue-50 border-blue-300 shadow-sm' 
+                                                                    : 'bg-white border-gray-200 hover:border-blue-200 hover:bg-blue-50/50'
+                                                            }`}
+                                                            onClick={() => handleRewardToggle(reward.id)}
+                                                        >
+                                                            <div className="mt-0.5">
+                                                                <Checkbox
+                                                                    checked={isSelected}
+                                                                    onCheckedChange={() => handleRewardToggle(reward.id)}
+                                                                />
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex flex-col gap-2">
+                                                                    <span className={`text-sm font-semibold ${
+                                                                        isSelected ? 'text-blue-900' : 'text-gray-900'
+                                                                    }`}>
+                                                                        {nameTranslation}
+                                                                    </span>
+                                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                                        <Badge 
+                                                                            variant="outline" 
+                                                                            className="text-xs bg-gray-700 text-gray-700 font-medium border border-gray-200"
+                                                                        >
+                                                                            {reward.rewardType}
+                                                                        </Badge>
+                                                                        <Badge 
+                                                                            variant="secondary" 
+                                                                            className="text-xs bg-gray-100 text-gray-700 font-medium border border-gray-200"
+                                                                        >
+                                                                            {reward.rewardTarget}
+                                                                        </Badge>
+                                                                        {reward.rewardItem && (
+                                                                            <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">
+                                                                                {reward.rewardItem}
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
                                     </div>
+                                    {errors.rewardIds && (
+                                        <p className="text-sm text-red-500 flex items-center gap-1">
+                                            <X className="h-3 w-3" />
+                                            {errors.rewardIds}
+                                        </p>
+                                    )}
+                                    {(formData.rewardIds && formData.rewardIds.length > 0) && (
+                                        <p className="text-xs text-muted-foreground">
+                                            Đã chọn {formData.rewardIds.length} phần thưởng
+                                        </p>
+                                    )}
                                 </div>
 
                                 {/* Phiên bản */}

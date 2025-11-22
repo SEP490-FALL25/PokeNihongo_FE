@@ -20,6 +20,23 @@ export const useGetRewardList = (params?: IQueryRequest) => {
 };
 //----------------------End----------------------//
 
+/**
+ * Handle Get Reward List Admin (with nameTranslations array)
+ * @returns { getRewardListAdminQuery }
+ */
+export const useGetRewardListAdmin = (params?: IQueryRequest & {
+    name?: string;
+    rewardType?: string;
+    rewardTarget?: string;
+}) => {
+    const getRewardListAdminQuery = useQuery({
+        queryKey: ['reward-list-admin', params],
+        queryFn: () => rewardService.getRewardListAdmin(params),
+    });
+    return { data: getRewardListAdminQuery.data?.data?.data, isLoading: getRewardListAdminQuery.isLoading, error: getRewardListAdminQuery.error };
+};
+//----------------------End----------------------//
+
 
 /**
  * Handle Get Reward By Id
