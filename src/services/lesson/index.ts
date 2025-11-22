@@ -1,6 +1,6 @@
 import { axiosPrivate } from "@configs/axios";
 import { IQueryRequest } from "@models/common/request";
-import { ICreateLessonRequest } from "@models/lesson/request";
+import { ICreateLessonRequest, IUpdateLessonRequest } from "@models/lesson/request";
 import { ICreateLessonContentRequest } from "@models/lessonContent/entity";
 
 const lessonService = {
@@ -44,6 +44,12 @@ const lessonService = {
   },
   createLesson: async (data: ICreateLessonRequest) => {
     return axiosPrivate.post("/lessons", data);
+  },
+  getLessonById: async (id: number) => {
+    return axiosPrivate.get(`/lessons/${id}`);
+  },
+  updateLesson: async (id: number, data: IUpdateLessonRequest) => {
+    return axiosPrivate.put(`/lessons/${id}`, data);
   },
 
   getLessonContentList: async (

@@ -22,3 +22,13 @@ export const CreateLessonSchema = z.object({
 });
 
 export type ICreateLessonRequest = z.infer<typeof CreateLessonSchema>;
+
+// Update lesson schema - same as create, but some fields are optional
+export const UpdateLessonSchema = CreateLessonSchema.partial().extend({
+    titleJp: z.string().min(1, "Tiêu đề tiếng Nhật là bắt buộc").optional(),
+    levelJlpt: z.number().min(1).max(5, "Cấp độ JLPT phải từ 1-5").optional(),
+    estimatedTimeMinutes: z.number().min(1, "Thời lượng phải lớn hơn 0").optional(),
+    version: z.string().min(1, "Phiên bản là bắt buộc").optional(),
+});
+
+export type IUpdateLessonRequest = z.infer<typeof UpdateLessonSchema> | ICreateLessonRequest;

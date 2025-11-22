@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@ui/Card';
 import { Badge } from '@ui/Badge';
 import { Separator } from '@ui/Separator';
 import { Checkbox } from '@ui/Checkbox';
-import { useCreateLesson } from '@hooks/useLesson';
+import { useCreateLesson, useUpdateLesson, useGetLessonById } from '@hooks/useLesson';
 import { ICreateLessonRequest } from '@models/lesson/request';
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
@@ -34,11 +34,22 @@ import {
 
 interface CreateLessonProps {
     setIsAddDialogOpen: (value: boolean) => void;
+    lessonId?: number | null; // If provided, component is in edit mode
 }
 
-const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
+// Map levelJlpt to lessonCategoryId: 5→1, 4→2, 3→3, 2→4, 1→5
+const getLessonCategoryIdFromLevel = (levelJlpt: number): number => {
+    return 6 - levelJlpt;
+};
+
+const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps) => {
     const { t } = useTranslation();
+    const isEditMode = !!lessonId;
     const createLessonMutation = useCreateLesson();
+    const updateLessonMutation = useUpdateLesson();
+    
+    // Fetch lesson data if in edit mode
+    const { data: lessonData, isLoading: isLoadingLesson } = useGetLessonById(lessonId);
 
     const [formData, setFormData] = useState<ICreateLessonRequest>({
         titleJp: '',
@@ -55,6 +66,103 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
             ]
         }
     });
+
+    // Load lesson data when in edit mode
+    useEffect(() => {
+        if (isEditMode && lessonData) {
+            console.log('Loading lesson data for edit:', lessonData);
+
+            // Map title array to translations.meaning format
+            let mappedTranslations = {
+                meaning: [
+                    { language_code: 'vi', value: '' },
+                    { language_code: 'en', value: '' }
+                ]
+            };
+
+            if (lessonData.title && Array.isArray(lessonData.title)) {
+                // Map title array: [{language: "lang_1", value: "..."}, {language: "lang_2", value: "..."}]
+                // to translations.meaning: [{language_code: "vi", value: "..."}, {language_code: "en", value: "..."}]
+                const titleTranslations = lessonData.title.map((item: { language?: string; value?: string }) => {
+                    // Map language codes: lang_1 -> vi, lang_2 -> en (or use the language value directly if it's already a code)
+                    let languageCode = 'vi'; // default
+                    if (item.language === 'lang_1' || item.language === 'vi') {
+                        languageCode = 'vi';
+                    } else if (item.language === 'lang_2' || item.language === 'en') {
+                        languageCode = 'en';
+                    } else if (item.language === 'ja' || item.language === 'lang_3') {
+                        languageCode = 'ja';
+                    } else if (item.language) {
+                        // Try to extract language code from the language field
+                        languageCode = item.language.replace('lang_', '') || 'vi';
+                    }
+
+                    return {
+                        language_code: languageCode,
+                        value: item.value || ''
+                    };
+                });
+
+                // Ensure we have at least vi and en
+                const viTranslation = titleTranslations.find((t: { language_code: string }) => t.language_code === 'vi') || { language_code: 'vi', value: '' };
+                const enTranslation = titleTranslations.find((t: { language_code: string }) => t.language_code === 'en') || { language_code: 'en', value: '' };
+
+                mappedTranslations = {
+                    meaning: [viTranslation, enTranslation]
+                };
+            } else if (lessonData.translations) {
+                // If translations object already exists, use it
+                mappedTranslations = lessonData.translations;
+            }
+
+            // Find titleJp - could be in title array with language='ja' or a separate field
+            let titleJp = '';
+            if (lessonData.titleJp) {
+                titleJp = lessonData.titleJp;
+            } else if (lessonData.title && Array.isArray(lessonData.title)) {
+                const jaTitle = lessonData.title.find((item: { language?: string }) => 
+                    item.language === 'ja' || item.language === 'lang_3' || item.language?.includes('ja')
+                );
+                if (jaTitle && jaTitle.value) {
+                    titleJp = jaTitle.value;
+                }
+            }
+
+            // Handle rewardIds - could be array, number, or empty array
+            let rewardIds: number[] = [];
+            if (Array.isArray(lessonData.rewardId) && lessonData.rewardId.length > 0) {
+                rewardIds = lessonData.rewardId;
+            } else if (typeof lessonData.rewardId === 'number') {
+                rewardIds = [lessonData.rewardId];
+            } else if (Array.isArray(lessonData.rewardIds) && lessonData.rewardIds.length > 0) {
+                rewardIds = lessonData.rewardIds;
+            }
+
+            // Map lesson response to form data
+            setFormData({
+                titleJp: titleJp,
+                levelJlpt: lessonData.levelJlpt || 5,
+                estimatedTimeMinutes: lessonData.estimatedTimeMinutes || 45,
+                isPublished: lessonData.isPublished ?? true,
+                version: lessonData.version || '1.0.0',
+                lessonCategoryId: lessonData.lessonCategoryId || getLessonCategoryIdFromLevel(lessonData.levelJlpt || 5),
+                rewardIds: rewardIds,
+                testId: lessonData.testId || undefined,
+                translations: mappedTranslations
+            });
+
+            console.log('Mapped form data:', {
+                titleJp,
+                rewardIds,
+                translations: mappedTranslations
+            });
+
+            // Load selected rewards into map if available
+            if (rewardIds.length > 0) {
+                // We'll fetch these rewards when the modal opens
+            }
+        }
+    }, [isEditMode, lessonData]);
 
     // Modal state for selecting rewards
     const [isRewardModalOpen, setIsRewardModalOpen] = useState(false);
@@ -104,11 +212,6 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
         return formData.rewardIds
             .map(id => selectedRewardsMap[id])
             .filter(Boolean) as IRewardEntityType[];
-    };
-
-    // Map levelJlpt to lessonCategoryId: 5→1, 4→2, 3→3, 2→4, 1→5
-    const getLessonCategoryIdFromLevel = (levelJlpt: number): number => {
-        return 6 - levelJlpt;
     };
 
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -272,34 +375,40 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
         }
 
         try {
-            // Tạo test trước với meanings
-            const testNameVi = `Kiểm tra cuối bài học N${formData.levelJlpt}`;
-            const testNameEn = `N${formData.levelJlpt} Final Lesson Test`;
-            const testNameJa = `N${formData.levelJlpt}レッスンフィナルテスト`;
+            let testId = formData.testId;
 
-            const testType = "LESSON_REVIEW" as const;
-            const testStatus = isPublish ? ("ACTIVE" as const) : ("DRAFT" as const);
+            // Only create test if in create mode
+            if (!isEditMode) {
+                // Tạo test trước với meanings
+                const testNameVi = `Kiểm tra cuối bài học N${formData.levelJlpt}`;
+                const testNameEn = `N${formData.levelJlpt} Final Lesson Test`;
+                const testNameJa = `N${formData.levelJlpt}レッスンフィナルテスト`;
 
-            const testBody = {
-                meanings: [
-                    {
-                        field: "name",
-                        translations: {
-                            vi: testNameVi,
-                            en: testNameEn,
-                            ja: testNameJa
+                const testType = "LESSON_REVIEW" as const;
+                const testStatus = isPublish ? ("ACTIVE" as const) : ("DRAFT" as const);
+
+                const testBody = {
+                    meanings: [
+                        {
+                            field: "name",
+                            translations: {
+                                vi: testNameVi,
+                                en: testNameEn,
+                                ja: testNameJa
+                            }
                         }
-                    }
-                ],
-                price: 0,
-                levelN: formData.levelJlpt,
-                limit: 0,
-                testType,
-                status: testStatus
-            };
+                    ],
+                    price: 0,
+                    levelN: formData.levelJlpt,
+                    limit: 0,
+                    testType,
+                    status: testStatus
+                };
 
-            const testResponse = await testService.createTestWithMeanings(testBody);
-            const testId = testResponse.data.id;
+                const testResponse = await testService.createTestWithMeanings(testBody);
+                testId = testResponse.data.id;
+            }
+            // In edit mode, use existing testId from formData
 
             // Auto-calculate lessonCategoryId from levelJlpt
             const submitData = {
@@ -310,12 +419,17 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
                 rewardIds: formData.rewardIds && formData.rewardIds.length > 0 ? formData.rewardIds : undefined
             };
 
-            await createLessonMutation.mutateAsync(submitData);
-            toast.success(isPublish ? t('createLesson.publishedSuccess') : t('createLesson.draftSuccess'));
+            if (isEditMode && lessonId) {
+                await updateLessonMutation.mutateAsync({ id: lessonId, data: submitData });
+                toast.success(isPublish ? t('createLesson.updatePublishedSuccess') : t('createLesson.updateDraftSuccess'));
+            } else {
+                await createLessonMutation.mutateAsync(submitData);
+                toast.success(isPublish ? t('createLesson.publishedSuccess') : t('createLesson.draftSuccess'));
+            }
             setIsAddDialogOpen(false);
         } catch (error) {
-            console.error('Error creating lesson:', error);
-            toast.error(t('createLesson.createError'));
+            console.error(`Error ${isEditMode ? 'updating' : 'creating'} lesson:`, error);
+            toast.error(isEditMode ? t('createLesson.updateError') : t('createLesson.createError'));
         }
     };
 
@@ -329,16 +443,22 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
                         </div>
                         <div>
                             <DialogTitle className="text-2xl font-bold text-foreground">
-                                {t('createLesson.title')}
+                                {isEditMode ? t('createLesson.editTitle') : t('createLesson.title')}
                             </DialogTitle>
                             <p className="text-sm text-muted-foreground mt-1">
-                                {t('createLesson.description')}
+                                {isEditMode ? t('createLesson.editDescription') : t('createLesson.description')}
                             </p>
                         </div>
                     </div>
                 </DialogHeader>
 
                 <div className="overflow-y-auto max-h-[calc(95vh-300px)] pr-2">
+                    {isLoadingLesson && isEditMode ? (
+                        <div className="flex flex-col items-center justify-center py-12">
+                            <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+                            <p className="text-sm text-muted-foreground">Đang tải thông tin bài học...</p>
+                        </div>
+                    ) : (
                     <div className="space-y-6">
                         {/* Thông tin cơ bản */}
                         <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
@@ -581,6 +701,7 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
                             </CardContent>
                         </Card>
                     </div>
+                    )}
                 </div>
 
                 <Separator className="my-4" />
@@ -602,18 +723,18 @@ const CreateLesson = ({ setIsAddDialogOpen }: CreateLessonProps) => {
                             variant="outline"
                             className="border-border text-foreground bg-transparent hover:bg-gray-50 h-10 px-6"
                             onClick={() => handleSubmit(false)}
-                            disabled={createLessonMutation.isPending}
+                            disabled={createLessonMutation.isPending || updateLessonMutation.isPending || isLoadingLesson}
                         >
                             <Save className="h-4 w-4 mr-2" />
-                            {createLessonMutation.isPending ? t('common.loading') : t('createLesson.saveDraft')}
+                            {(createLessonMutation.isPending || updateLessonMutation.isPending) ? t('common.loading') : t('createLesson.saveDraft')}
                         </Button>
                         <Button
                             className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 h-10 px-6 shadow-lg"
                             onClick={() => handleSubmit(true)}
-                            disabled={createLessonMutation.isPending}
+                            disabled={createLessonMutation.isPending || updateLessonMutation.isPending || isLoadingLesson}
                         >
                             <Send className="h-4 w-4 mr-2" />
-                            {createLessonMutation.isPending ? t('createLesson.publishing') : t('createLesson.publish')}
+                            {(createLessonMutation.isPending || updateLessonMutation.isPending) ? t('createLesson.publishing') : t('createLesson.publish')}
                         </Button>
                     </div>
                 </div>
