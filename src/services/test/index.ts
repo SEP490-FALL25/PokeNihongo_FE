@@ -71,6 +71,17 @@ const testService = {
     );
     return response.data;
   },
+
+  linkFinalTestMultiple: async (
+    lessonId: number,
+    body: TestTestSetLinkMultipleRequest
+  ): Promise<{ message: string } & Record<string, unknown>> => {
+    const response = await axiosPrivate.post(
+      `test/lesson/${lessonId}/testSets`,
+      body
+    );
+    return response.data;
+  },
 };
 
 export default testService;
