@@ -18,8 +18,7 @@ import { useTranslation } from "react-i18next";
 import { ExerciseResponseType } from "@models/exercise/response";
 import { TestSetEntity } from "@models/testSet/entity";
 import { QUESTION_TYPE } from "@constants/questionBank";
-import { useLinkTestSets } from "@hooks/useTest";
-import { useGetLessonById } from "@hooks/useLesson";
+import { useLinkFinalTestSets } from "@hooks/useTest";
 import { toast } from "react-toastify";
 
 interface LessonItem {
@@ -55,14 +54,8 @@ const LessonExercisesStep = ({
     null
   );
 
-  // Get full lesson data to access testId
-  const { data: lessonData } = useGetLessonById(lesson.id);
-  const testId = lessonData && typeof lessonData === 'object' && 'testId' in lessonData 
-    ? (lessonData as { testId?: number }).testId 
-    : undefined;
-
   // Hook for linking testSets to test
-  const linkTestSetsMutation = useLinkTestSets();
+  const linkFinalTestSetsMutation = useLinkFinalTestSets();
 
   const handleSelectTestSet = (testSet: TestSetEntity) => {
     if (updateTarget) {
@@ -131,8 +124,8 @@ const LessonExercisesStep = ({
 
   // Handle creating final test by linking all testSets
   const handleCreateFinalTest = () => {
-    if (!testId) {
-      toast.error("Bài học chưa có Test ID. Vui lòng tạo Test trước.");
+    if (!lesson.id) {
+      toast.error("Bài học chưa có ID. Vui lòng tạo Bài học trước.");
       return;
     }
 
@@ -147,8 +140,8 @@ const LessonExercisesStep = ({
       return;
     }
 
-    linkTestSetsMutation.mutate({
-      testId,
+    linkFinalTestSetsMutation.mutate({
+      lessonId: lesson.id,
       data: { testSetIds },
     });
   };
@@ -199,11 +192,11 @@ const LessonExercisesStep = ({
               </div>
               <Button
                 onClick={handleCreateFinalTest}
-                disabled={linkTestSetsMutation.isPending || !testId}
+                disabled={linkFinalTestSetsMutation.isPending || !lesson.id}
                 size="lg"
                 className="bg-green-600 text-white hover:bg-green-700 shadow-lg px-6 py-3 text-base font-semibold"
               >
-                {linkTestSetsMutation.isPending ? (
+                {linkFinalTestSetsMutation.isPending ? (
                   <>
                     <Loader2 className="h-5 w-5 mr-2 animate-spin" />
                     Đang tạo...

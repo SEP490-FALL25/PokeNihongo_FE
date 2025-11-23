@@ -194,6 +194,33 @@ export const useLinkTestSets = () => {
 
   return linkTestSetsMutation;
 };
+export const useLinkFinalTestSets = () => {
+  const queryClient = useQueryClient();
+
+  const linkFinalTestSetsMutation = useMutation({
+    mutationFn: ({
+      lessonId,
+      data,
+    }: {
+      lessonId: number;
+      data: TestTestSetLinkMultipleRequest;
+    }) => testService.linkFinalTestMultiple(lessonId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["test-detail"] });
+      queryClient.invalidateQueries({ queryKey: ["test-list"] });
+      queryClient.invalidateQueries({ queryKey: ["testset-list"] });
+      toast.success("Đã thêm bộ đề vào Final Test");
+    },
+    onError: (error: unknown) => {
+      console.error("Error linking final test sets:", error);
+      toast.error(
+        getErrorMessage(error, "Có lỗi xảy ra khi liên kết bộ đề vào Final Test")
+      );
+    },
+  });
+
+  return linkFinalTestSetsMutation;
+};
 
 /**
  * Hook for deleting linked test sets
