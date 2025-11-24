@@ -34,8 +34,8 @@ const ListVocabulary = ({ isAddVocabularyDialogOpen, setIsAddVocabularyDialogOpe
     const [activeTab, setActiveTab] = useState<string>("all");
     const [page, setPage] = useState<number>(1);
     const [itemsPerPage, setItemsPerPage] = useState<number>(15);
-    const [sortBy, setSortBy] = useState<string | undefined>(undefined);
-    const [sort, setSort] = useState<"asc" | "desc" | undefined>(undefined);
+    const [sortBy, setSortBy] = useState<string | undefined>("createdAt");
+    const [sort, setSort] = useState<"asc" | "desc" | undefined>("desc");
     const [vocabularyIdToDelete, setVocabularyIdToDelete] = useState<number | null>(null);
     const { data: vocabularies, isLoading } = useVocabularyList({
         page: page,
