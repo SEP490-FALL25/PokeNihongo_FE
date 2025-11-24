@@ -12,7 +12,6 @@ import { toast } from 'react-toastify';
 import vocabularyService from '@services/vocabulary';
 import { CreateVocabularyFullMultipartSchema, ICreateVocabularyFullMultipartType } from '@models/vocabulary/request';
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/Card';
-import { Badge } from '@ui/Badge';
 import { Plus, Trash2, Languages, UploadCloud } from 'lucide-react';
 import { cn } from '@utils/CN';
 import ImageDropzone from '@ui/ImageDropzone/ImageDropzone';
@@ -337,16 +336,20 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                                     {/* Language chips */}
                                     <div className="flex flex-wrap gap-2">
                                         {Object.keys(meaningsByLang).map((lang) => (
-                                            <Badge
+                                            <span
                                                 key={lang}
-                                                variant={selectedMeaningLang === lang ? 'default' : 'outline'}
                                                 onClick={() => setSelectedMeaningLang(lang)}
-                                                className="cursor-pointer select-none"
+                                                className={cn(
+                                                    "inline-flex items-center cursor-pointer select-none px-3 py-1.5 rounded-xl text-[12px] font-medium transition-colors",
+                                                    selectedMeaningLang === lang
+                                                        ? "bg-primary text-white shadow-sm"
+                                                        : "bg-background border border-border text-foreground hover:bg-muted"
+                                                )}
                                             >
                                                 <Languages className="h-3.5 w-3.5 mr-1.5" />
                                                 {LANGUAGE_OPTIONS.find((l) => l.code === lang)?.label || lang}
                                                 <span className="ml-2 text-[10px] opacity-80">{meaningsByLang[lang].length}</span>
-                                            </Badge>
+                                            </span>
                                         ))}
                                     </div>
 
