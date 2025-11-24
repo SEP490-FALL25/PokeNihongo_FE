@@ -47,6 +47,9 @@ const vocabularyService = {
     getStatistics: async () => {
         return axiosPrivate.get('/vocabulary/statistics');
     },
+    putVocabulary: async (wordJp: number, regenerateAudio: boolean, data: any) => {
+        return axiosPrivate.put(`/vocabulary/by-word/${wordJp}?regenerateAudio=${regenerateAudio}`, data);
+    },
     deleteVocabulary: async (id: number) => {
         return axiosPrivate.delete(`/vocabulary/${id}`);
     }

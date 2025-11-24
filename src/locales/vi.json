@@ -876,12 +876,15 @@
             "examples": {
                 "title": "Ví dụ",
                 "addExample": "Thêm ví dụ",
+                "noExamples": "Chưa có ví dụ nào",
                 "language": "Ngôn ngữ",
                 "selectLanguage": "Chọn",
                 "originalSentence": "Câu gốc",
                 "originalSentencePlaceholder": "日本語の文",
                 "translation": "Bản dịch",
+                "translations": "Bản dịch",
                 "translationPlaceholder": "Câu dịch",
+                "addTranslation": "Thêm bản dịch",
                 "delete": "Xóa"
             },
             "attachments": {

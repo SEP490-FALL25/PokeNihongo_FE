@@ -61,7 +61,7 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
     // meanings grouped by language for easier editing
     const [meaningsByLang, setMeaningsByLang] = useState<Record<string, string[]>>({ vi: [''] });
     const [selectedMeaningLang, setSelectedMeaningLang] = useState<string>('vi');
-    const [examples, setExamples] = useState<Array<{ language_code: string; sentence: string; original_sentence: string }>>([]);
+    const [examples, setExamples] = useState<Array<{ original_sentence: string; translations: Array<{ language_code: string; sentence: string }> }>>([]);
 
     // Keep hidden translations JSON in sync for zod validation
     useEffect(() => {
@@ -423,51 +423,109 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                                 </CardContent>
                             </Card>
 
-                            <div className="flex items-center justify-between pt-2">
-                                <h4 className="text-sm font-medium">{t("vocabulary.createVocabulary.examples.title")}</h4>
-                                <Button type="button" variant="outline" onClick={() => setExamples((prev) => [...prev, { language_code: 'vi', sentence: '', original_sentence: '' }])}>{t("vocabulary.createVocabulary.examples.addExample")}</Button>
-                            </div>
-                            <div className="space-y-3">
-                                {examples.map((ex, idx) => (
-                                    <div key={idx} className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
-                                        <div className="md:col-span-1">
-                                            <label className="mb-2 block text-sm font-medium text-gray-700">{t("vocabulary.createVocabulary.examples.language")}</label>
-                                            <Select
-                                                onValueChange={(val) => setExamples((prev) => prev.map((it, i) => i === idx ? { ...it, language_code: val } : it))}
-                                                defaultValue={ex.language_code}
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder={t("vocabulary.createVocabulary.examples.selectLanguage")} />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {LANGUAGE_OPTIONS.map((opt) => (
-                                                        <SelectItem key={opt.code} value={opt.code}>{opt.label}</SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="md:col-span-2">
-                                            <Input
-                                                label={t("vocabulary.createVocabulary.examples.originalSentence")}
-                                                placeholder={t("vocabulary.createVocabulary.examples.originalSentencePlaceholder")}
-                                                value={ex.original_sentence}
-                                                onChange={(e) => setExamples((prev) => prev.map((it, i) => i === idx ? { ...it, original_sentence: e.target.value } : it))}
-                                            />
-                                        </div>
-                                        <div className="md:col-span-2">
-                                            <Input
-                                                label={t("vocabulary.createVocabulary.examples.translation")}
-                                                placeholder={t("vocabulary.createVocabulary.examples.translationPlaceholder")}
-                                                value={ex.sentence}
-                                                onChange={(e) => setExamples((prev) => prev.map((it, i) => i === idx ? { ...it, sentence: e.target.value } : it))}
-                                            />
-                                        </div>
-                                        <div className="md:col-span-1">
-                                            <Button type="button" variant="outline" onClick={() => setExamples((prev) => prev.filter((_, i) => i !== idx))}>{t("vocabulary.createVocabulary.examples.delete")}</Button>
-                                        </div>
+                            <Card>
+                                <CardHeader className="pb-3">
+                                    <div className="flex items-center justify-between">
+                                        <CardTitle className="text-base">{t("vocabulary.createVocabulary.examples.title")}</CardTitle>
                                     </div>
-                                ))}
-                            </div>
+                                </CardHeader>
+                                <CardContent className="pt-0 space-y-4">
+                                    {examples.length === 0 ? (
+                                        <div className="text-center py-8 text-muted-foreground">
+                                            <p className="text-sm">{t("vocabulary.createVocabulary.examples.noExamples")}</p>
+                                        </div>
+                                    ) : (
+                                        examples.map((ex, idx) => (
+                                            <div key={idx} className="border border-border rounded-lg p-4 space-y-3 bg-muted/30">
+                                                <div className="flex items-start gap-3">
+                                                    <div className="flex-1">
+                                                        <Input
+                                                            label={t("vocabulary.createVocabulary.examples.originalSentence")}
+                                                            placeholder={t("vocabulary.createVocabulary.examples.originalSentencePlaceholder")}
+                                                            value={ex.original_sentence}
+                                                            onChange={(e) => setExamples((prev) => prev.map((it, i) => i === idx ? { ...it, original_sentence: e.target.value } : it))}
+                                                        />
+                                                    </div>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => setExamples((prev) => prev.filter((_, i) => i !== idx))}
+                                                        className="mt-7"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+
+                                                <div className="space-y-2 pl-4 border-l-2 border-primary/20">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                                            {t("vocabulary.createVocabulary.examples.translations")}
+                                                        </label>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => setExamples((prev) => prev.map((it, i) => i === idx ? { ...it, translations: [...it.translations, { language_code: 'vi', sentence: '' }] } : it))}
+                                                            className="h-7 text-xs"
+                                                        >
+                                                            <Plus className="h-3 w-3 mr-1" />
+                                                            {t("vocabulary.createVocabulary.examples.addTranslation")}
+                                                        </Button>
+                                                    </div>
+                                                    {ex.translations.map((trans, transIdx) => (
+                                                        <div key={transIdx} className="flex items-center gap-2">
+                                                            <div className="w-24 flex-shrink-0">
+                                                                <Select
+                                                                    onValueChange={(val) => setExamples((prev) => prev.map((it, i) => i === idx ? { ...it, translations: it.translations.map((t, ti) => ti === transIdx ? { ...t, language_code: val } : t) } : it))}
+                                                                    value={trans.language_code}
+                                                                >
+                                                                    <SelectTrigger className="h-9 text-xs">
+                                                                        <SelectValue />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        {LANGUAGE_OPTIONS.map((opt) => (
+                                                                            <SelectItem key={opt.code} value={opt.code}>{opt.label}</SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <Input
+                                                                    placeholder={t("vocabulary.createVocabulary.examples.translationPlaceholder")}
+                                                                    value={trans.sentence}
+                                                                    onChange={(e) => setExamples((prev) => prev.map((it, i) => i === idx ? { ...it, translations: it.translations.map((t, ti) => ti === transIdx ? { ...t, sentence: e.target.value } : t) } : it))}
+                                                                    className="h-9"
+                                                                />
+                                                            </div>
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() => setExamples((prev) => prev.map((it, i) => i === idx ? { ...it, translations: it.translations.filter((_, ti) => ti !== transIdx) } : it))}
+                                                                disabled={ex.translations.length === 1}
+                                                                className="h-9 w-9 p-0 flex-shrink-0"
+                                                            >
+                                                                <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                                                            </Button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => setExamples((prev) => [...prev, { original_sentence: '', translations: [{ language_code: 'vi', sentence: '' }] }])}
+                                        className="w-full"
+                                    >
+                                        <Plus className="h-4 w-4 mr-2" />
+                                        {t("vocabulary.createVocabulary.examples.addExample")}
+                                    </Button>
+                                </CardContent>
+                            </Card>
 
                             {/* Hidden textarea to satisfy zod union (string -> JSON) */}
                             <Controller

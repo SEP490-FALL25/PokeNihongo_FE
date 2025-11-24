@@ -6,9 +6,11 @@ const TranslationItemSchema = z.object({
 })
 
 const ExampleTranslationSchema = z.object({
-    language_code: z.string().min(2, 'validation.languageCodeMinLength'),
-    sentence: z.string().min(1, 'validation.sentenceTranslationRequired'),
-    original_sentence: z.string().min(1, 'validation.originalSentenceRequired')
+    original_sentence: z.string().min(1, 'validation.originalSentenceRequired'),
+    translations: z.array(z.object({
+        language_code: z.string().min(2, 'validation.languageCodeMinLength'),
+        sentence: z.string().min(1, 'validation.sentenceTranslationRequired'),
+    })).min(1, 'validation.translationsRequired')
 })
 
 

@@ -888,12 +888,15 @@
             "examples": {
                 "title": "Examples",
                 "addExample": "Add Example",
+                "noExamples": "No examples yet",
                 "language": "Language",
                 "selectLanguage": "Select",
                 "originalSentence": "Original Sentence",
                 "originalSentencePlaceholder": "Japanese sentence",
                 "translation": "Translation",
+                "translations": "Translations",
                 "translationPlaceholder": "Translated sentence",
+                "addTranslation": "Add Translation",
                 "delete": "Delete"
             },
             "attachments": {

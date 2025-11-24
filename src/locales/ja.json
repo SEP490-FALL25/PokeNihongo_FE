@@ -866,12 +866,15 @@
             "examples": {
                 "title": "例文",
                 "addExample": "例文を追加",
+                "noExamples": "例文がありません",
                 "language": "言語",
                 "selectLanguage": "選択",
                 "originalSentence": "原文",
                 "originalSentencePlaceholder": "日本語の文",
                 "translation": "翻訳",
+                "translations": "翻訳",
                 "translationPlaceholder": "翻訳文",
+                "addTranslation": "翻訳を追加",
                 "delete": "削除"
             },
             "attachments": {
