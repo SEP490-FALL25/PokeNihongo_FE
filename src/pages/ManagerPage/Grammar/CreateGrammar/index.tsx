@@ -77,7 +77,24 @@ const CreateGrammarDialog = ({ open, onOpenChange }: CreateGrammarDialogProps) =
 
     const onSubmit = async (values: ICreateGrammarRequest) => {
         try {
-            await createGrammar.mutateAsync(values);
+            // Filter bỏ các item có explanation hoặc example rỗng
+            const validUsageItems = values.translations.usage.filter(
+                (item) => item.explanation.trim() !== "" && item.example.trim() !== ""
+            );
+
+            // Kiểm tra có ít nhất 1 item hợp lệ
+            if (validUsageItems.length === 0) {
+                toast.error(t("createGrammar.error.noValidTranslation", { defaultValue: "Vui lòng điền ít nhất một bản dịch hợp lệ" }));
+                return;
+            }
+
+            const cleanedValues: ICreateGrammarRequest = {
+                ...values,
+                translations: {
+                    usage: validUsageItems,
+                },
+            };
+            await createGrammar.mutateAsync(cleanedValues);
             toast.success(t("createGrammar.success"));
             closeDialog();
         } catch {
