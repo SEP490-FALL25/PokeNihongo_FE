@@ -623,7 +623,6 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
                         <Button
                             variant="outline"
                             size="sm"
-                            disabled={rankGroups.length === 0}
                             onClick={() => setIsRewardDialogOpen(true)}
                             className="h-9"
                         >
