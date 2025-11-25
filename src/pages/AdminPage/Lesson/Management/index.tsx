@@ -27,7 +27,7 @@ import LessonExercisesStep from "../WorkflowSteps/LessonExercisesStep";
 interface LessonItem {
   id: number;
   slug: string;
-  titleKey: string;
+  titleJp: string;
   levelJlpt: number;
   estimatedTimeMinutes: number;
   lessonOrder: number;
@@ -166,7 +166,7 @@ const LessonsManagement = () => {
                   </div>
                   <div>
                     <CardTitle className="text-xl font-bold text-foreground">
-                      {t("lesson.managing")}: {selectedLesson.titleKey}
+                      {t("lesson.managing")}: {selectedLesson.titleJp}
                     </CardTitle>
                     <div className="flex items-center gap-3 mt-2">
                       <Badge className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-600 border-blue-500/30 shadow-sm font-medium">
@@ -235,7 +235,7 @@ const LessonsManagement = () => {
         {!selectedLesson ? (
           <>
             {/* Stats Cards */}
-            <div className="grid gap-6 md:grid-cols-4">
+            <div className="grid gap-6 md:grid-cols-3">
               <Card className="relative overflow-hidden bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-full -mr-16 -mt-16" />
                 <CardHeader className="pb-3 relative">
@@ -291,7 +291,7 @@ const LessonsManagement = () => {
                   <div className="h-1 w-16 bg-gradient-to-r from-transparent via-current to-transparent opacity-20 mt-2" />
                 </CardContent>
               </Card>
-              <Card className="relative overflow-hidden bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              {/* <Card className="relative overflow-hidden bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-full -mr-16 -mt-16" />
                 <CardHeader className="pb-3 relative">
                   <div className="flex items-center justify-between">
@@ -309,7 +309,7 @@ const LessonsManagement = () => {
                   </div>
                   <div className="h-1 w-16 bg-gradient-to-r from-transparent via-current to-transparent opacity-20 mt-2" />
                 </CardContent>
-              </Card>
+              </Card> */}
             </div>
 
             {/* Lessons Content */}
@@ -368,7 +368,7 @@ const LessonsManagement = () => {
                         <SelectItem value="updatedAt">
                           {t("lesson.updatedAt")}
                         </SelectItem>
-                        <SelectItem value="titleKey">
+                        <SelectItem value="titleJp">
                           {t("lesson.title")}
                         </SelectItem>
                       </SelectContent>
@@ -469,7 +469,7 @@ const LessonsManagement = () => {
                                     <BookOpenIcon className="w-4 h-4 text-primary" />
                                   </div>
                                   <CardTitle className="text-lg font-bold text-foreground line-clamp-2">
-                                    {lesson.titleKey}
+                                    {lesson.titleJp}
                                   </CardTitle>
                                 </div>
                                 <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
