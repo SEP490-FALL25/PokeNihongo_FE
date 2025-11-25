@@ -41,14 +41,25 @@ interface GrammarListResponse {
     pagination?: PaginationMeta;
 }
 
+interface ApiError {
+    message?: string;
+    response?: {
+        data?: {
+            message?: string;
+        };
+    };
+}
+
 const levelOptions: GrammarLevelValue[] = ["all", "N5", "N4", "N3", "N2", "N1"];
 
+const LEVEL_BADGE_BASE_CLASS = "font-semibold uppercase tracking-wide text-[11px] leading-tight";
+
 const LEVEL_BADGE_STYLES: Record<string, string> = {
-    N5: "bg-emerald-100 text-emerald-700 border-emerald-200",
-    N4: "bg-teal-100 text-teal-700 border-teal-200",
-    N3: "bg-sky-100 text-sky-700 border-sky-200",
-    N2: "bg-indigo-100 text-indigo-700 border-indigo-200",
-    N1: "bg-purple-100 text-purple-700 border-purple-200",
+    N5: "bg-emerald-400 text-emerald-950 border-emerald-600 shadow-sm",
+    N4: "bg-teal-400 text-teal-950 border-teal-600 shadow-sm",
+    N3: "bg-sky-400 text-sky-950 border-sky-600 shadow-sm",
+    N2: "bg-indigo-500 text-white border-indigo-700 shadow-sm",
+    N1: "bg-purple-500 text-white border-purple-700 shadow-sm",
 };
 
 type SortColumn = "level" | "createdAt" | "updatedAt";
@@ -127,8 +138,8 @@ const GrammarManagementPage = () => {
         LEVEL_BADGE_STYLES[label] ?? "bg-muted text-muted-foreground border-border";
 
     const errorMessage =
-        (error as any)?.response?.data?.message ??
-        (error as Error | undefined)?.message ??
+        (error as ApiError | undefined)?.response?.data?.message ??
+        (error as ApiError | undefined)?.message ??
         t("managerGrammar.fallbackError");
 
     const SkeletonRows = () => (
@@ -274,7 +285,12 @@ const GrammarManagementPage = () => {
                                                         {grammar.structure || grammar.title || "—"}
                                                     </TableCell>
                                                     <TableCell>
-                                                        <Badge className={getLevelClassName(levelLabel)}>{levelLabel}</Badge>
+                                                    <Badge
+                                                        variant="flat"
+                                                        className={`${LEVEL_BADGE_BASE_CLASS} ${getLevelClassName(levelLabel)}`}
+                                                    >
+                                                        {levelLabel}
+                                                    </Badge>
                                                     </TableCell>
                                                     <TableCell>{formatDateTime(grammar.createdAt)}</TableCell>
                                                     <TableCell>{formatDateTime(grammar.updatedAt)}</TableCell>

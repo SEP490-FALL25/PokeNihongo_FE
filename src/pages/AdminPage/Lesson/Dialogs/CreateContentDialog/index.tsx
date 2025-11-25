@@ -17,7 +17,7 @@ import { toast } from "react-toastify";
 import { useVocabularyList } from "@hooks/useVocabulary";
 import { useGrammarList } from "@hooks/useGrammar";
 import { useKanjiList } from "@hooks/useKanji";
-import { useLessonContent } from "@hooks/useLessonContent";
+import { useLessonContents } from "@hooks/useLessonContents";
 import { QUESTION_TYPE } from "@constants/questionBank";
 import {
   validateCreateContent,
@@ -192,7 +192,10 @@ const CreateContentDialog = ({
   const { validateField } = useFormValidation(validationRules);
 
   // Use lesson content hook for creating multiple contents
-  const { createMultipleContents } = useLessonContent(lessonId || null);
+  const { createMultipleContents } = useLessonContents({
+    lessonId,
+    queryEnabled: false,
+  });
 
   // Trigger fetch when dialog opens
   useEffect(() => {
