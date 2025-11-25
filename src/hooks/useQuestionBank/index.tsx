@@ -50,6 +50,13 @@ export const useQuestionBankList = (filters: IQueryQuestionRequest) => {
       totalPage: 1,
       totalItem: 0,
     },
+    levelCounts: data?.data?.data?.levelCounts || {
+      N5: 0,
+      N4: 0,
+      N3: 0,
+      N2: 0,
+      N1: 0,
+    },
     isLoading,
     error,
   };
@@ -245,6 +252,7 @@ export const useQuestionBank = (
   const {
     data: questions,
     pagination,
+    levelCounts,
     isLoading,
     error,
   } = useQuestionBankList(filters);
@@ -814,6 +822,7 @@ export const useQuestionBank = (
     // Data
     questions,
     pagination,
+    levelCounts,
     isLoading,
     error,
     filters,

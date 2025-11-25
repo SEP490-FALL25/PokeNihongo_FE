@@ -37,6 +37,13 @@ declare namespace COMPONENTS {
   export interface IStatsCardsProps {
     questions: QuestionEntityType[];
     totalItems: number;
+    levelCounts?: {
+      N5: number;
+      N4: number;
+      N3: number;
+      N2: number;
+      N1: number;
+    };
   }
 
   export type IQuestionMeaningLike = {

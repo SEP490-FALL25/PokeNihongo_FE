@@ -22,6 +22,7 @@ const QuestionBankManagement: React.FC = () => {
   const {
     questions,
     pagination,
+    levelCounts,
     isLoading,
     filters,
     formData,
@@ -68,7 +69,7 @@ const QuestionBankManagement: React.FC = () => {
       />
       <div className="p-8 mt-24 space-y-8">
         {/* Statistics Cards */}
-        <StatsCards questions={questions} totalItems={pagination.totalItem} />
+        <StatsCards questions={questions} totalItems={pagination.totalItem} levelCounts={levelCounts} />
 
         {/* Questions List Card */}
         <Card className="bg-gradient-to-br from-card via-card to-card/95 border-border shadow-md">

@@ -1,11 +1,18 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card";
 import { Badge } from "@ui/Badge";
-import { BookOpen, Hash, FileQuestion } from "lucide-react";
+import { BookOpen, Hash } from "lucide-react";
 import { QuestionEntityType } from "@models/questionBank/entity";
 
-const StatsCards: React.FC<COMPONENTS.IStatsCardsProps> = ({ questions, totalItems }) => {
-  const countByLevel = (level: number) => questions.filter((q: QuestionEntityType) => q.levelN === level).length;
+const StatsCards: React.FC<COMPONENTS.IStatsCardsProps> = ({ questions, totalItems, levelCounts }) => {
+  // Fallback to calculating from questions array if levelCounts is not provided
+  const countByLevel = (level: number) => {
+    if (levelCounts) {
+      const levelKey = `N${level}` as keyof typeof levelCounts;
+      return levelCounts[levelKey] || 0;
+    }
+    return questions.filter((q: QuestionEntityType) => q.levelN === level).length;
+  };
 
   const stats = [
     {
