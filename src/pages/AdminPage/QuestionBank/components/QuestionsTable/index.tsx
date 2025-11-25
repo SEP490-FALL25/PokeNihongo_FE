@@ -107,7 +107,7 @@ const QuestionsTable: React.FC<COMPONENTS.IQuestionsTableProps> = ({
                   </Badge>
                 </TableCell>
                 <TableCell className="w-16 whitespace-nowrap py-3">
-                  <Badge variant="outline" className="text-xs shadow-sm font-medium">N{question.levelN}</Badge>
+                  <Badge variant="default" className="text-xs shadow-sm font-medium">N{question.levelN}</Badge>
                 </TableCell>
                 <TableCell className="w-32 py-3">
                   {question.meanings && question.meanings.length > 0 ? (
