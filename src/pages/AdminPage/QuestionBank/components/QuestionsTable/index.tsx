@@ -17,7 +17,7 @@ const QuestionsTable: React.FC<COMPONENTS.IQuestionsTableProps> = ({
   t,
 }) => {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto -mx-4 sm:mx-0">
       <Table className="min-w-full">
         <TableHeader>
           <TableRow className="border-border hover:bg-muted/30">
@@ -27,7 +27,7 @@ const QuestionsTable: React.FC<COMPONENTS.IQuestionsTableProps> = ({
               currentSortBy={filters.sortBy}
               currentSort={filters.sortOrder as "asc" | "desc"}
               onSort={handleSort}
-              className="text-muted-foreground font-semibold w-12"
+              className="text-muted-foreground font-semibold w-12 hidden md:table-cell"
             />
             <SortableTableHeader
               title={t("questionBank.question")}
@@ -35,7 +35,7 @@ const QuestionsTable: React.FC<COMPONENTS.IQuestionsTableProps> = ({
               currentSortBy={filters.sortBy}
               currentSort={filters.sortOrder as "asc" | "desc"}
               onSort={handleSort}
-              className="text-muted-foreground font-semibold w-64"
+              className="text-muted-foreground font-semibold min-w-[200px] sm:min-w-[250px] md:w-64"
             />
             <SortableTableHeader
               title={t("questionBank.questionType")}
@@ -43,7 +43,7 @@ const QuestionsTable: React.FC<COMPONENTS.IQuestionsTableProps> = ({
               currentSortBy={filters.sortBy}
               currentSort={filters.sortOrder as "asc" | "desc"}
               onSort={handleSort}
-              className="text-muted-foreground font-semibold w-20"
+              className="text-muted-foreground font-semibold w-20 hidden lg:table-cell"
             />
             <SortableTableHeader
               title={t("questionBank.level")}
@@ -51,7 +51,7 @@ const QuestionsTable: React.FC<COMPONENTS.IQuestionsTableProps> = ({
               currentSortBy={filters.sortBy}
               currentSort={filters.sortOrder as "asc" | "desc"}
               onSort={handleSort}
-              className="text-muted-foreground font-semibold w-16"
+              className="text-muted-foreground font-semibold w-16 whitespace-nowrap"
             />
             <SortableTableHeader
               title={t("questionBank.meaning")}
@@ -59,9 +59,9 @@ const QuestionsTable: React.FC<COMPONENTS.IQuestionsTableProps> = ({
               currentSortBy={filters.sortBy}
               currentSort={filters.sortOrder as "asc" | "desc"}
               onSort={handleSort}
-              className="text-muted-foreground font-semibold w-32"
+              className="text-muted-foreground font-semibold w-32 hidden xl:table-cell"
             />
-            <TableHead className="text-muted-foreground text-right w-20">{t("questionBank.actions")}</TableHead>
+            <TableHead className="text-muted-foreground text-right w-20 whitespace-nowrap">{t("questionBank.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -88,20 +88,53 @@ const QuestionsTable: React.FC<COMPONENTS.IQuestionsTableProps> = ({
           ) : (
             questions.map((question: QuestionEntityType) => (
               <TableRow key={question.id} className="border-border hover:bg-muted/30 transition-colors group">
-                <TableCell className="font-medium w-12 whitespace-nowrap text-sm py-3 text-muted-foreground">
+                <TableCell className="font-medium w-12 whitespace-nowrap text-sm py-3 text-muted-foreground hidden md:table-cell">
                   {question.id}
                 </TableCell>
-                <TableCell className="truncate py-3 w-64">
-                  <div className="max-w-60">
-                    <div className="font-semibold text-sm truncate leading-tight text-foreground">
+                <TableCell className="py-3 min-w-[200px] sm:min-w-[250px] md:w-64">
+                  <div className="max-w-full sm:max-w-60">
+                    <div className="font-semibold text-sm leading-tight text-foreground break-words">
                       {question.questionJp}
                     </div>
-                    <div className="text-xs text-muted-foreground truncate leading-tight mt-1">
+                    <div className="text-xs text-muted-foreground leading-tight mt-1 break-words">
                       {question.pronunciation || "No pronunciation"}
+                    </div>
+                    {/* Show question type on mobile as inline badge */}
+                    <div className="mt-2 lg:hidden">
+                      <Badge variant="secondary" className="text-xs shadow-sm font-medium">
+                        {getQuestionTypeLabel(question.questionType)}
+                      </Badge>
+                    </div>
+                    {/* Show meaning on mobile/tablet below question */}
+                    <div className="mt-2 xl:hidden">
+                      {question.meanings && question.meanings.length > 0 ? (
+                        <div className="text-muted-foreground text-xs space-y-1">
+                          {question.meanings.slice(0, 1).map((meaning: COMPONENTS.IQuestionMeaningLike, index: number) => (
+                            <div key={index} className="bg-muted/30 px-2 py-1 rounded-md break-words">
+                              {"language" in meaning && "value" in meaning ? (
+                                <>
+                                  <span className="font-medium">{meaning.language}:</span> {meaning.value}
+                                </>
+                              ) : (
+                                <>
+                                  {"translations" in meaning && meaning.translations?.vi && (
+                                    <div>vi: {meaning.translations.vi}</div>
+                                  )}
+                                  {"translations" in meaning && meaning.translations?.en && (
+                                    <div>en: {meaning.translations.en}</div>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : question.meaning ? (
+                        <div className="text-muted-foreground text-xs bg-muted/30 px-2 py-1 rounded-md break-words">{question.meaning}</div>
+                      ) : null}
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="w-20 whitespace-nowrap py-3">
+                <TableCell className="w-20 whitespace-nowrap py-3 hidden lg:table-cell">
                   <Badge variant="secondary" className="text-xs shadow-sm font-medium">
                     {getQuestionTypeLabel(question.questionType)}
                   </Badge>
@@ -109,7 +142,7 @@ const QuestionsTable: React.FC<COMPONENTS.IQuestionsTableProps> = ({
                 <TableCell className="w-16 whitespace-nowrap py-3">
                   <Badge variant="default" className="text-xs shadow-sm font-medium">N{question.levelN}</Badge>
                 </TableCell>
-                <TableCell className="w-32 py-3">
+                <TableCell className="w-32 py-3 hidden xl:table-cell">
                   {question.meanings && question.meanings.length > 0 ? (
                     <div className="text-muted-foreground text-xs space-y-1">
                       {question.meanings.map((meaning: COMPONENTS.IQuestionMeaningLike, index: number) => (
