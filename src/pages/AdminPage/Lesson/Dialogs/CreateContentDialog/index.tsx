@@ -123,8 +123,8 @@ const CreateContentDialog = ({
 
   // Fetch data based on content type - only when shouldFetch is true
   const { data: vocabularies, isLoading: vocabLoading } = useVocabularyList({
-    currentPage: page,
-    pageSize: itemsPerPage,
+    page,
+    limit: itemsPerPage,
     search: searchQuery || undefined,
     levelN: selectedLevel === "all" ? undefined : parseInt(selectedLevel),
     sortBy: "createdAt",
@@ -142,8 +142,8 @@ const CreateContentDialog = ({
         : `N${selectedLevel}`;
 
   const { data: grammars, isLoading: grammarLoading } = useGrammarList({
-    currentPage: page,
-    pageSize: itemsPerPage,
+    page,
+    limit: itemsPerPage,
     search: searchQuery || undefined,
     level: normalizedGrammarLevel,
     sortBy: "createdAt",
