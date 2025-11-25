@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@ui/Select";
-import { Search, Plus, Trash2, Eye, BookOpen, BookOpen as BookOpenIcon, FileText, Target, ArrowRight, CheckCircle2, Clock, Users, Edit } from "lucide-react";
+import { Search, Plus, Trash2, Eye, BookOpen, BookOpen as BookOpenIcon, FileText, Target, ArrowRight, CheckCircle2, Clock, Edit } from "lucide-react";
 import { Tabs } from "@ui/Tabs";
 import HeaderAdmin from "@organisms/Header/Admin";
 import PaginationControls from "@ui/PaginationControls";
@@ -28,6 +28,7 @@ interface LessonItem {
   id: number;
   slug: string;
   titleJp: string;
+  titleKey: string;
   levelJlpt: number;
   estimatedTimeMinutes: number;
   lessonOrder: number;

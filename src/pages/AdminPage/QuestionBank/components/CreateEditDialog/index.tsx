@@ -49,9 +49,10 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
               label={t("questionBank.createDialog.questionJpLabel")}
               value={formData.questionJp}
               onChange={(e) => {
+                const value = e.target.value.trim();
                 setFormData((prev: any) => ({
                   ...prev,
-                  questionJp: e.target.value,
+                  questionJp: value,
                 }));
                 if (fieldErrors.questionJp) {
                   setFieldErrors((prev) => {
@@ -164,7 +165,8 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                 }`}
                 value={formData.pronunciation || ""}
                 onChange={(e) => {
-                  setFormData((prev: any) => ({ ...prev, pronunciation: e.target.value }));
+                  const value = e.target.value.trim();
+                  setFormData((prev: any) => ({ ...prev, pronunciation: value }));
                   if (fieldErrors.pronunciation) {
                     setFieldErrors((prev) => {
                       const newErrors = { ...prev } as Record<string, string[]>;
@@ -212,7 +214,10 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                   <Input
                     label={t("questionBank.createDialog.audioUrlLabel")}
                     value={formData.audioUrl || ""}
-                    onChange={(e) => setFormData((prev: any) => ({ ...prev, audioUrl: e.target.value }))}
+                    onChange={(e) => {
+                      const value = e.target.value.trim();
+                      setFormData((prev: any) => ({ ...prev, audioUrl: value }));
+                    }}
                     placeholder={
                       formData.questionType === "LISTENING"
                         ? "Optional - will auto-generate TTS if not provided"
@@ -255,12 +260,13 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                   <Input
                     value={formData.meanings?.[0]?.translations?.vi || ""}
                     onChange={(e) => {
+                      const value = e.target.value.trim();
                       setFormData((prev: any) => ({
                         ...prev,
                         meanings: [
                           {
                             ...prev.meanings?.[0],
-                            translations: { ...prev.meanings?.[0]?.translations, vi: e.target.value },
+                            translations: { ...prev.meanings?.[0]?.translations, vi: value },
                           },
                         ],
                       }));
@@ -280,12 +286,13 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                   <Input
                     value={formData.meanings?.[0]?.translations?.en || ""}
                     onChange={(e) => {
+                      const value = e.target.value.trim();
                       setFormData((prev: any) => ({
                         ...prev,
                         meanings: [
                           {
                             ...prev.meanings?.[0],
-                            translations: { ...prev.meanings?.[0]?.translations, en: e.target.value },
+                            translations: { ...prev.meanings?.[0]?.translations, en: value },
                           },
                         ],
                       }));
@@ -436,7 +443,7 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                               label="Japanese Answer"
                               value={jpValue}
                               onChange={(e) => {
-                                const newJp = e.target.value;
+                                const newJp = e.target.value.trim();
                                 setFormData((prev: any) => ({
                                   ...prev,
                                   answers: prev.answers?.map((a: any, i: number) =>
@@ -458,7 +465,7 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                                 label="Vietnamese Answer"
                                 value={viValue}
                                 onChange={(e) => {
-                                  const newVi = e.target.value;
+                                  const newVi = e.target.value.trim();
                                   setAnswerExtras((prev: Record<number, { vi: string; en: string }>) => ({ ...prev, [index]: { vi: newVi, en: enValue } }));
                                   setFormData((prev: any) => ({
                                     ...prev,
@@ -473,7 +480,7 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                                 label="English Answer"
                                 value={enValue}
                                 onChange={(e) => {
-                                  const newEn = e.target.value;
+                                  const newEn = e.target.value.trim();
                                   setAnswerExtras((prev: Record<number, { vi: string; en: string }>) => ({ ...prev, [index]: { vi: viValue, en: newEn } }));
                                   setFormData((prev: any) => ({
                                     ...prev,
@@ -521,7 +528,8 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                           <label className="block text-sm font-medium text-gray-600 mb-1">Vietnamese Translation</label>
                           <Input
                             value={answer.translations?.meaning?.find((m: any) => m && m.language_code === "vi")?.value || ""}
-                            onChange={(e) =>
+                            onChange={(e) => {
+                              const value = e.target.value.trim();
                               setFormData((prev: any) => ({
                                 ...prev,
                                 answers: prev.answers?.map((a: any, i: number) =>
@@ -533,7 +541,7 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                                             const existingMeanings = a.translations?.meaning || [];
                                             const enMeaning = existingMeanings.find((m: any) => m && m.language_code === "en");
                                             return [
-                                              { language_code: "vi", value: e.target.value },
+                                              { language_code: "vi", value: value },
                                               { language_code: "en", value: enMeaning?.value || "" },
                                             ];
                                           })(),
@@ -541,8 +549,8 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                                       }
                                     : a
                                 ),
-                              }))
-                            }
+                              }));
+                            }}
                             placeholder="Vietnamese translation"
                           />
                         </div>
@@ -550,7 +558,8 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                           <label className="block text-sm font-medium text-gray-600 mb-1">English Translation</label>
                           <Input
                             value={answer.translations?.meaning?.find((m: any) => m && m.language_code === "en")?.value || ""}
-                            onChange={(e) =>
+                            onChange={(e) => {
+                              const value = e.target.value.trim();
                               setFormData((prev: any) => ({
                                 ...prev,
                                 answers: prev.answers?.map((a: any, i: number) =>
@@ -563,15 +572,15 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                                             const viMeaning = existingMeanings.find((m: any) => m && m.language_code === "vi");
                                             return [
                                               { language_code: "vi", value: viMeaning?.value || "" },
-                                              { language_code: "en", value: e.target.value },
+                                              { language_code: "en", value: value },
                                             ];
                                           })(),
                                         },
                                       }
                                     : a
                                 ),
-                              }))
-                            }
+                              }));
+                            }}
                             placeholder="English translation"
                           />
                         </div>

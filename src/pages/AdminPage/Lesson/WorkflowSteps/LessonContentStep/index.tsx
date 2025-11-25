@@ -36,6 +36,14 @@ import {
 } from "@dnd-kit/sortable";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import {
+  useLessonContents,
+  type SectionItem,
+  type VocabularyItem,
+  type GrammarItem,
+  type KanjiItem,
+  type MeaningEntry,
+} from "@hooks/useLessonContents";
 
 interface LessonItem {
   id: number;
@@ -65,9 +73,6 @@ interface LessonContentStepProps {
 }
 
 // Sortable Item Component
-// Minimal BE item shapes to avoid transforming data
-type MeaningEntry = { meaningKey?: string; meaning?: unknown };
-
 // Type guards and helpers for safe extraction
 const isRecord = (v: unknown): v is Record<string, unknown> =>
   !!v && typeof v === "object" && !Array.isArray(v);
@@ -149,26 +154,6 @@ const extractMeaningText = (entry: MeaningEntry, lang: string): string => {
 
   return entry?.meaningKey || "";
 };
-type BaseSectionItem = {
-  id: number;
-  contentType?: string;
-  contentId?: number;
-  contentOrder?: number;
-  lessonId?: number;
-  lessonContentId?: number;
-  meaningKey?: string;
-  meanings?: MeaningEntry[];
-};
-
-type VocabularyItem = BaseSectionItem & { wordJp?: string };
-type GrammarItem = BaseSectionItem & {
-  structure?: string;
-  title?: string;
-  description?: string;
-};
-type KanjiItem = BaseSectionItem & { character?: string; meaning?: string };
-
-type SectionItem = VocabularyItem | GrammarItem | KanjiItem;
 
 interface SortableItemProps {
   content: SectionItem;
@@ -408,126 +393,59 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
     },
   ]);
 
-  // Fetch all sections in one grouped call
-  const fetchAllSections = useCallback(async () => {
-    // set loading true for all
-    setContentSections((prev) =>
-      prev.map((section) => ({ ...section, isLoading: true, error: null }))
-    );
+  const {
+    lessonContentsData,
+    isLessonContentsLoading,
+    lessonContentErrorMessage,
+    refetchLessonContents,
+    removeLessonContentsFromCache,
+  } = useLessonContents({
+    lessonId: lesson.id,
+    language: currentLanguage,
+  });
 
-    try {
-      const response = await lessonService.getLessonContentsByLessonId(
-        lesson.id,
-        currentLanguage
-      );
-      const payload = response?.data?.data ?? response?.data ?? {};
-
-      const vocabularyList: SectionItem[] = payload?.voca ?? [];
-      const grammarList: SectionItem[] = payload?.grama ?? [];
-      const kanjiList: SectionItem[] = payload?.kanji ?? [];
-
-      setContentSections((prev) =>
-        prev.map((section) => {
-          if (section.type === QUESTION_TYPE.VOCABULARY) {
-            return {
-              ...section,
-              contents: vocabularyList,
-              isLoading: false,
-              error: null,
-            };
-          }
-          if (section.type === QUESTION_TYPE.GRAMMAR) {
-            return {
-              ...section,
-              contents: grammarList,
-              isLoading: false,
-              error: null,
-            };
-          }
-          if (section.type === QUESTION_TYPE.KANJI) {
-            return {
-              ...section,
-              contents: kanjiList,
-              isLoading: false,
-              error: null,
-            };
-          }
-          return section;
-        })
-      );
-    } catch (error) {
-      console.error("Failed to fetch grouped lesson contents:", error);
-      setContentSections((prev) =>
-        prev.map((section) => ({
-          ...section,
-          isLoading: false,
-          error: "Failed to fetch content",
-        }))
-      );
-    }
-  }, [lesson.id]);
-
-  // Load all sections on component mount using grouped API
   useEffect(() => {
-    const lang = (i18n?.language || "vi").split("-")[0];
-    // Re-fetch with current language so BE can localize if supported
-    (async () => {
-      try {
-        setContentSections((prev) =>
-          prev.map((section) => ({ ...section, isLoading: true, error: null }))
-        );
-        const response = await lessonService.getLessonContentsByLessonId(
-          lesson.id,
-          lang
-        );
-        const payload = response?.data?.data ?? response?.data ?? {};
-        const vocabularyList: SectionItem[] = payload?.voca ?? [];
-        const grammarList: SectionItem[] = payload?.grama ?? [];
-        const kanjiList: SectionItem[] = payload?.kanji ?? [];
-        setContentSections((prev) =>
-          prev.map((section) => {
-            if (section.type === QUESTION_TYPE.VOCABULARY)
-              return {
-                ...section,
-                contents: vocabularyList,
-                isLoading: false,
-                error: null,
-              };
-            if (section.type === QUESTION_TYPE.GRAMMAR)
-              return {
-                ...section,
-                contents: grammarList,
-                isLoading: false,
-                error: null,
-              };
-            if (section.type === QUESTION_TYPE.KANJI)
-              return {
-                ...section,
-                contents: kanjiList,
-                isLoading: false,
-                error: null,
-              };
-            return section;
-          })
-        );
-      } catch (error) {
-        console.error(
-          "Failed to fetch grouped lesson contents with lang:",
-          error
-        );
-        setContentSections((prev) =>
-          prev.map((section) => ({
-            ...section,
-            isLoading: false,
-            error: "Failed to fetch content",
-          }))
-        );
-      }
-    })();
-  }, [lesson.id, i18n?.language, fetchAllSections]);
+    setContentSections((prev) =>
+      prev.map((section) => {
+        const baseSection = {
+          ...section,
+          isLoading: isLessonContentsLoading,
+          error: lessonContentErrorMessage,
+        };
 
-  // Keep effect for any external changes; reuse grouped fetch
-  // (combined with initial load above)
+        if (!lessonContentsData) return baseSection;
+
+        if (section.type === QUESTION_TYPE.VOCABULARY) {
+          return {
+            ...baseSection,
+            contents: lessonContentsData.vocabularyList,
+          };
+        }
+        if (section.type === QUESTION_TYPE.GRAMMAR) {
+          return {
+            ...baseSection,
+            contents: lessonContentsData.grammarList,
+          };
+        }
+        if (section.type === QUESTION_TYPE.KANJI) {
+          return {
+            ...baseSection,
+            contents: lessonContentsData.kanjiList,
+          };
+        }
+        return baseSection;
+      })
+    );
+  }, [
+    lessonContentsData,
+    isLessonContentsLoading,
+    lessonContentErrorMessage,
+  ]);
+
+  // Fetch all sections in one grouped call using TanStack cache
+  const fetchAllSections = useCallback(async () => {
+    await refetchLessonContents();
+  }, [refetchLessonContents]);
 
   const handleViewContent = (content: SectionItem) => {
     setSelectedContent(content);
@@ -585,6 +503,8 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
         return next;
       });
 
+      removeLessonContentsFromCache([lessonContentId]);
+
       // silent success
     } catch (error) {
       console.error("Failed to delete content:", error);
@@ -634,6 +554,8 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
         idsToDelete.forEach((id) => next.delete(id));
         return next;
       });
+
+      removeLessonContentsFromCache(idsToDelete);
 
       // silent success
     } catch (error) {
@@ -686,6 +608,7 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
 
       // Show success toast
       toast.success("Đã lưu thay đổi vị trí thành công!");
+      await fetchAllSections();
     } catch (error) {
       console.error(`❌ Failed to save changes:`, error);
 
