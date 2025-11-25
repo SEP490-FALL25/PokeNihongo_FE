@@ -81,8 +81,6 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                 value={formData.questionType}
                 onValueChange={(value) => {
                   const newQuestionType = value as QuestionType;
-                  const isEditMode = isEditDialogOpen;
-                  
                   setFormData((prev: any) => {
                     const newFormData: any = { ...prev, questionType: newQuestionType };
                     // Only reset pronunciation and audioUrl if not applicable to new type
@@ -93,8 +91,8 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                       newFormData.audioUrl = "";
                     }
                     
-                    // Only reset answers structure when creating new question, keep answers when editing
-                    if (!isEditMode) {
+                    // Only populate default answers when there are none yet (fresh form)
+                    if (!prev.answers || prev.answers.length === 0) {
                       const blankAnswer = () => ({
                         answerJp: "",
                         isCorrect: false,
