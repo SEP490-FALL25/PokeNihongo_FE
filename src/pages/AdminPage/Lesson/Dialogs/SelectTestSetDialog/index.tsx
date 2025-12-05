@@ -51,7 +51,7 @@ const SelectTestSetDialog: React.FC<SelectTestSetDialogProps> = ({
   lessonLevel,
   testType,
 }) => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const currentLang = (i18n?.language || "vi").slice(0, 2);
 
   type TranslationEntry = { language: string; value: string };
@@ -134,27 +134,11 @@ const SelectTestSetDialog: React.FC<SelectTestSetDialogProps> = ({
     onClose();
   };
 
-  const getTestTypeLabel = (testType: string) => {
-    const labels: Record<string, string> = {
-      VOCABULARY: "Từ vựng",
-      GRAMMAR: "Ngữ pháp",
-      KANJI: "Kanji",
-      LISTENING: "Nghe",
-      READING: "Đọc",
-      SPEAKING: "Nói",
-      GENERAL: "Tổng hợp",
-    };
-    return labels[testType] || testType;
-  };
+  const getTestTypeLabel = (testType: string) =>
+    t(`testManagement.testSetTypes.${testType}`, { defaultValue: testType });
 
-  const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      DRAFT: "Nháp",
-      ACTIVE: "Hoạt động",
-      INACTIVE: "Không hoạt động",
-    };
-    return labels[status] || status;
-  };
+  const getStatusLabel = (status: string) =>
+    t(`common.${status.toLowerCase()}`, { defaultValue: status });
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -234,7 +218,7 @@ const SelectTestSetDialog: React.FC<SelectTestSetDialogProps> = ({
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col bg-white">
         <DialogHeader>
           <DialogTitle>
-            Chọn TestSet cho bài học (JLPT N{lessonLevel})
+            {t("workflow.selectTestSet.title", { level: lessonLevel })}
           </DialogTitle>
         </DialogHeader>
 
@@ -244,7 +228,7 @@ const SelectTestSetDialog: React.FC<SelectTestSetDialogProps> = ({
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Tìm kiếm testset..."
+                placeholder={t("workflow.selectTestSet.searchPlaceholder")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -259,17 +243,35 @@ const SelectTestSetDialog: React.FC<SelectTestSetDialogProps> = ({
             }
           >
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="Loại đề thi" />
+              <SelectValue
+                placeholder={t("workflow.selectTestSet.typePlaceholder")}
+              />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ALL">Tất cả loại</SelectItem>
-              <SelectItem value="VOCABULARY">Từ vựng</SelectItem>
-              <SelectItem value="GRAMMAR">Ngữ pháp</SelectItem>
-              <SelectItem value="KANJI">Kanji</SelectItem>
-              <SelectItem value="LISTENING">Nghe</SelectItem>
-              <SelectItem value="READING">Đọc</SelectItem>
-              <SelectItem value="SPEAKING">Nói</SelectItem>
-              <SelectItem value="GENERAL">Tổng hợp</SelectItem>
+              <SelectItem value="ALL">
+                {t("workflow.selectTestSet.allTypes")}
+              </SelectItem>
+              <SelectItem value="VOCABULARY">
+                {t("testManagement.testSetTypes.VOCABULARY")}
+              </SelectItem>
+              <SelectItem value="GRAMMAR">
+                {t("testManagement.testSetTypes.GRAMMAR")}
+              </SelectItem>
+              <SelectItem value="KANJI">
+                {t("testManagement.testSetTypes.KANJI")}
+              </SelectItem>
+              <SelectItem value="LISTENING">
+                {t("testManagement.testSetTypes.LISTENING")}
+              </SelectItem>
+              <SelectItem value="READING">
+                {t("testManagement.testSetTypes.READING")}
+              </SelectItem>
+              <SelectItem value="SPEAKING">
+                {t("testManagement.testSetTypes.SPEAKING")}
+              </SelectItem>
+              <SelectItem value="GENERAL">
+                {t("testManagement.testSetTypes.GENERAL")}
+              </SelectItem>
             </SelectContent>
           </Select>
 
@@ -280,13 +282,17 @@ const SelectTestSetDialog: React.FC<SelectTestSetDialogProps> = ({
             }
           >
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="Trạng thái" />
+              <SelectValue
+                placeholder={t("workflow.selectTestSet.statusPlaceholder")}
+              />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ALL">Tất cả trạng thái</SelectItem>
-              <SelectItem value="ACTIVE">Hoạt động</SelectItem>
-              <SelectItem value="DRAFT">Nháp</SelectItem>
-              <SelectItem value="INACTIVE">Không hoạt động</SelectItem>
+              <SelectItem value="ALL">
+                {t("workflow.selectTestSet.allStatuses")}
+              </SelectItem>
+              <SelectItem value="ACTIVE">{t("common.active")}</SelectItem>
+              <SelectItem value="DRAFT">{t("common.draft")}</SelectItem>
+              <SelectItem value="INACTIVE">{t("common.inactive")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -303,7 +309,7 @@ const SelectTestSetDialog: React.FC<SelectTestSetDialogProps> = ({
               </div>
             ) : allTestSets.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                Không tìm thấy testset nào phù hợp
+                {t("workflow.selectTestSet.notFound")}
               </div>
             ) : (
               <div className="grid gap-4">
@@ -375,7 +381,7 @@ const SelectTestSetDialog: React.FC<SelectTestSetDialogProps> = ({
                 )}
                 {!hasMore && allTestSets.length > 0 && (
                   <div className="text-center py-4 text-sm text-gray-500">
-                    Đã tải hết
+                    {t("workflow.selectTestSet.allLoaded")}
                   </div>
                 )}
               </div>

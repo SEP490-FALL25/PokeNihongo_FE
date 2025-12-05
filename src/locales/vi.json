@@ -796,6 +796,16 @@
             "addFirstExercise": "Thêm bài tập đầu tiên",
             "exerciseLabel": "{{count}} bài tập"
         },
+        "selectTestSet": {
+            "title": "Chọn TestSet cho bài học (JLPT N{{level}})",
+            "searchPlaceholder": "Tìm kiếm testset...",
+            "typePlaceholder": "Loại đề thi",
+            "allTypes": "Tất cả loại",
+            "statusPlaceholder": "Trạng thái",
+            "allStatuses": "Tất cả trạng thái",
+            "notFound": "Không tìm thấy testset phù hợp",
+            "allLoaded": "Đã tải hết"
+        },
         "questionSets": {
             "title": "Quản lý Bộ câu hỏi",
             "description": "Quản lý bộ câu hỏi cho bài học",

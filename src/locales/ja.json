@@ -786,6 +786,16 @@
             "addFirstExercise": "最初の演習を追加",
             "exerciseLabel": "{{count}} 件の演習"
         },
+        "selectTestSet": {
+            "title": "レッスン用TestSetを選択 (JLPT N{{level}})",
+            "searchPlaceholder": "TestSetを検索...",
+            "typePlaceholder": "テストセットの種類",
+            "allTypes": "すべての種類",
+            "statusPlaceholder": "ステータス",
+            "allStatuses": "すべてのステータス",
+            "notFound": "該当するTestSetが見つかりません",
+            "allLoaded": "すべて読み込み済み"
+        },
         "questionSets": {
             "title": "問題セット管理",
             "description": "レッスンの問題セットを管理",
