@@ -11,8 +11,8 @@ export const CreateVocabularyFullMultipartSchema = z.object({
         TranslationsSchema
     ]),
     // Optional media files for multipart submission
-    image: z.any().optional(),
-    audio: z.any().optional(),
+    imageFile: z.any().optional(),
+    audioFile: z.any().optional(),
 })
 
 export type ICreateVocabularyFullMultipartType = z.infer<typeof CreateVocabularyFullMultipartSchema>

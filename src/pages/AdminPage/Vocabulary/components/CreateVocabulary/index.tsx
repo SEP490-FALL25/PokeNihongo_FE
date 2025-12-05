@@ -43,8 +43,8 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
             level_n: '',
             word_type_id: '',
             translations: '',
-            image: undefined,
-            audio: undefined,
+            imageFile: undefined,
+            audioFile: undefined,
         }
     });
 
@@ -118,10 +118,10 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
             const submitPayload: any = {
                 ...data,
             };
-            const imageFile: File | undefined = (watch('image') as any) as File | undefined;
-            const audioFile: File | undefined = (watch('audio') as any) as File | undefined;
-            if (imageFile) submitPayload.image = imageFile;
-            if (audioFile) submitPayload.audio = audioFile;
+            const imageFile: File | undefined = (watch('imageFile') as any) as File | undefined;
+            const audioFile: File | undefined = (watch('audioFile') as any) as File | undefined;
+            if (imageFile) submitPayload.imageFile = imageFile;
+            if (audioFile) submitPayload.audioFile = audioFile;
             createVocabularyMutation.mutate(submitPayload as ICreateVocabularyFullMultipartType);
         } catch (error: any) {
             setIsSubmitting(false);
@@ -546,7 +546,7 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                                 </CardHeader>
                                 <CardContent className="pt-0 grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <Controller
-                                        name="image"
+                                        name="imageFile"
                                         control={control}
                                         render={({ field: { onChange, value } }) => (
                                             <ImageDropzone value={value} onChange={(file) => {
@@ -557,7 +557,7 @@ const CreateVocabulary = ({ setIsAddDialogOpen }: CreateVocabularyProps) => {
                                         )}
                                     />
                                     <Controller
-                                        name="audio"
+                                        name="audioFile"
                                         control={control}
                                         render={({ field: { onChange, value } }) => (
                                             <AudioDropzone value={value as File | undefined} onChange={(file) => {
