@@ -170,6 +170,7 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
     const [rewardTypeFilter, setRewardTypeFilter] = useState('all');
     const [rewardTargetFilter, setRewardTargetFilter] = useState('all');
     const [rewardCurrentPage, setRewardCurrentPage] = useState(1);
+    const [modalSelectedRewardIds, setModalSelectedRewardIds] = useState<number[]>([]);
     const debouncedRewardSearchQuery = useDebounce(rewardSearchQuery, 500);
 
     // Fetch reward list for modal (with filters)
@@ -305,6 +306,54 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
 
     const handleRemoveReward = (rewardId: number) => {
         handleRewardToggle(rewardId);
+    };
+
+    // Modal-specific selection (confirmed later)
+    const toggleModalReward = (rewardId: number) => {
+        setModalSelectedRewardIds((prev) =>
+            prev.includes(rewardId) ? prev.filter((id) => id !== rewardId) : [...prev, rewardId]
+        );
+    };
+
+    const handleOpenRewardModal = (open: boolean) => {
+        setIsRewardModalOpen(open);
+        if (open) {
+            setModalSelectedRewardIds(formData.rewardIds || []);
+        }
+    };
+
+    const handleConfirmRewards = () => {
+        // Update main form with modal selections
+        setFormData((prev) => ({
+            ...prev,
+            rewardIds: modalSelectedRewardIds
+        }));
+
+        // Update selected rewards map based on current list
+        setSelectedRewardsMap((prev) => {
+            const newMap = { ...prev };
+            const availableRewards = rewardListData?.results || [];
+            modalSelectedRewardIds.forEach((id) => {
+                const found = availableRewards.find((r: IRewardEntityType) => r.id === id);
+                if (found) {
+                    newMap[id] = found;
+                }
+            });
+            // Remove deselected
+            Object.keys(newMap).forEach((key) => {
+                const id = Number(key);
+                if (!modalSelectedRewardIds.includes(id)) {
+                    delete newMap[id];
+                }
+            });
+            return newMap;
+        });
+
+        if (errors.rewardIds) {
+            setErrors((prev) => ({ ...prev, rewardIds: '' }));
+        }
+
+        setIsRewardModalOpen(false);
     };
 
     const getRewardTypeLabel = (type: string) => {
@@ -747,7 +796,7 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
             </DialogContent>
 
             {/* Reward Selection Modal */}
-            <Dialog open={isRewardModalOpen} onOpenChange={setIsRewardModalOpen}>
+            <Dialog open={isRewardModalOpen} onOpenChange={handleOpenRewardModal}>
                 <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden bg-white">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2 text-xl">
@@ -824,7 +873,7 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                             ) : (
                                 <div className="p-2 space-y-2">
                                     {rewards.map((reward: IRewardEntityType) => {
-                                        const isSelected = (formData.rewardIds || []).includes(reward.id);
+                                        const isSelected = modalSelectedRewardIds.includes(reward.id);
                                         
                                         return (
                                             <div
@@ -834,12 +883,12 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                                                         ? 'bg-blue-50 border-blue-300 shadow-sm' 
                                                         : 'bg-white border-gray-200 hover:border-blue-200 hover:bg-blue-50/50'
                                                 }`}
-                                                onClick={() => handleRewardToggle(reward.id, reward)}
+                                    onClick={() => toggleModalReward(reward.id)}
                                             >
                                                 <div className="mt-0.5">
                                                     <Checkbox
                                                         checked={isSelected}
-                                                        onCheckedChange={() => handleRewardToggle(reward.id, reward)}
+                                                        onCheckedChange={() => toggleModalReward(reward.id)}
                                                     />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
@@ -907,12 +956,25 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                             </div>
                         )}
 
-                        {/* Selected Count */}
-                        {(formData.rewardIds && formData.rewardIds.length > 0) && (
+                        {/* Selected Count (modal state) */}
+                        {(modalSelectedRewardIds && modalSelectedRewardIds.length > 0) && (
                             <div className="text-sm text-muted-foreground pt-2 border-t border-border">
-                                {t('createLesson.rewardSelectedCount', { count: formData.rewardIds.length })}
+                                {t('createLesson.rewardSelectedCount', { count: modalSelectedRewardIds.length })}
                             </div>
                         )}
+
+                        <div className="flex justify-end gap-2 pt-3">
+                            <Button
+                                variant="outline"
+                                onClick={() => setIsRewardModalOpen(false)}
+                                className="border-border"
+                            >
+                                {t('common.cancel')}
+                            </Button>
+                            <Button onClick={handleConfirmRewards} className="bg-primary text-primary-foreground">
+                                {t('common.confirm')}
+                            </Button>
+                        </div>
                     </div>
                 </DialogContent>
             </Dialog>
