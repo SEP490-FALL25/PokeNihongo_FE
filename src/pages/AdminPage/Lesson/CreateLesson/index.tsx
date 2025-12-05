@@ -931,8 +931,8 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                             <div className="flex items-center justify-between pt-2 border-t border-border">
                                 <p className="text-sm text-muted-foreground">
                                     {t('createLesson.rewardModal.pageStat', {
-                                        current: rewardListData.pagination.currentPage,
-                                        total: rewardListData.pagination.totalPage
+                                        current: rewardListData.pagination.currentPage || rewardCurrentPage || 1,
+                                        total: rewardListData.pagination.totalPage || 1
                                     })}
                                 </p>
                                 <div className="flex gap-2">
