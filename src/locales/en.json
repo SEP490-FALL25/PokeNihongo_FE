@@ -1090,7 +1090,23 @@
         "basicLevel": "Basic",
         "intermediateLevel": "Intermediate",
         "upperIntermediateLevel": "Upper Intermediate",
-        "advancedLevel": "Advanced"
+        "advancedLevel": "Advanced",
+        "loadingLesson": "Loading lesson details...",
+        "translationPlaceholderVi": "Enter Vietnamese meaning",
+        "translationPlaceholderEn": "Enter English meaning",
+        "rewardSelectHint": "Click to choose rewards...",
+        "rewardSelectedCount": "Selected: {{count}} rewards",
+        "rewardModal": {
+            "title": "Select rewards",
+            "searchPlaceholder": "Search rewards...",
+            "typePlaceholder": "Reward type",
+            "allTypes": "All types",
+            "targetPlaceholder": "Target",
+            "allTargets": "All targets",
+            "loading": "Loading reward list...",
+            "noRewards": "No rewards found",
+            "pageStat": "Page {{current}} / {{total}}"
+        }
     },
     "createPokemon": {
         "createSuccess": "Pokémon created successfully",
