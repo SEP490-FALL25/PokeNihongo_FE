@@ -1,7 +1,8 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card";
 import { Badge } from "@ui/Badge";
-import { FileText, Tag, Hash } from "lucide-react";
+import { FileText, Tag } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface TestSetCardProps {
   testSet: {
@@ -22,6 +23,12 @@ const TestSetCard: React.FC<TestSetCardProps> = ({
   extractText,
   onClick,
 }) => {
+  const { t } = useTranslation();
+  const statusLabel =
+    t(`testSetManagement.statuses.${testSet.status}` as const) || testSet.status;
+  const testTypeLabel =
+    t(`testManagement.testSetTypes.${testSet.testType}` as const) ||
+    testSet.testType;
   return (
     <Card
       className="group relative overflow-hidden bg-gradient-to-br from-card via-card to-card/95 border-border hover:border-primary/50 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer"
@@ -63,7 +70,7 @@ const TestSetCard: React.FC<TestSetCardProps> = ({
                     : "bg-gradient-to-r from-gray-500/20 to-gray-600/20 text-gray-600 border-gray-500/30"
                 }`}
               >
-                {testSet.status}
+                {statusLabel}
               </Badge>
             </div>
           </div>
@@ -77,10 +84,10 @@ const TestSetCard: React.FC<TestSetCardProps> = ({
           <div className="flex items-center justify-between pt-2 border-t border-border/50">
             <span className="text-muted-foreground font-medium flex items-center gap-2">
               <Tag className="h-4 w-4" />
-              Loại:
+              {t("testSetManagement.testTypeLabel")}
             </span>
             <span className="text-foreground font-bold">
-              {testSet.testType}
+              {testTypeLabel}
             </span>
           </div>
           <div className="text-xs text-muted-foreground mt-2 pt-2 border-t border-border/50">

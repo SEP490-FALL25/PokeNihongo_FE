@@ -15,6 +15,7 @@ import { ROUTES } from "@constants/route";
 import { toast } from "react-toastify";
 import { TestSetUpsertWithQuestionBanksRequest, QuestionBankForSpeaking } from "@models/testSet/request";
 import { useUpsertTestSetWithQuestionBanks } from "@hooks/useTestSet";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import testSetService from "@services/testSet";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
@@ -43,6 +44,7 @@ const SpeakingTestSetPage: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
   const isEditMode = !!id;
+  const { t } = useTranslation();
 
   const [form, setForm] = useState<{
     meanings: Array<{
@@ -205,7 +207,7 @@ const SpeakingTestSetPage: React.FC = () => {
   };
 
   const handleDeleteMessage = (index: number) => {
-    if (confirm("Bạn có chắc muốn xóa câu này?")) {
+    if (confirm(t("speakingTestSet.deleteConfirm"))) {
       setMessages(messages.filter((_, i) => i !== index));
     }
   };
@@ -223,7 +225,7 @@ const SpeakingTestSetPage: React.FC = () => {
   const handleSave = () => {
     const nameMeaning = form.meanings.find((m) => m.field === "name");
     if (!nameMeaning || !nameMeaning.translations.vi.trim()) {
-      toast.error("Vui lòng nhập tên (vi)");
+      toast.error(t("speakingTestSet.nameViRequired"));
       return;
     }
 
@@ -257,7 +259,7 @@ const SpeakingTestSetPage: React.FC = () => {
 
     upsertMutation.mutate(body, {
       onSuccess: () => {
-        toast.success(isEditMode ? "Cập nhật thành công" : "Tạo mới thành công");
+        toast.success(isEditMode ? t("speakingTestSet.updateSuccess") : t("speakingTestSet.createSuccess"));
         navigate(ROUTES.MANAGER.TESTSET_MANAGEMENT);
       },
     });
@@ -266,7 +268,7 @@ const SpeakingTestSetPage: React.FC = () => {
   if (loadingTestSet) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div>Đang tải...</div>
+        <div>{t("common.loading")}</div>
       </div>
     );
   }
@@ -274,8 +276,8 @@ const SpeakingTestSetPage: React.FC = () => {
   return (
     <>
       <HeaderAdmin
-        title={isEditMode ? "Chỉnh sửa Speaking Test" : "Tạo Speaking Test"}
-        description="Quản lý bộ đề thi nói"
+        title={isEditMode ? t("speakingTestSet.editTitle") : t("speakingTestSet.createTitle")}
+        description={t("speakingTestSet.description")}
       />
 
       <div className="p-8 mt-24 max-w-6xl mx-auto">
@@ -284,16 +286,16 @@ const SpeakingTestSetPage: React.FC = () => {
           onClick={() => navigate(ROUTES.MANAGER.TESTSET_MANAGEMENT)}
           className="mb-4"
         >
-          ← Quay lại
+          ← {t("common.back")}
         </Button>
 
         {/* Test Set Form */}
         <Card className="p-6 mb-6">
-          <h3 className="text-lg font-semibold mb-4">Thông tin Test Set</h3>
+          <h3 className="text-lg font-semibold mb-4">{t("speakingTestSet.formTitle")}</h3>
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="text-sm font-medium">Name (vi) *</label>
+                <label className="text-sm font-medium">{t("speakingTestSet.nameVi")}</label>
                 <Input
                   value={form.meanings.find(m=>m.field==='name')!.translations.vi}
                   onChange={(e) =>
@@ -309,7 +311,7 @@ const SpeakingTestSetPage: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Name (en)</label>
+                <label className="text-sm font-medium">{t("speakingTestSet.nameEn")}</label>
                 <Input
                   value={form.meanings.find(m=>m.field==='name')!.translations.en}
                   onChange={(e) =>
@@ -325,7 +327,7 @@ const SpeakingTestSetPage: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Name (ja)</label>
+                <label className="text-sm font-medium">{t("speakingTestSet.nameJa")}</label>
                 <Input
                   value={form.meanings.find(m=>m.field==='name')!.translations.ja}
                   onChange={(e) =>
@@ -343,7 +345,7 @@ const SpeakingTestSetPage: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="text-sm font-medium">Description (vi)</label>
+                <label className="text-sm font-medium">{t("speakingTestSet.descriptionVi")}</label>
                 <Input
                   value={form.meanings.find(m=>m.field==='description')!.translations.vi}
                   onChange={(e) =>
@@ -359,7 +361,7 @@ const SpeakingTestSetPage: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Description (en)</label>
+                <label className="text-sm font-medium">{t("speakingTestSet.descriptionEn")}</label>
                 <Input
                   value={form.meanings.find(m=>m.field==='description')!.translations.en}
                   onChange={(e) =>
@@ -375,7 +377,7 @@ const SpeakingTestSetPage: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Description (ja)</label>
+                <label className="text-sm font-medium">{t("speakingTestSet.descriptionJa")}</label>
                 <Input
                   value={form.meanings.find(m=>m.field==='description')!.translations.ja}
                   onChange={(e) =>
@@ -392,7 +394,7 @@ const SpeakingTestSetPage: React.FC = () => {
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium">Audio URL</label>
+              <label className="text-sm font-medium">{t("speakingTestSet.audioUrl")}</label>
               <Input
                 value={form.audioUrl}
                 onChange={(e) =>
@@ -402,7 +404,7 @@ const SpeakingTestSetPage: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="flex items-center gap-2">
-                <label className="text-sm font-medium">Có phí</label>
+                <label className="text-sm font-medium">{t("speakingTestSet.hasPrice")}</label>
                 <Switch
                   checked={!!form.price}
                   onCheckedChange={(checked) =>
@@ -411,7 +413,7 @@ const SpeakingTestSetPage: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">LevelN</label>
+                <label className="text-sm font-medium">{t("speakingTestSet.levelN")}</label>
                 <Select
                   value={String(form.levelN)}
                   onValueChange={(v) =>
@@ -419,20 +421,20 @@ const SpeakingTestSetPage: React.FC = () => {
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Chọn cấp độ" />
+                    <SelectValue placeholder={t("speakingTestSet.selectLevel")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="0">Tất cả cấp</SelectItem>
-                    <SelectItem value="1">N1</SelectItem>
-                    <SelectItem value="2">N2</SelectItem>
-                    <SelectItem value="3">N3</SelectItem>
-                    <SelectItem value="4">N4</SelectItem>
-                    <SelectItem value="5">N5</SelectItem>
+                    <SelectItem value="0">{t("testManagement.levels.N0")}</SelectItem>
+                    <SelectItem value="1">{t("testManagement.levels.N1")}</SelectItem>
+                    <SelectItem value="2">{t("testManagement.levels.N2")}</SelectItem>
+                    <SelectItem value="3">{t("testManagement.levels.N3")}</SelectItem>
+                    <SelectItem value="4">{t("testManagement.levels.N4")}</SelectItem>
+                    <SelectItem value="5">{t("testManagement.levels.N5")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-medium">Status</label>
+                <label className="text-sm font-medium">{t("speakingTestSet.status")}</label>
                 <Select
                   value={form.status}
                   onValueChange={(v) =>
@@ -443,12 +445,12 @@ const SpeakingTestSetPage: React.FC = () => {
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Chọn trạng thái" />
+                    <SelectValue placeholder={t("speakingTestSet.selectStatus")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="DRAFT">DRAFT</SelectItem>
-                    <SelectItem value="ACTIVE">ACTIVE</SelectItem>
-                    <SelectItem value="INACTIVE">INACTIVE</SelectItem>
+                    <SelectItem value="DRAFT">{t("testSetManagement.statuses.DRAFT")}</SelectItem>
+                    <SelectItem value="ACTIVE">{t("testSetManagement.statuses.ACTIVE")}</SelectItem>
+                    <SelectItem value="INACTIVE">{t("testSetManagement.statuses.INACTIVE")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -459,17 +461,17 @@ const SpeakingTestSetPage: React.FC = () => {
         {/* Conversation Messages */}
         <Card className="p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Hội thoại</h3>
+            <h3 className="text-lg font-semibold">{t("speakingTestSet.conversation")}</h3>
             <Button onClick={addInlineMessage}>
               <Plus className="w-4 h-4 mr-2" />
-              Thêm câu
+              {t("speakingTestSet.addMessage")}
             </Button>
           </div>
 
           <div className="min-h-[400px] bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-6">
             {messages.length === 0 ? (
               <div className="text-center text-gray-500 py-16">
-                Chưa có câu nào. Nhấn "Thêm câu" để bắt đầu.
+                {t("speakingTestSet.emptyMessages")}
               </div>
             ) : (
               <DndContext
@@ -495,7 +497,7 @@ const SpeakingTestSetPage: React.FC = () => {
                           {/* 1) questionJp */}
                           <Input
                             value={message.questionJp}
-                            placeholder="Câu tiếng Nhật"
+                            placeholder={t("speakingTestSet.questionPlaceholder")}
                             onChange={(e) => {
                               const updated = [...messages];
                               updated[index] = { ...message, questionJp: e.target.value };
@@ -508,7 +510,7 @@ const SpeakingTestSetPage: React.FC = () => {
                           <div className="mt-2">
                             <Input
                               value={message.pronunciation || ''}
-                              placeholder="Phiên âm / ふりがな"
+                              placeholder={t("speakingTestSet.pronunciationPlaceholder")}
                               onChange={(e) => {
                                 const updated = [...messages];
                                 updated[index] = { ...message, pronunciation: e.target.value || '' };
@@ -522,7 +524,7 @@ const SpeakingTestSetPage: React.FC = () => {
                           <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
                             <Input
                               value={message.meanings?.[0]?.translations?.vi || ''}
-                              placeholder="VI"
+                              placeholder={t("speakingTestSet.meaningViPlaceholder")}
                               onChange={(e) => {
                                 const updated = [...messages];
                                 const meanings: NonNullable<QuestionBankForSpeaking['meanings']> = (message.meanings && message.meanings.length > 0)
@@ -542,7 +544,7 @@ const SpeakingTestSetPage: React.FC = () => {
                             />
                             <Input
                               value={message.meanings?.[0]?.translations?.en || ''}
-                              placeholder="EN"
+                              placeholder={t("speakingTestSet.meaningEnPlaceholder")}
                               onChange={(e) => {
                                 const updated = [...messages];
                                 const meanings: NonNullable<QuestionBankForSpeaking['meanings']> = (message.meanings && message.meanings.length > 0)
@@ -562,7 +564,7 @@ const SpeakingTestSetPage: React.FC = () => {
                             />
                             <Input
                               value={message.meanings?.[0]?.translations?.ja || ''}
-                              placeholder="JA"
+                              placeholder={t("speakingTestSet.meaningJaPlaceholder")}
                               onChange={(e) => {
                                 const updated = [...messages];
                                 const meanings: NonNullable<QuestionBankForSpeaking['meanings']> = (message.meanings && message.meanings.length > 0)
@@ -583,7 +585,9 @@ const SpeakingTestSetPage: React.FC = () => {
                           </div>
 
                           <div className="flex justify-between items-center mt-3">
-                            <div className={`text-xs ${message.role === 'A' ? 'text-white/80' : 'text-gray-500'}`}>Level N: {message.levelN}</div>
+                            <div className={`text-xs ${message.role === 'A' ? 'text-white/80' : 'text-gray-500'}`}>
+                              {t("speakingTestSet.levelLabel", { level: message.levelN })}
+                            </div>
                             <div className="flex gap-2 items-center">
                               <Select
                                 value={message.role}
@@ -597,8 +601,8 @@ const SpeakingTestSetPage: React.FC = () => {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="A">A (Hệ thống)</SelectItem>
-                                  <SelectItem value="B">B (Người dùng)</SelectItem>
+                                  <SelectItem value="A">{t("speakingTestSet.roleSystem")}</SelectItem>
+                                  <SelectItem value="B">{t("speakingTestSet.roleUser")}</SelectItem>
                                 </SelectContent>
                               </Select>
                               <Button
@@ -607,7 +611,7 @@ const SpeakingTestSetPage: React.FC = () => {
                                 onClick={() => handleDeleteMessage(index)}
                                 className={`${message.role === 'A' ? 'text-white/90 hover:text-white' : 'text-red-600'} text-xs`}
                               >
-                                Xóa
+                                {t("speakingTestSet.deleteMessage")}
                               </Button>
                               <div className={`${message.role === 'A' ? 'text-white/80' : 'text-gray-400'} cursor-grab active:cursor-grabbing`} {...attributes} {...listeners}>
                                 <GripVertical className="w-4 h-4" />
@@ -632,10 +636,10 @@ const SpeakingTestSetPage: React.FC = () => {
             variant="ghost"
             onClick={() => navigate(ROUTES.MANAGER.TESTSET_MANAGEMENT)}
           >
-            Hủy
+            {t("common.cancel")}
           </Button>
           <Button onClick={handleSave} disabled={upsertMutation.isPending}>
-            {upsertMutation.isPending ? "Đang lưu..." : "Lưu"}
+            {upsertMutation.isPending ? t("common.saving") : t("common.save")}
           </Button>
         </div>
 

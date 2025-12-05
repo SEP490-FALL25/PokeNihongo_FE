@@ -80,7 +80,7 @@ const QuestionBankManagement: React.FC = () => {
                   <FileQuestion className="w-5 h-5 text-primary" />
                 </div>
                 <CardTitle className="text-xl font-bold text-foreground">
-                  Danh sách câu hỏi
+                  {t("questionBank.listTitle")}
                 </CardTitle>
               </div>
             </div>
