@@ -808,6 +808,16 @@
             "noExercise": "No exercises for this section yet",
             "exerciseLabel": "{{count}} exercise"
         },
+        "selectTestSet": {
+            "title": "Choose TestSet for lesson (JLPT N{{level}})",
+            "searchPlaceholder": "Search test sets...",
+            "typePlaceholder": "Test set type",
+            "allTypes": "All types",
+            "statusPlaceholder": "Status",
+            "allStatuses": "All status",
+            "notFound": "No matching test set",
+            "allLoaded": "All test sets loaded"
+        },
         "questionSets": {
             "title": "Question Sets Management",
             "description": "Manage question sets for lesson",
