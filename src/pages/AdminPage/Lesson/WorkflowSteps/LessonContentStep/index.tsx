@@ -300,6 +300,14 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
   const [selectedSectionType, setSelectedSectionType] = useState<string>(
     QUESTION_TYPE.VOCABULARY
   );
+  const sectionTitleByType = (type: string) => {
+    if (type === QUESTION_TYPE.VOCABULARY)
+      return t("workflow.content.partVocabulary");
+    if (type === QUESTION_TYPE.GRAMMAR)
+      return t("workflow.content.partGrammar");
+    if (type === QUESTION_TYPE.KANJI) return t("workflow.content.partKanji");
+    return type;
+  };
   // Drag and drop sensors
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -470,7 +478,7 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
       const content = section?.contents.find((c) => c.id === contentId);
 
       if (!content) {
-        toast.error("Không tìm thấy content để xóa");
+        toast.error(t("workflow.content.errors.notFound"));
         return;
       }
 
@@ -511,7 +519,9 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
 
       // Show error toast
       const errorMessage =
-        error instanceof Error ? error.message : "Không thể xóa content";
+        error instanceof Error
+          ? error.message
+          : t("workflow.content.errors.deleteFailed");
       toast.error(errorMessage);
     }
   };
@@ -531,7 +541,7 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
     }
 
     if (idsToDelete.length === 0) {
-      toast.error("Hãy chọn ít nhất một content để xóa");
+      toast.error(t("workflow.content.errors.selectAtLeastOne"));
       return;
     }
 
@@ -560,7 +570,7 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
       // silent success
     } catch (error) {
       console.error("Failed to bulk delete lesson contents:", error);
-      toast.error("Không thể xóa các content đã chọn");
+      toast.error(t("workflow.content.errors.bulkDeleteFailed"));
     }
   };
 
@@ -607,7 +617,7 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
       console.log("✅ All changes saved successfully");
 
       // Show success toast
-      toast.success("Đã lưu thay đổi vị trí thành công!");
+      toast.success(t("workflow.content.saveOrderSuccess"));
       await fetchAllSections();
     } catch (error) {
       console.error(`❌ Failed to save changes:`, error);
@@ -616,7 +626,7 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
       const errorMessage =
         error instanceof Error
           ? error.message
-          : "Không thể lưu thay đổi vị trí";
+          : t("workflow.content.saveOrderFailed");
       toast.error(errorMessage);
     }
   };
@@ -776,15 +786,17 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
                     </div>
                     <div>
                       <h4 className="text-lg font-semibold text-foreground">
-                        {section.title}
+                        {sectionTitleByType(section.type)}
                         {pendingChanges[section.type] && (
                           <span className="ml-2 text-orange-500 text-sm">
-                            ● Có thay đổi
+                            {t("workflow.content.pendingChanges")}
                           </span>
                         )}
                       </h4>
                       <p className="text-sm text-muted-foreground">
-                        {section.contents.length} items
+                        {t("workflow.content.itemCount", {
+                          count: section.contents.length,
+                        })}
                       </p>
                     </div>
                   </div>
@@ -842,7 +854,9 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
                           }
                         >
                           <GripVertical className="h-4 w-4 mr-1" />
-                          {section.isDragMode ? "Done" : "Reorder"}
+                          {section.isDragMode
+                            ? t("workflow.content.reorderDone")
+                            : t("workflow.content.reorder")}
                         </Button>
                         {/* Select all / delete selected for this section */}
                         <Button
@@ -852,8 +866,8 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
                         >
                           {getSectionSelectedCount(section.type) ===
                           section.contents.length
-                            ? "Bỏ chọn"
-                            : "Chọn tất cả"}
+                            ? t("workflow.content.unselectAll")
+                            : t("workflow.content.selectAll")}
                         </Button>
                         <Button
                           variant="outline"
@@ -866,7 +880,9 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
                           }
                           onClick={() => handleBulkDelete(section.type)}
                         >
-                          Xóa đã chọn ({getSectionSelectedCount(section.type)})
+                          {t("workflow.content.deleteSelected", {
+                            count: getSectionSelectedCount(section.type),
+                          })}
                         </Button>
                       </div>
                     )}
@@ -876,7 +892,7 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
                       size="sm"
                     >
                       <Plus className="h-4 w-4 mr-2" />
-                      Add Content
+                      {t("workflow.content.addContent")}
                     </Button>
                   </div>
                 </div>
@@ -886,7 +902,9 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
                   <div className="flex items-center justify-center py-8">
                     <Loader2 className="h-6 w-6 animate-spin text-primary" />
                     <span className="ml-2 text-muted-foreground">
-                      Loading {section.type.toLowerCase()} content...
+                      {t("workflow.content.loadingSection", {
+                        section: sectionTitleByType(section.type),
+                      })}
                     </span>
                   </div>
                 )}
@@ -900,7 +918,7 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
                       variant="outline"
                       size="sm"
                     >
-                      Retry
+                      {t("common.retry")}
                     </Button>
                   </div>
                 )}
@@ -911,7 +929,9 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
                     {section.contents.length === 0 ? (
                       <div className="text-center py-8">
                         <div className="text-muted-foreground mb-4">
-                          No {section.type.toLowerCase()} content yet
+                          {t("workflow.content.emptySection", {
+                            section: sectionTitleByType(section.type),
+                          })}
                         </div>
                         <Button
                           onClick={() => handleAddContent(section.type)}
@@ -919,7 +939,7 @@ const LessonContentStep = ({ lesson, onNext }: LessonContentStepProps) => {
                           size="sm"
                         >
                           <Plus className="h-4 w-4 mr-2" />
-                          Add First Item
+                          {t("workflow.content.addFirst")}
                         </Button>
                       </div>
                     ) : (
