@@ -1441,6 +1441,8 @@
     "testSetManagement": {
         "title": "Quản lý Test Set",
         "description": "Quản lý các bộ đề thi",
+        "filters": "Bộ lọc",
+        "searchPlaceholder": "Tìm kiếm test set...",
         "addSpeakingTest": "Thêm Speaking Test",
         "addNew": "Thêm mới",
         "noTestSets": "Không có test set",

@@ -1458,6 +1458,8 @@
     "testSetManagement": {
         "title": "Test Set Management",
         "description": "Manage all test sets",
+        "filters": "Filters",
+        "searchPlaceholder": "Search test sets...",
         "addSpeakingTest": "Add Speaking Test",
         "addNew": "Add New",
         "noTestSets": "No test sets",

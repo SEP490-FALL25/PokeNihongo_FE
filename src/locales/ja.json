@@ -1419,6 +1419,8 @@
     "testSetManagement": {
         "title": "テストセット管理",
         "description": "テストセットを管理",
+        "filters": "フィルター",
+        "searchPlaceholder": "テストセットを検索...",
         "addSpeakingTest": "スピーキングテストを追加",
         "addNew": "新規追加",
         "noTestSets": "テストセットがありません",
