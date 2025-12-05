@@ -19,10 +19,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@ui/Select";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card";
 import { Skeleton } from "@ui/Skeleton";
-import { Badge } from "@ui/Badge";
-import { FileText, Plus, Loader2, Sparkles, CheckCircle2, Clock, Target, Mic, X } from "lucide-react";
+import { FileText, Plus, Mic, X } from "lucide-react";
 import HeaderAdmin from "@organisms/Header/Admin";
 import PaginationControls from "@ui/PaginationControls";
 import { Checkbox } from "@ui/Checkbox";
@@ -38,9 +37,11 @@ import TestSetCard from "./components/TestSetCard";
 import { extractText, getTranslation } from "./utils/helpers";
 import { TestSetEntity } from "@models/testSet/entity";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const TestSetManagement: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   // Helper function to extract error message from axios error response
   const getErrorMessage = (error: unknown, defaultMessage: string): string => {
     if (error instanceof AxiosError) {
@@ -178,11 +179,11 @@ const TestSetManagement: React.FC = () => {
     deleteLinkedQuestionBanksMutation.mutate([id], {
       onSuccess: () => {
         setSelectedLinkedIds((prev) => prev.filter((qId) => qId !== id));
-        toast.success("Đã xóa câu hỏi khỏi test set");
+        toast.success(t("testSetManagement.removeQuestionSuccess"));
       },
       onError: (e) => {
-        console.error("Lỗi xóa câu hỏi khỏi test set:", e);
-        toast.error(getErrorMessage(e, "Không thể xóa câu hỏi khỏi test set"));
+        console.error(t("testSetManagement.removeQuestionError"), e);
+        toast.error(getErrorMessage(e, t("testSetManagement.removeQuestionError")));
       },
     });
   };
@@ -195,17 +196,21 @@ const TestSetManagement: React.FC = () => {
 
   const handleRemoveSelectedLinked = async () => {
     if (selectedLinkedIds.length === 0) {
-      toast.error("Hãy chọn ít nhất một câu hỏi để xóa");
+      toast.error(t("testSetManagement.selectAtLeastOneQuestionToDelete"));
       return;
     }
     deleteLinkedQuestionBanksMutation.mutate(selectedLinkedIds, {
       onSuccess: () => {
-        toast.success(`Đã xóa ${selectedLinkedIds.length} câu hỏi khỏi test set`);
+        toast.success(
+          t("testSetManagement.removeSelectedQuestionsSuccess", {
+            count: selectedLinkedIds.length,
+          })
+        );
         setSelectedLinkedIds([]);
       },
       onError: (e) => {
-        console.error("Lỗi xóa câu hỏi khỏi test set:", e);
-        toast.error(getErrorMessage(e, "Không thể xóa câu hỏi khỏi test set"));
+        console.error(t("testSetManagement.removeQuestionError"), e);
+        toast.error(getErrorMessage(e, t("testSetManagement.removeQuestionError")));
       },
     });
   };
@@ -248,14 +253,14 @@ const TestSetManagement: React.FC = () => {
                   {
                     onSuccess: () => {
                       setSelectedQuestionIds([]);
-                      toast.success("Cập nhật thành công");
+                      toast.success(t("testSetManagement.updateSuccess"));
                       setIsDialogOpen(false);
                       setSelectedId(null);
                       setSaving(false);
                     },
                     onError: () => {
                       // Still close dialog even if linking fails
-                      toast.success("Cập nhật thành công");
+                      toast.success(t("testSetManagement.updateSuccess"));
                       setIsDialogOpen(false);
                       setSelectedId(null);
                       setSaving(false);
@@ -263,7 +268,7 @@ const TestSetManagement: React.FC = () => {
                   }
                 );
               } else {
-                toast.success("Cập nhật thành công");
+                toast.success(t("testSetManagement.updateSuccess"));
                 setIsDialogOpen(false);
                 setSelectedId(null);
                 setSaving(false);
@@ -281,7 +286,7 @@ const TestSetManagement: React.FC = () => {
           onSuccess: (response) => {
             const newId = response?.data?.id;
             if (!newId) {
-              toast.error("Không nhận được ID từ server sau khi tạo");
+          toast.error(t("testSetManagement.createNoId"));
               setSaving(false);
               return;
             }
@@ -296,7 +301,7 @@ const TestSetManagement: React.FC = () => {
                 {
                   onSuccess: () => {
                     setSelectedQuestionIds([]);
-                    toast.success("Tạo bộ đề thành công");
+                toast.success(t("testSetManagement.createSuccess"));
                     // keep dialog open and switch to edit mode for further actions
                     setSelectedId(newId);
                     setIsDialogOpen(true);
@@ -307,7 +312,7 @@ const TestSetManagement: React.FC = () => {
                   },
                   onError: () => {
                     // Still proceed even if linking fails
-                    toast.success("Tạo bộ đề thành công");
+                toast.success(t("testSetManagement.createSuccess"));
                     setSelectedId(newId);
                     setIsDialogOpen(true);
                     setQbForceKey((k) => k + 1);
@@ -317,7 +322,7 @@ const TestSetManagement: React.FC = () => {
                 }
               );
             } else {
-              toast.success("Tạo bộ đề thành công");
+          toast.success(t("testSetManagement.createSuccess"));
               setSelectedId(newId);
               setIsDialogOpen(true);
               setQbForceKey((k) => k + 1);
@@ -333,8 +338,8 @@ const TestSetManagement: React.FC = () => {
         return; // Early return since mutation handles the flow
       }
     } catch (e) {
-      console.error("Lỗi không xác định:", e);
-      toast.error(getErrorMessage(e, "Đã xảy ra lỗi không mong muốn"));
+      console.error(t("testSetManagement.unknownError"), e);
+      toast.error(getErrorMessage(e, t("testSetManagement.unknownError")));
       setSaving(false);
     }
   };
@@ -385,7 +390,7 @@ const TestSetManagement: React.FC = () => {
 
   const handleLinkSelected = () => {
     if (!selectedId || selectedQuestionIds.length === 0) {
-      toast.error("Hãy chọn ít nhất một câu hỏi");
+      toast.error(t("testSetManagement.selectAtLeastOneQuestion"));
       return;
     }
     linkQuestionBanksMutation.mutate(
@@ -395,7 +400,7 @@ const TestSetManagement: React.FC = () => {
       },
       {
         onSuccess: () => {
-          toast.success("Đã thêm câu hỏi vào TestSet");
+          toast.success(t("testSetManagement.addQuestionSuccess"));
           setSelectedQuestionIds([]);
           setQbForceKey((k) => k + 1);
           setIsAddQuestionsOpen(false);
@@ -410,8 +415,8 @@ const TestSetManagement: React.FC = () => {
   return (
     <>
       <HeaderAdmin
-        title="Quản lý Test Set"
-        description="Quản lý các bộ đề thi"
+        title={t("testSetManagement.title")}
+        description={t("testSetManagement.description")}
       />
 
       <div className="p-8 mt-24 space-y-8">
@@ -422,7 +427,9 @@ const TestSetManagement: React.FC = () => {
                 <div className="p-2 bg-primary/10 rounded-lg">
                   <FileText className="w-5 h-5 text-primary" />
                 </div>
-                <CardTitle className="text-xl font-bold text-foreground">Quản lý Test Set</CardTitle>
+                <CardTitle className="text-xl font-bold text-foreground">
+                  {t("testSetManagement.title")}
+                </CardTitle>
               </div>
               <div className="flex items-center gap-2">
                 <Button 
@@ -431,14 +438,14 @@ const TestSetManagement: React.FC = () => {
                   className="border-border text-foreground hover:bg-primary/10 hover:border-primary/50 hover:text-primary transition-all shadow-sm"
                 >
                   <Mic className="h-4 w-4 mr-2" />
-                  Thêm Speaking Test
+                  {t("testSetManagement.addSpeakingTest")}
                 </Button>
                 <Button 
                   onClick={openCreate}
                   className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 shadow-lg"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Thêm mới
+                  {t("testSetManagement.addNew")}
                 </Button>
               </div>
             </div>
@@ -478,7 +485,7 @@ const TestSetManagement: React.FC = () => {
                   <FileText className="w-8 h-8 text-muted-foreground" />
                 </div>
                 <p className="text-muted-foreground font-medium text-lg">
-                  Không có test set
+                  {t("testSetManagement.noTestSets")}
                 </p>
               </div>
             ) : (
@@ -536,14 +543,18 @@ const TestSetManagement: React.FC = () => {
           <DialogContent className="max-w-2xl bg-white">
             <DialogHeader>
               <DialogTitle>
-                {selectedId ? "Chỉnh sửa Test Set" : "Tạo Test Set"}
+                {selectedId
+                  ? t("testSetManagement.editTitle")
+                  : t("testSetManagement.createTitle")}
               </DialogTitle>
             </DialogHeader>
 
             <div className="space-y-3">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-sm font-medium">Name (vi)</label>
+                  <label className="text-sm font-medium">
+                    {t("testSetManagement.nameVi")}
+                  </label>
                   <Input
                     value={form.nameVi}
                     onChange={(e) =>
@@ -552,7 +563,9 @@ const TestSetManagement: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Name (en)</label>
+                  <label className="text-sm font-medium">
+                    {t("testSetManagement.nameEn")}
+                  </label>
                   <Input
                     value={form.nameEn}
                     onChange={(e) =>
@@ -562,7 +575,7 @@ const TestSetManagement: React.FC = () => {
                 </div>
                 <div>
                   <label className="text-sm font-medium">
-                    Description (vi)
+                    {t("testSetManagement.descriptionVi")}
                   </label>
                   <Input
                     value={form.descriptionVi}
@@ -573,7 +586,7 @@ const TestSetManagement: React.FC = () => {
                 </div>
                 <div>
                   <label className="text-sm font-medium">
-                    Description (en)
+                    {t("testSetManagement.descriptionEn")}
                   </label>
                   <Input
                     value={form.descriptionEn}
@@ -604,7 +617,9 @@ const TestSetManagement: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">LevelN</label>
+                  <label className="text-sm font-medium">
+                    {t("testSetManagement.levelN")}
+                  </label>
                   <Select
                     value={String(form.levelN)}
                     onValueChange={(v) =>
@@ -612,20 +627,24 @@ const TestSetManagement: React.FC = () => {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Chọn cấp độ" />
+                      <SelectValue
+                        placeholder={t("testSetManagement.selectLevel")}
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="0">Tất cả cấp</SelectItem>
-                      <SelectItem value="1">N1</SelectItem>
-                      <SelectItem value="2">N2</SelectItem>
-                      <SelectItem value="3">N3</SelectItem>
-                      <SelectItem value="4">N4</SelectItem>
-                      <SelectItem value="5">N5</SelectItem>
+                      <SelectItem value="0">{t("testManagement.allLevels")}</SelectItem>
+                      <SelectItem value="1">{t("testManagement.levels.N1")}</SelectItem>
+                      <SelectItem value="2">{t("testManagement.levels.N2")}</SelectItem>
+                      <SelectItem value="3">{t("testManagement.levels.N3")}</SelectItem>
+                      <SelectItem value="4">{t("testManagement.levels.N4")}</SelectItem>
+                      <SelectItem value="5">{t("testManagement.levels.N5")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Loại đề</label>
+                  <label className="text-sm font-medium">
+                    {t("testSetManagement.testType")}
+                  </label>
                   <Select
                     value={form.testType}
                     onValueChange={(v) =>
@@ -636,21 +655,39 @@ const TestSetManagement: React.FC = () => {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Chọn loại" />
+                      <SelectValue
+                        placeholder={t("testSetManagement.selectTestType")}
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="VOCABULARY">Từ vựng</SelectItem>
-                      <SelectItem value="GRAMMAR">Ngữ pháp</SelectItem>
-                      <SelectItem value="KANJI">Hán tự</SelectItem>
-                      <SelectItem value="LISTENING">Nghe</SelectItem>
-                      <SelectItem value="READING">Đọc</SelectItem>
-                      <SelectItem value="SPEAKING">Nói</SelectItem>
-                      <SelectItem value="GENERAL">Tổng hợp</SelectItem>
+                      <SelectItem value="VOCABULARY">
+                        {t("testManagement.testSetTypes.VOCABULARY")}
+                      </SelectItem>
+                      <SelectItem value="GRAMMAR">
+                        {t("testManagement.testSetTypes.GRAMMAR")}
+                      </SelectItem>
+                      <SelectItem value="KANJI">
+                        {t("testManagement.testSetTypes.KANJI")}
+                      </SelectItem>
+                      <SelectItem value="LISTENING">
+                        {t("testManagement.testSetTypes.LISTENING")}
+                      </SelectItem>
+                      <SelectItem value="READING">
+                        {t("testManagement.testSetTypes.READING")}
+                      </SelectItem>
+                      <SelectItem value="SPEAKING">
+                        {t("testManagement.testSetTypes.SPEAKING")}
+                      </SelectItem>
+                      <SelectItem value="GENERAL">
+                        {t("testManagement.testSetTypes.GENERAL")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Status</label>
+                  <label className="text-sm font-medium">
+                    {t("testSetManagement.status")}
+                  </label>
                   <Select
                     value={form.status}
                     onValueChange={(v) =>
@@ -661,12 +698,20 @@ const TestSetManagement: React.FC = () => {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Chọn trạng thái" />
+                      <SelectValue
+                        placeholder={t("testSetManagement.selectStatus")}
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="DRAFT">DRAFT</SelectItem>
-                      <SelectItem value="ACTIVE">ACTIVE</SelectItem>
-                      <SelectItem value="INACTIVE">INACTIVE</SelectItem>
+                      <SelectItem value="DRAFT">
+                        {t("testSetManagement.statuses.DRAFT")}
+                      </SelectItem>
+                      <SelectItem value="ACTIVE">
+                        {t("testSetManagement.statuses.ACTIVE")}
+                      </SelectItem>
+                      <SelectItem value="INACTIVE">
+                        {t("testSetManagement.statuses.INACTIVE")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -675,7 +720,7 @@ const TestSetManagement: React.FC = () => {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-medium">
-                      Câu hỏi đã thêm
+                      {t("testSetManagement.linkedQuestions")}
                     </label>
                     {selectedLinkedIds.length > 0 && (
                       <Button
@@ -685,18 +730,18 @@ const TestSetManagement: React.FC = () => {
                         size="sm"
                         onClick={handleRemoveSelectedLinked}
                       >
-                        Xóa đã chọn ({selectedLinkedIds.length})
+                        {t("testSetManagement.removeSelected")} ({selectedLinkedIds.length})
                       </Button>
                     )}
                   </div>
                   <div className="border rounded">
                     {loadingLinked ? (
                       <div className="p-4 text-sm text-gray-500">
-                        Đang tải...
+                        {t("common.loading")}
                       </div>
                     ) : linkedQuestions.length === 0 ? (
                       <div className="p-4 text-sm text-gray-500">
-                        Chưa có câu hỏi
+                        {t("testSetManagement.noQuestions")}
                       </div>
                     ) : (
                       <div className="max-h-[30vh] overflow-auto">
@@ -737,7 +782,7 @@ const TestSetManagement: React.FC = () => {
                   variant="secondary"
                   onClick={handleOpenAddQuestions}
                 >
-                  Thêm câu hỏi
+                  {t("testSetManagement.addQuestion")}
                 </Button>
                 <Button
                   variant="ghost"
@@ -746,15 +791,15 @@ const TestSetManagement: React.FC = () => {
                     setSelectedId(null);
                   }}
                 >
-                  Hủy
+                  {t("common.cancel")}
                 </Button>
                 <Button
                   onClick={handleSave}
                   disabled={saving || createTestSetMutation.isPending || updateTestSetMutation.isPending}
                 >
                   {saving || createTestSetMutation.isPending || updateTestSetMutation.isPending
-                    ? "Đang lưu..."
-                    : "Lưu"}
+                    ? t("common.saving")
+                    : t("common.save")}
                 </Button>
               </div>
             </div>
@@ -765,13 +810,15 @@ const TestSetManagement: React.FC = () => {
         <Dialog open={isAddQuestionsOpen} onOpenChange={setIsAddQuestionsOpen}>
           <DialogContent className="max-w-3xl bg-white">
             <DialogHeader>
-              <DialogTitle>Thêm câu hỏi vào TestSet #{selectedId}</DialogTitle>
+              <DialogTitle>
+                {t("testSetManagement.addQuestionsTitle", { id: selectedId ?? "" })}
+              </DialogTitle>
             </DialogHeader>
 
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <Input
-                  placeholder="Tìm kiếm câu hỏi..."
+                  placeholder={t("testSetManagement.searchQuestionPlaceholder")}
                   value={qbSearch}
                   onChange={(e) => {
                     setQbSearch(e.target.value);
@@ -780,7 +827,7 @@ const TestSetManagement: React.FC = () => {
                 />
                 <div className="flex items-center gap-2 ml-2">
                   <span className="text-sm text-muted-foreground">
-             Lấy những câu hỏi không có trong test set
+                    {t("testSetManagement.fetchNoTestSet")}
                   </span>
                   <Switch
                     checked={qbNoTestSet}
@@ -792,7 +839,9 @@ const TestSetManagement: React.FC = () => {
                   />
                 </div>
                 <div className="flex items-center gap-2 ml-2">
-                  <label className="text-sm font-medium">Loại câu hỏi</label>
+                  <label className="text-sm font-medium">
+                    {t("testSetManagement.questionType")}
+                  </label>
                   <Select
                     value={form.testType}
                     onValueChange={(v) =>
@@ -803,16 +852,30 @@ const TestSetManagement: React.FC = () => {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Chọn loại" />
+                      <SelectValue placeholder={t("testSetManagement.selectTestType")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="VOCABULARY">Từ vựng</SelectItem>
-                      <SelectItem value="GRAMMAR">Ngữ pháp</SelectItem>
-                      <SelectItem value="KANJI">Hán tự</SelectItem>
-                      <SelectItem value="LISTENING">Nghe</SelectItem>
-                      <SelectItem value="READING">Đọc</SelectItem>
-                      <SelectItem value="SPEAKING">Nói</SelectItem>
-                      <SelectItem value="GENERAL">Tổng hợp</SelectItem>
+                      <SelectItem value="VOCABULARY">
+                        {t("testManagement.testSetTypes.VOCABULARY")}
+                      </SelectItem>
+                      <SelectItem value="GRAMMAR">
+                        {t("testManagement.testSetTypes.GRAMMAR")}
+                      </SelectItem>
+                      <SelectItem value="KANJI">
+                        {t("testManagement.testSetTypes.KANJI")}
+                      </SelectItem>
+                      <SelectItem value="LISTENING">
+                        {t("testManagement.testSetTypes.LISTENING")}
+                      </SelectItem>
+                      <SelectItem value="READING">
+                        {t("testManagement.testSetTypes.READING")}
+                      </SelectItem>
+                      <SelectItem value="SPEAKING">
+                        {t("testManagement.testSetTypes.SPEAKING")}
+                      </SelectItem>
+                      <SelectItem value="GENERAL">
+                        {t("testManagement.testSetTypes.GENERAL")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -820,10 +883,10 @@ const TestSetManagement: React.FC = () => {
 
               <div className="border rounded">
                 {qbLoading ? (
-                  <div className="p-4 text-sm text-gray-500">Đang tải...</div>
+                  <div className="p-4 text-sm text-gray-500">{t("common.loading")}</div>
                 ) : qbItems.length === 0 ? (
                   <div className="p-4 text-sm text-gray-500">
-                    Không có câu hỏi phù hợp
+                    {t("testSetManagement.noMatchingQuestions")}
                   </div>
                 ) : (
                   <div className="max-h-[50vh] overflow-auto">
@@ -873,13 +936,15 @@ const TestSetManagement: React.FC = () => {
                   variant="ghost"
                   onClick={() => setIsAddQuestionsOpen(false)}
                 >
-                  Đóng
+                  {t("common.close")}
                 </Button>
                 <Button
                   onClick={handleLinkSelected}
                   disabled={selectedQuestionIds.length === 0 || linkQuestionBanksMutation.isPending}
                 >
-                  {linkQuestionBanksMutation.isPending ? "Đang thêm..." : "Thêm vào TestSet"}
+                  {linkQuestionBanksMutation.isPending
+                    ? t("testSetManagement.linking")
+                    : t("testSetManagement.addToTestSet")}
                 </Button>
               </div>
             </div>
