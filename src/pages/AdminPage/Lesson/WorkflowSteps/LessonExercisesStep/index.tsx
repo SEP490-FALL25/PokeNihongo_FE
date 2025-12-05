@@ -125,7 +125,7 @@ const LessonExercisesStep = ({
   // Handle creating final test by linking all testSets
   const handleCreateFinalTest = () => {
     if (!lesson.id) {
-      toast.error("Bài học chưa có ID. Vui lòng tạo Bài học trước.");
+      toast.error(t("workflow.exercises.missingLessonId"));
       return;
     }
 
@@ -136,7 +136,7 @@ const LessonExercisesStep = ({
     ].filter((id): id is number => id !== undefined && id !== null);
 
     if (testSetIds.length !== 3) {
-      toast.error("Không thể lấy đầy đủ TestSet IDs từ các bài tập.");
+      toast.error(t("workflow.exercises.missingTestSetIds"));
       return;
     }
 
@@ -183,10 +183,10 @@ const LessonExercisesStep = ({
                 </div>
                 <div>
                   <h4 className="text-xl font-bold text-foreground">
-                    Đã có đầy đủ 3 loại bài tập
+                    {t("workflow.exercises.finalTestReadyTitle")}
                   </h4>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Bạn có thể tạo bài tập cuối cùng bằng cách liên kết tất cả TestSet vào Test
+                    {t("workflow.exercises.finalTestReadyDesc")}
                   </p>
                 </div>
               </div>
@@ -199,12 +199,12 @@ const LessonExercisesStep = ({
                 {linkFinalTestSetsMutation.isPending ? (
                   <>
                     <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                    Đang tạo...
+                    {t("workflow.exercises.creatingFinalTest")}
                   </>
                 ) : (
                   <>
                     <CheckCircle2 className="h-5 w-5 mr-2" />
-                    Tạo bài tập cuối cùng
+                    {t("workflow.exercises.createFinalTest")}
                   </>
                 )}
               </Button>
@@ -219,19 +219,19 @@ const LessonExercisesStep = ({
             {[
               {
                 type: QUESTION_TYPE.VOCABULARY,
-                title: "Part 1: Vocabulary",
+                title: t("workflow.exercises.partVocabulary"),
                 Icon: BookOpen,
                 color: "bg-blue-600",
               },
               {
                 type: QUESTION_TYPE.GRAMMAR,
-                title: "Part 2: Grammar",
+                title: t("workflow.exercises.partGrammar"),
                 Icon: FileText,
                 color: "bg-green-600",
               },
               {
                 type: QUESTION_TYPE.KANJI,
-                title: "Part 3: Kanji",
+                title: t("workflow.exercises.partKanji"),
                 Icon: BookMarked,
                 color: "bg-purple-600",
               },
@@ -257,7 +257,9 @@ const LessonExercisesStep = ({
                           {section.title}
                         </h4>
                         <p className="text-sm text-muted-foreground">
-                          {existing ? "1 exercise" : "0 exercise"}
+                          {t("workflow.exercises.exerciseCount", {
+                            count: existing ? 1 : 0,
+                          })}
                         </p>
                       </div>
                     </div>
@@ -268,7 +270,9 @@ const LessonExercisesStep = ({
                         onClick={() => handleUpdateExercise(existing)}
                         disabled={isUpdating || isCreatingExercise}
                       >
-                        {isUpdating ? "Đang cập nhật..." : "Cập nhật TestSet"}
+                        {isUpdating
+                          ? t("workflow.exercises.updatingExercise")
+                          : t("workflow.exercises.updateTestSet")}
                       </Button>
                     ) : (
                       <Button
@@ -279,7 +283,7 @@ const LessonExercisesStep = ({
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         {isCreatingExercise
-                          ? "Đang tạo..."
+                          ? t("workflow.exercises.creatingExercise")
                           : t("workflow.exercises.addExercise")}
                       </Button>
                     )}
@@ -309,7 +313,7 @@ const LessonExercisesStep = ({
                   ) : (
                     <div className="text-center py-6">
                       <div className="text-muted-foreground mb-2">
-                        Chưa có bài tập cho mục này
+                        {t("workflow.exercises.noExercise")}
                       </div>
                       <Button
                         size="sm"
@@ -318,7 +322,7 @@ const LessonExercisesStep = ({
                         disabled={isCreatingExercise}
                       >
                         <Plus className="h-4 w-4 mr-2" />
-                        Thêm bài tập đầu tiên
+                        {t("workflow.exercises.addFirstExercise")}
                       </Button>
                     </div>
                   )}
