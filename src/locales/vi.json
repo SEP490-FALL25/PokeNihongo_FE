@@ -1066,7 +1066,23 @@
         "updatePublishedSuccess": "Bài học đã được cập nhật và xuất bản",
         "updateDraftSuccess": "Bài học đã được cập nhật và lưu nháp",
         "createError": "Có lỗi xảy ra khi tạo bài học",
-        "updateError": "Có lỗi xảy ra khi cập nhật bài học"
+        "updateError": "Có lỗi xảy ra khi cập nhật bài học",
+        "loadingLesson": "Đang tải thông tin bài học...",
+        "translationPlaceholderVi": "Nhập nghĩa Tiếng Việt",
+        "translationPlaceholderEn": "Nhập nghĩa Tiếng Anh",
+        "rewardSelectHint": "Nhấn để chọn phần thưởng...",
+        "rewardSelectedCount": "Đã chọn {{count}} phần thưởng",
+        "rewardModal": {
+            "title": "Chọn phần thưởng",
+            "searchPlaceholder": "Tìm kiếm phần thưởng...",
+            "typePlaceholder": "Loại phần thưởng",
+            "allTypes": "Tất cả loại",
+            "targetPlaceholder": "Mục tiêu",
+            "allTargets": "Tất cả mục tiêu",
+            "loading": "Đang tải danh sách phần thưởng...",
+            "noRewards": "Không có phần thưởng nào",
+            "pageStat": "Trang {{current}} / {{total}}"
+        }
     },
     "createPokemon": {
         "createSuccess": "Tạo Pokémon thành công",

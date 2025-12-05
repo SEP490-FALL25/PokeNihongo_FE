@@ -456,7 +456,7 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                     {isLoadingLesson && isEditMode ? (
                         <div className="flex flex-col items-center justify-center py-12">
                             <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-                            <p className="text-sm text-muted-foreground">Đang tải thông tin bài học...</p>
+                            <p className="text-sm text-muted-foreground">{t('createLesson.loadingLesson')}</p>
                         </div>
                     ) : (
                     <div className="space-y-6">
@@ -501,7 +501,11 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                                                     {translation.language_code}
                                                 </label>
                                                 <Input
-                                                    placeholder={index === 0 ? "Cách chào hỏi cơ bản" : "Basic Greetings"}
+                                                    placeholder={
+                                                        index === 0
+                                                            ? t('createLesson.translationPlaceholderVi')
+                                                            : t('createLesson.translationPlaceholderEn')
+                                                    }
                                                     value={translation.value}
                                                     onChange={(e) => handleTranslationChange(index, 'value', e.target.value)}
                                                     onBlur={() => { }}
@@ -548,31 +552,31 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                                             <SelectItem value="5">
                                                 <div className="flex items-center gap-2">
                                                     <Badge variant="secondary" className="text-xs">N5</Badge>
-                                                    <span>Bắt đầu</span>
+                                                    <span>{t('createLesson.startLevel')}</span>
                                                 </div>
                                             </SelectItem>
                                             <SelectItem value="4">
                                                 <div className="flex items-center gap-2">
                                                     <Badge variant="secondary" className="text-xs">N4</Badge>
-                                                    <span>Cơ bản</span>
+                                                    <span>{t('createLesson.basicLevel')}</span>
                                                 </div>
                                             </SelectItem>
                                             <SelectItem value="3">
                                                 <div className="flex items-center gap-2">
                                                     <Badge variant="secondary" className="text-xs">N3</Badge>
-                                                    <span>Trung cấp</span>
+                                                    <span>{t('createLesson.intermediateLevel')}</span>
                                                 </div>
                                             </SelectItem>
                                             <SelectItem value="2">
                                                 <div className="flex items-center gap-2">
                                                     <Badge variant="secondary" className="text-xs">N2</Badge>
-                                                    <span>Trung thượng</span>
+                                                    <span>{t('createLesson.upperIntermediateLevel')}</span>
                                                 </div>
                                             </SelectItem>
                                             <SelectItem value="1">
                                                 <div className="flex items-center gap-2">
                                                     <Badge variant="secondary" className="text-xs">N1</Badge>
-                                                    <span>Cao cấp</span>
+                                                    <span>{t('createLesson.advancedLevel')}</span>
                                                 </div>
                                             </SelectItem>
                                         </SelectContent>
@@ -588,7 +592,7 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                                     <div className="space-y-2">
                                         <label className="text-sm font-semibold text-foreground flex items-center gap-2">
                                             <Clock className="h-4 w-4 text-primary" />
-                                            Thời lượng (phút) *
+                                            {t('createLesson.timeMinutes')} *
                                         </label>
                                         <Input
                                             type="number"
@@ -608,7 +612,7 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                                     <div className="space-y-2">
                                         <label className="text-sm font-semibold text-foreground flex items-center gap-2">
                                             <FileText className="h-4 w-4 text-primary" />
-                                            Phiên bản *
+                                            {t('createLesson.version')} *
                                         </label>
                                         <Input
                                             placeholder="1.0.0"
@@ -628,7 +632,7 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                                 <div className="space-y-2">
                                     <label className="text-sm font-semibold text-foreground flex items-center gap-2">
                                         <Gift className="h-4 w-4 text-primary" />
-                                        Phần thưởng *
+                                        {t('createLesson.rewardId')} *
                                     </label>
                                     <div 
                                         className="min-h-[60px] w-full rounded-lg border-2 border-gray-200 bg-background p-3 cursor-pointer hover:border-primary/50 transition-colors"
@@ -656,7 +660,9 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                                                 ))}
                                             </div>
                                         ) : (
-                                            <span className="text-sm text-muted-foreground">Nhấn để chọn phần thưởng...</span>
+                                            <span className="text-sm text-muted-foreground">
+                                                {t('createLesson.rewardSelectHint')}
+                                            </span>
                                         )}
                                     </div>
                                     {errors.rewardIds && (
@@ -667,7 +673,7 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                                     )}
                                     {(formData.rewardIds && formData.rewardIds.length > 0) && (
                                         <p className="text-xs text-muted-foreground">
-                                            Đã chọn {formData.rewardIds.length} phần thưởng
+                                            {t('createLesson.rewardSelectedCount', { count: formData.rewardIds.length })}
                                         </p>
                                     )}
                                 </div>
@@ -684,10 +690,10 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                                         </div>
                                         <div>
                                             <label htmlFor="isPublished" className="text-sm font-semibold text-foreground cursor-pointer">
-                                                Xuất bản ngay
+                                                {t('createLesson.publishNow')}
                                             </label>
                                             <p className="text-xs text-muted-foreground">
-                                                Bài học sẽ được hiển thị cho người dùng ngay lập tức
+                                                {t('createLesson.publishDescription')}
                                             </p>
                                         </div>
                                     </div>
@@ -746,7 +752,7 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2 text-xl">
                             <Gift className="h-5 w-5 text-primary" />
-                            Chọn phần thưởng
+                            {t('createLesson.rewardModal.title')}
                         </DialogTitle>
                     </DialogHeader>
 
@@ -756,7 +762,7 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                             <div className="flex-1 relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
                                 <Input
-                                    placeholder="Tìm kiếm phần thưởng..."
+                                    placeholder={t('createLesson.rewardModal.searchPlaceholder')}
                                     value={rewardSearchQuery}
                                     onChange={(e) => {
                                         setRewardSearchQuery(e.target.value);
@@ -773,10 +779,10 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                                 }}
                             >
                                 <SelectTrigger className="w-full sm:w-[180px] bg-background border-border text-foreground h-11 shadow-sm">
-                                    <SelectValue placeholder="Loại phần thưởng" />
+                                    <SelectValue placeholder={t('createLesson.rewardModal.typePlaceholder')} />
                                 </SelectTrigger>
                                 <SelectContent className="bg-card border-border">
-                                    <SelectItem value="all">Tất cả loại</SelectItem>
+                                    <SelectItem value="all">{t('createLesson.rewardModal.allTypes')}</SelectItem>
                                     <SelectItem value={REWARD_TYPE.LESSON}>LESSON</SelectItem>
                                     <SelectItem value={REWARD_TYPE.DAILY_REQUEST}>DAILY_REQUEST</SelectItem>
                                     <SelectItem value={REWARD_TYPE.EVENT}>EVENT</SelectItem>
@@ -792,10 +798,10 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                                 }}
                             >
                                 <SelectTrigger className="w-full sm:w-[180px] bg-background border-border text-foreground h-11 shadow-sm">
-                                    <SelectValue placeholder="Mục tiêu" />
+                                    <SelectValue placeholder={t('createLesson.rewardModal.targetPlaceholder')} />
                                 </SelectTrigger>
                                 <SelectContent className="bg-card border-border">
-                                    <SelectItem value="all">Tất cả mục tiêu</SelectItem>
+                                    <SelectItem value="all">{t('createLesson.rewardModal.allTargets')}</SelectItem>
                                     <SelectItem value={REWARD_TARGET.EXP}>EXP</SelectItem>
                                     <SelectItem value={REWARD_TARGET.POKEMON}>POKEMON</SelectItem>
                                     <SelectItem value={REWARD_TARGET.POKE_COINS}>POKE_COINS</SelectItem>
@@ -809,11 +815,11 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                             {isLoadingRewards ? (
                                 <div className="flex flex-col items-center justify-center py-12">
                                     <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-                                    <p className="text-sm text-gray-600">Đang tải danh sách phần thưởng...</p>
+                                    <p className="text-sm text-gray-600">{t('createLesson.rewardModal.loading')}</p>
                                 </div>
                             ) : rewards.length === 0 ? (
                                 <div className="text-sm text-gray-600 text-center py-12">
-                                    Không có phần thưởng nào
+                                    {t('createLesson.rewardModal.noRewards')}
                                 </div>
                             ) : (
                                 <div className="p-2 space-y-2">
@@ -875,7 +881,10 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                         {rewardListData?.pagination && rewardListData.pagination.totalPage > 1 && (
                             <div className="flex items-center justify-between pt-2 border-t border-border">
                                 <p className="text-sm text-muted-foreground">
-                                    Trang {rewardListData.pagination.currentPage} / {rewardListData.pagination.totalPage}
+                                    {t('createLesson.rewardModal.pageStat', {
+                                        current: rewardListData.pagination.currentPage,
+                                        total: rewardListData.pagination.totalPage
+                                    })}
                                 </p>
                                 <div className="flex gap-2">
                                     <Button
@@ -884,7 +893,7 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                                         onClick={() => setRewardCurrentPage(prev => Math.max(1, prev - 1))}
                                         disabled={rewardCurrentPage === 1 || isLoadingRewards}
                                     >
-                                        Trước
+                                        {t('common.previous')}
                                     </Button>
                                     <Button
                                         variant="outline"
@@ -892,7 +901,7 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                                         onClick={() => setRewardCurrentPage(prev => Math.min(rewardListData.pagination.totalPage, prev + 1))}
                                         disabled={rewardCurrentPage === rewardListData.pagination.totalPage || isLoadingRewards}
                                     >
-                                        Sau
+                                        {t('common.next')}
                                     </Button>
                                 </div>
                             </div>
@@ -901,7 +910,7 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                         {/* Selected Count */}
                         {(formData.rewardIds && formData.rewardIds.length > 0) && (
                             <div className="text-sm text-muted-foreground pt-2 border-t border-border">
-                                Đã chọn: <span className="font-semibold text-primary">{formData.rewardIds.length}</span> phần thưởng
+                                {t('createLesson.rewardSelectedCount', { count: formData.rewardIds.length })}
                             </div>
                         )}
                     </div>
