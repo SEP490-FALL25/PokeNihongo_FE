@@ -3,8 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card";
 import { Badge } from "@ui/Badge";
 import { BookOpen, Hash } from "lucide-react";
 import { QuestionEntityType } from "@models/questionBank/entity";
+import { useTranslation } from "react-i18next";
 
 const StatsCards: React.FC<COMPONENTS.IStatsCardsProps> = ({ questions, totalItems, levelCounts }) => {
+  const { t } = useTranslation();
   // Fallback to calculating from questions array if levelCounts is not provided
   const countByLevel = (level: number) => {
     if (levelCounts) {
@@ -16,7 +18,7 @@ const StatsCards: React.FC<COMPONENTS.IStatsCardsProps> = ({ questions, totalIte
 
   const stats = [
     {
-      label: "Tổng câu hỏi",
+      label: t("questionBank.stats.totalQuestions"),
       value: totalItems || 0,
       icon: BookOpen,
       gradient: "from-purple-500/10 to-pink-500/10",
@@ -25,7 +27,7 @@ const StatsCards: React.FC<COMPONENTS.IStatsCardsProps> = ({ questions, totalIte
       borderColor: "border-purple-500/20"
     },
     {
-      label: "Câu hỏi N5",
+      label: t("questionBank.stats.levelLabel", { level: 5 }),
       value: countByLevel(5),
       icon: Hash,
       gradient: "from-green-500/10 to-emerald-500/10",
@@ -36,7 +38,7 @@ const StatsCards: React.FC<COMPONENTS.IStatsCardsProps> = ({ questions, totalIte
       badgeColor: "bg-green-500/20 text-green-600 border-green-500/30"
     },
     {
-      label: "Câu hỏi N4",
+      label: t("questionBank.stats.levelLabel", { level: 4 }),
       value: countByLevel(4),
       icon: Hash,
       gradient: "from-blue-500/10 to-cyan-500/10",
@@ -47,7 +49,7 @@ const StatsCards: React.FC<COMPONENTS.IStatsCardsProps> = ({ questions, totalIte
       badgeColor: "bg-blue-500/20 text-blue-600 border-blue-500/30"
     },
     {
-      label: "Câu hỏi N3",
+      label: t("questionBank.stats.levelLabel", { level: 3 }),
       value: countByLevel(3),
       icon: Hash,
       gradient: "from-yellow-500/10 to-amber-500/10",
@@ -58,7 +60,7 @@ const StatsCards: React.FC<COMPONENTS.IStatsCardsProps> = ({ questions, totalIte
       badgeColor: "bg-yellow-500/20 text-yellow-600 border-yellow-500/30"
     },
     {
-      label: "Câu hỏi N2",
+      label: t("questionBank.stats.levelLabel", { level: 2 }),
       value: countByLevel(2),
       icon: Hash,
       gradient: "from-orange-500/10 to-red-500/10",

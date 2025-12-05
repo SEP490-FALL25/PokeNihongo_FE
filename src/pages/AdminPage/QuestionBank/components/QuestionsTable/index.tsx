@@ -97,7 +97,7 @@ const QuestionsTable: React.FC<COMPONENTS.IQuestionsTableProps> = ({
                       {question.questionJp}
                     </div>
                     <div className="text-xs text-muted-foreground leading-tight mt-1 break-words">
-                      {question.pronunciation || "No pronunciation"}
+                      {question.pronunciation || t("questionBank.noPronunciation")}
                     </div>
                     {/* Show question type on mobile as inline badge */}
                     <div className="mt-2 lg:hidden">
@@ -167,7 +167,7 @@ const QuestionsTable: React.FC<COMPONENTS.IQuestionsTableProps> = ({
                   ) : question.meaning ? (
                     <div className="text-muted-foreground text-xs bg-muted/30 px-2 py-1 rounded-md">{question.meaning}</div>
                   ) : (
-                    <span className="text-muted-foreground text-xs">No translation</span>
+                    <span className="text-muted-foreground text-xs">{t("questionBank.noTranslation")}</span>
                   )}
                 </TableCell>
                 <TableCell className="text-right w-20 py-3">

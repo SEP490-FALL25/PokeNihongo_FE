@@ -220,8 +220,8 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                     }}
                     placeholder={
                       formData.questionType === "LISTENING"
-                        ? "Optional - will auto-generate TTS if not provided"
-                        : "Optional"
+                        ? t("questionBank.createDialog.audioUrlOptionalListening")
+                        : t("questionBank.createDialog.audioUrlOptional")
                     }
                   />
                   {formData.audioUrl && (
@@ -229,15 +229,19 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                       type="button"
                       variant="outline"
                       size="sm"
-                    onClick={() => setFormData((prev: any) => ({ ...prev, audioUrl: "" }))}
+                      onClick={() => setFormData((prev: any) => ({ ...prev, audioUrl: "" }))}
                       className="w-full"
                     >
-                      Remove Audio URL
+                      {t("questionBank.createDialog.removeAudioUrl")}
                     </Button>
                   )}
                 </>
               ) : (
-                <AudioDropzone label="Audio" value={selectedAudioFile || undefined} onChange={(file) => setSelectedAudioFile(file || null)} />
+                <AudioDropzone
+                  label={t("questionBank.createDialog.audioLabel")}
+                  value={selectedAudioFile || undefined}
+                  onChange={(file) => setSelectedAudioFile(file || null)}
+                />
               )}
             </div>
           )}
@@ -256,7 +260,9 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
             <div className="border rounded-lg p-4 mb-4 bg-gray-50">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Vietnamese Translation</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    {t("questionBank.createDialog.meaningsViLabel")}
+                  </label>
                   <Input
                     value={formData.meanings?.[0]?.translations?.vi || ""}
                     onChange={(e) => {
@@ -278,11 +284,13 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                         });
                       }
                     }}
-                    placeholder="Vietnamese translation"
+                    placeholder={t("questionBank.createDialog.meaningsViPlaceholder")}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">English Translation</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    {t("questionBank.createDialog.meaningsEnLabel")}
+                  </label>
                   <Input
                     value={formData.meanings?.[0]?.translations?.en || ""}
                     onChange={(e) => {
@@ -304,7 +312,7 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                         });
                       }
                     }}
-                    placeholder="English translation"
+                    placeholder={t("questionBank.createDialog.meaningsEnPlaceholder")}
                   />
                 </div>
               </div>
@@ -342,7 +350,9 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                       <div className="flex items-center space-x-2">
                         <div className="flex items-center space-x-2">
                           <span className="text-sm font-medium text-gray-700">
-                            {answer.isCorrect ? "Correct Answer" : "Incorrect Answer"}
+                          {answer.isCorrect
+                            ? t("questionBank.createDialog.correctAnswer")
+                            : t("questionBank.createDialog.incorrectAnswer")}
                           </span>
                           {answer.isCorrect ? (
                             <div className="flex items-center justify-center w-5 h-5 bg-green-500 text-white rounded-full">
@@ -392,10 +402,10 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                             }));
                           }}
                           className="text-gray-600 hover:text-red-600"
-                          title="Clear all fields for this option"
+                          title={t("questionBank.createDialog.clearTooltip")}
                         >
                           <X className="h-4 w-4 mr-1" />
-                          Clear
+                          {t("questionBank.createDialog.clearAnswer")}
                         </Button>
                         {formData.answers && formData.answers.length > 1 && (
                           <Button
@@ -410,7 +420,7 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                               }));
                             }}
                           >
-                            Remove Answer
+                            {t("questionBank.createDialog.removeAnswer")}
                           </Button>
                         )}
                       </div>
@@ -440,7 +450,7 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                         return (
                           <>
                             <Input
-                              label="Japanese Answer"
+                              label={t("questionBank.createDialog.jpAnswerLabel")}
                               value={jpValue}
                               onChange={(e) => {
                                 const newJp = e.target.value.trim();
@@ -458,11 +468,11 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                                   });
                                 }
                               }}
-                              placeholder="Enter Japanese answer"
+                              placeholder={t("questionBank.createDialog.jpAnswerPlaceholder")}
                             />
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
                               <Input
-                                label="Vietnamese Answer"
+                                label={t("questionBank.createDialog.viAnswerLabel")}
                                 value={viValue}
                                 onChange={(e) => {
                                   const newVi = e.target.value.trim();
@@ -474,10 +484,10 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                                     ),
                                   }));
                                 }}
-                                placeholder="Enter Vietnamese answer"
+                                placeholder={t("questionBank.createDialog.viAnswerPlaceholder")}
                               />
                               <Input
-                                label="English Answer"
+                                label={t("questionBank.createDialog.enAnswerLabel")}
                                 value={enValue}
                                 onChange={(e) => {
                                   const newEn = e.target.value.trim();
@@ -489,12 +499,15 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                                     ),
                                   }));
                                 }}
-                                placeholder="Enter English answer"
+                                placeholder={t("questionBank.createDialog.enAnswerPlaceholder")}
                               />
                             </div>
                             <div className="mt-2 text-xs text-gray-500 flex items-center gap-2 flex-wrap">
                               <span>
-                                Tự động ghép: <code className="px-1 py-0.5 bg-gray-100 rounded">{compose(jpValue, viValue, enValue) || "(trống)"}</code>
+                                {t("questionBank.createDialog.autoComposePrefix")}{" "}
+                                <code className="px-1 py-0.5 bg-gray-100 rounded">
+                                  {compose(jpValue, viValue, enValue) || t("questionBank.createDialog.emptyPlaceholder")}
+                                </code>
                               </span>
                               <Button
                                 type="button"
@@ -517,7 +530,7 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                                   }
                                 }}
                               >
-                                Copy
+                                {t("questionBank.createDialog.copy")}
                               </Button>
                             </div>
                           </>
@@ -525,7 +538,9 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                       })()}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-600 mb-1">Vietnamese Translation</label>
+                          <label className="block text-sm font-medium text-gray-600 mb-1">
+                            {t("questionBank.createDialog.meaningsViLabel")}
+                          </label>
                           <Input
                             value={answer.translations?.meaning?.find((m: any) => m && m.language_code === "vi")?.value || ""}
                             onChange={(e) => {
@@ -551,11 +566,13 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                                 ),
                               }));
                             }}
-                            placeholder="Vietnamese translation"
+                            placeholder={t("questionBank.createDialog.meaningsViPlaceholder")}
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-600 mb-1">English Translation</label>
+                          <label className="block text-sm font-medium text-gray-600 mb-1">
+                            {t("questionBank.createDialog.meaningsEnLabel")}
+                          </label>
                           <Input
                             value={answer.translations?.meaning?.find((m: any) => m && m.language_code === "en")?.value || ""}
                             onChange={(e) => {
@@ -581,7 +598,7 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                                 ),
                               }));
                             }}
-                            placeholder="English translation"
+                            placeholder={t("questionBank.createDialog.meaningsEnPlaceholder")}
                           />
                         </div>
                       </div>
@@ -608,7 +625,7 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                     }))
                   }
                 >
-                  Add Answer
+                  {t("questionBank.createDialog.addAnswer")}
                 </Button>
               )}
             </div>
@@ -624,7 +641,7 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                     try {
                       if ((formData.questionType === "VOCABULARY" || formData.questionType === "LISTENING") && audioInputMode === "file") {
                         if (!selectedAudioFile) {
-                          toast.error("Hãy chọn file âm thanh");
+                          toast.error(t("questionBank.createDialog.selectAudioFileError"));
                           return;
                         }
                         const uploadResponse = await mediaService.uploadFile({ folderName: "question-audio", file: selectedAudioFile, type: "audio" });
@@ -632,7 +649,7 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                         const respData = uploadResponse?.data as UploadResp;
                         const url = respData?.data?.url || (respData as unknown as { url?: string })?.url;
                         if (!url) {
-                          toast.error("Tải âm thanh thất bại");
+                          toast.error(t("questionBank.createDialog.uploadAudioFailed"));
                           return;
                         }
                         setFormData((prev: any) => ({ ...prev, audioUrl: url }));
@@ -641,7 +658,7 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
                       await handleCreateQuestion();
                     } catch (err: unknown) {
                       const anyErr = err as { response?: { data?: { message?: string } } };
-                      toast.error(anyErr?.response?.data?.message || "Không thể tạo câu hỏi");
+                      toast.error(anyErr?.response?.data?.message || t("questionBank.createDialog.createFailed"));
                     }
                   }}
                   disabled={isCreating}
@@ -651,10 +668,10 @@ const CreateEditDialog: React.FC<COMPONENTS.ICreateEditDialogProps> = ({
               ) : (
                 <>
                   <Button variant="outline" onClick={handleUpdateQuestion} disabled={isUpdating} className="bg-blue-50 text-blue-700 hover:bg-blue-100">
-                    {isUpdating ? "Đang cập nhật..." : "Cập nhật Câu hỏi"}
+                    {isUpdating ? t("questionBank.createDialog.updatingQuestion") : t("questionBank.createDialog.updateQuestionButton")}
                   </Button>
                   <Button onClick={handleUpdateAnswer} disabled={isUpdatingAnswer} className="bg-green-50 text-green-700 hover:bg-green-100">
-                    {isUpdatingAnswer ? "Đang cập nhật..." : "Cập nhật Đáp án"}
+                    {isUpdatingAnswer ? t("questionBank.createDialog.updatingAnswer") : t("questionBank.createDialog.updateAnswerButton")}
                   </Button>
                 </>
               )}
