@@ -21,11 +21,11 @@ const vocabularyService = {
         formData.append("translations", translationsValue);
 
         // Optional media files
-        if ((payload as any).image) {
-            formData.append("image", (payload as any).image as File);
+        if ((payload as any).imageFile) {
+            formData.append("imageFile", (payload as any).imageFile as File);
         }
-        if ((payload as any).audio) {
-            formData.append("audio", (payload as any).audio as File);
+        if ((payload as any).audioFile) {
+            formData.append("audioFile", (payload as any).audioFile as File);
         }
 
         return axiosPrivate.post("/vocabulary/full", formData, {
