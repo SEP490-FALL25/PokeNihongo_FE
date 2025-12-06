@@ -347,7 +347,7 @@ const AdminDashboard = () => {
                                                     {activeUserData?.activeUsers.toLocaleString() || "0"}
                                                 </p>
                                                 <p className="text-xs text-muted-foreground bg-muted/50 px-3 py-1 rounded-full inline-block">
-                                                    {activeUserData?.period || period}
+                                                    người dùng/{activeUserData?.period || period}
                                                 </p>
                                             </>
                                         )}
@@ -365,7 +365,7 @@ const AdminDashboard = () => {
                                                     {newUserData?.count.toLocaleString() || "0"}
                                                 </p>
                                                 <p className="text-xs text-muted-foreground bg-muted/50 px-3 py-1 rounded-full inline-block">
-                                                    {newUserData?.period || period}
+                                                    người dùng/{newUserData?.period || period}
                                                 </p>
                                             </>
                                         )}
@@ -389,7 +389,7 @@ const AdminDashboard = () => {
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div className="p-5 rounded-xl border-2 border-orange-500/20 bg-gradient-to-br from-orange-500/10 to-orange-500/5 hover:shadow-lg transition-all duration-300 hover:scale-105 group">
                                             <div className="flex items-center justify-between mb-3">
-                                                <p className="text-sm font-semibold text-foreground">Chờ làm bài test</p>
+                                                <p className="text-sm font-semibold text-foreground">Không làm kiểm tra đầu vào</p>
                                                 <Clock className="h-5 w-5 text-orange-500 group-hover:scale-110 transition-transform" />
                                             </div>
                                             <p className="text-3xl font-bold text-foreground mb-1">{userActivationData.pending_test.count.toLocaleString()}</p>
@@ -399,7 +399,7 @@ const AdminDashboard = () => {
                                         </div>
                                         <div className="p-5 rounded-xl border-2 border-yellow-500/20 bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 hover:shadow-lg transition-all duration-300 hover:scale-105 group">
                                             <div className="flex items-center justify-between mb-3">
-                                                <p className="text-sm font-semibold text-foreground">Cần test lại</p>
+                                                <p className="text-sm font-semibold text-foreground">Thử lại kiểm tra đầu vào</p>
                                                 <AlertCircle className="h-5 w-5 text-yellow-500 group-hover:scale-110 transition-transform" />
                                             </div>
                                             <p className="text-3xl font-bold text-foreground mb-1">{userActivationData.test_again.count.toLocaleString()}</p>
@@ -409,7 +409,7 @@ const AdminDashboard = () => {
                                         </div>
                                         <div className="p-5 rounded-xl border-2 border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-blue-500/5 hover:shadow-lg transition-all duration-300 hover:scale-105 group">
                                             <div className="flex items-center justify-between mb-3">
-                                                <p className="text-sm font-semibold text-foreground">Chờ chọn JLPT</p>
+                                                <p className="text-sm font-semibold text-foreground">Chưa chọn trình độ JLPT</p>
                                                 <Languages className="h-5 w-5 text-blue-500 group-hover:scale-110 transition-transform" />
                                             </div>
                                             <p className="text-3xl font-bold text-foreground mb-1">{userActivationData.pending_choose_level_jlpt.count.toLocaleString()}</p>
@@ -419,7 +419,7 @@ const AdminDashboard = () => {
                                         </div>
                                         <div className="p-5 rounded-xl border-2 border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-purple-500/5 hover:shadow-lg transition-all duration-300 hover:scale-105 group">
                                             <div className="flex items-center justify-between mb-3">
-                                                <p className="text-sm font-semibold text-foreground">Chờ chọn Pokemon</p>
+                                                <p className="text-sm font-semibold text-foreground">Đang chọn Pokemon</p>
                                                 <Sparkles className="h-5 w-5 text-purple-500 group-hover:scale-110 transition-transform" />
                                             </div>
                                             <p className="text-3xl font-bold text-foreground mb-1">{userActivationData.pending_choose_pokemon.count.toLocaleString()}</p>

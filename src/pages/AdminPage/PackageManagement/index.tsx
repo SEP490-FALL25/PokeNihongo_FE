@@ -1,13 +1,25 @@
-""
-
 import { useMemo, useState } from "react"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@ui/Card"
+import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/Tabs"
 import { Badge } from "@ui/Badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select"
-import { Package, DollarSign, Users, TrendingUp, Check, Sparkles, Loader2 } from "lucide-react"
+import { Package, DollarSign, Users, TrendingUp, Check, Loader2, BarChart3, PieChart as PieChartIcon, AlertCircle } from "lucide-react"
 import HeaderAdmin from "@organisms/Header/Admin"
 import { useTranslation } from "react-i18next"
 import { useGetDashboardRevenue, useGetDashboardSubscriptionPlan } from "@hooks/useDashboard"
+import {
+    BarChart,
+    Bar,
+    PieChart,
+    Pie,
+    Cell,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer,
+} from "recharts"
 
 const monthOptions = Array.from({ length: 12 }, (_, index) => ({
     value: index + 1,
@@ -22,82 +34,18 @@ const buildYearOptions = (currentYear: number, range = 5) =>
 
 const formatCurrency = (value: number) => value.toLocaleString("vi-VN");
 
+const COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))"];
+
 export default function PackageManagement() {
     const { t } = useTranslation();
     const now = new Date();
     const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+    const [activeTab, setActiveTab] = useState<string>("overview");
     const yearOptions = useMemo(() => buildYearOptions(now.getFullYear(), 6), [now]);
 
     const { data: subscriptionStats, isLoading: isSubscriptionLoading } = useGetDashboardSubscriptionPlan();
     const { data: revenueStats, isLoading: isRevenueLoading } = useGetDashboardRevenue(selectedMonth, selectedYear);
-    console.log(revenueStats);
-    const defaultPackages = useMemo(() => [
-        {
-            id: 1,
-            name: "Gói Cơ Bản",
-            nameEn: "Basic Plan",
-            price: 99000,
-            duration: "1 tháng",
-            subscribers: 234,
-            status: "active",
-            features: ["Truy cập 50 bài học", "5 Pokemon miễn phí", "Hỗ trợ email", "Tham gia giải đấu cơ bản"],
-            color: "blue",
-        },
-        {
-            id: 2,
-            name: "Gói Tiêu Chuẩn",
-            nameEn: "Standard Plan",
-            price: 249000,
-            duration: "3 tháng",
-            subscribers: 456,
-            status: "active",
-            features: [
-                "Truy cập 200 bài học",
-                "15 Pokemon miễn phí",
-                "Hỗ trợ ưu tiên",
-                "Tham gia mọi giải đấu",
-                "AI trợ giúp học tập",
-            ],
-            color: "purple",
-        },
-        {
-            id: 3,
-            name: "Gói Premium",
-            nameEn: "Premium Plan",
-            price: 499000,
-            duration: "6 tháng",
-            subscribers: 189,
-            status: "active",
-            features: [
-                "Truy cập không giới hạn",
-                "30 Pokemon miễn phí",
-                "Hỗ trợ 24/7",
-                "Giải đấu VIP",
-                "AI cá nhân hóa",
-                "Chứng chỉ hoàn thành",
-            ],
-            color: "yellow",
-        },
-        {
-            id: 4,
-            name: "Gói Doanh Nghiệp",
-            nameEn: "Enterprise Plan",
-            price: 2999000,
-            duration: "1 năm",
-            subscribers: 23,
-            status: "active",
-            features: [
-                "Tất cả tính năng Premium",
-                "Quản lý nhóm",
-                "Báo cáo chi tiết",
-                "API tích hợp",
-                "Đào tạo riêng",
-                "Tùy chỉnh nội dung",
-            ],
-            color: "red",
-        },
-    ], [])
 
     const mapTagToColor = (tagName?: string, type?: string) => {
         const normalizedTag = tagName?.toUpperCase()
@@ -119,6 +67,22 @@ export default function PackageManagement() {
         translations: Array<{ key: string; value: string }> | undefined,
         lang: "vi" | "en" | "ja"
     ) => translations?.find((translation) => translation.key === lang)?.value
+
+    const subscriptionPlanMap = useMemo(() => {
+        if (!subscriptionStats) return {}
+        const map: Record<number, { name: string; color: string }> = {}
+        subscriptionStats.plans.forEach((plan) => {
+            const name =
+                getTranslationValue(plan.subscription.nameTranslations, "vi") ??
+                plan.subscription.nameTranslation ??
+                plan.subscription.nameKey
+            map[plan.planId] = {
+                name,
+                color: mapTagToColor(plan.subscription.tagName, plan.type),
+            }
+        })
+        return map
+    }, [subscriptionStats])
 
     const remotePackages = useMemo(() => {
         if (!subscriptionStats) return null
@@ -145,6 +109,7 @@ export default function PackageManagement() {
                 price: plan.price,
                 duration: durationLabel,
                 subscribers: plan.stats.totalPurchases,
+                activeUsers: plan.stats.activeUsers,
                 status: plan.stats.activeUsers > 0 ? "active" : "inactive",
                 features,
                 color: mapTagToColor(plan.subscription.tagName, plan.type),
@@ -152,85 +117,79 @@ export default function PackageManagement() {
         })
     }, [subscriptionStats])
 
-    const subscriptionPlanMap = useMemo(() => {
-        if (!subscriptionStats) return {}
-        const map: Record<number, { name: string; color: string }> = {}
-        subscriptionStats.plans.forEach((plan) => {
-            const name =
-                getTranslationValue(plan.subscription.nameTranslations, "vi") ??
-                plan.subscription.nameTranslation ??
-                plan.subscription.nameKey
-            map[plan.planId] = {
-                name,
-                color: mapTagToColor(plan.subscription.tagName, plan.type),
+    const packages = remotePackages ?? []
+
+    // Prepare chart data
+    const revenueChartData = useMemo(() => {
+        if (!revenueStats) return []
+        return revenueStats.plans.map((plan) => {
+            const planInfo = subscriptionPlanMap[plan.planId]
+            return {
+                name: planInfo?.name || `Plan ${plan.planId}`,
+                month: plan.revenue.month.total,
+                year: plan.revenue.year.total,
+                monthCount: plan.revenue.month.count,
+                yearCount: plan.revenue.year.count,
             }
         })
-        return map
-    }, [subscriptionStats])
+    }, [revenueStats, subscriptionPlanMap])
 
-    const packages = remotePackages ?? defaultPackages
-
-
-    const packageGridColumns = useMemo(() => {
-        const count = packages.length
-        if (count >= 4) {
-            return "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-        }
-        if (count === 3) {
-            return "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-        }
-        if (count === 2) {
-            return "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2"
-        }
-        return "grid-cols-1 sm:grid-cols-1 lg:grid-cols-1"
-    }, [packages.length])
+    const subscribersChartData = useMemo(() => {
+        if (!subscriptionStats) return []
+        return subscriptionStats.plans.map((plan, index) => {
+            const planInfo = subscriptionPlanMap[plan.planId]
+            return {
+                name: planInfo?.name || `Plan ${plan.planId}`,
+                value: plan.stats.totalPurchases,
+                color: COLORS[index % COLORS.length],
+            }
+        })
+    }, [subscriptionStats, subscriptionPlanMap])
 
     const stats = useMemo(() => [
         {
             label: "Tổng gói dịch vụ",
-            value: remotePackages
-                ? String(subscriptionStats?.totalActivePlans ?? packages.length)
-                : defaultPackages.length.toString(),
+            value: subscriptionStats?.totalActivePlans ?? packages.length,
             icon: Package,
-            gradient: "from-blue-500/10 to-cyan-500/10",
+            gradient: "from-blue-500/20 via-blue-500/10 to-transparent",
+            borderColor: "border-blue-500/20",
             iconBg: "bg-blue-500/10",
             iconColor: "text-blue-500",
-            borderColor: "border-blue-500/20"
+            isLoading: isSubscriptionLoading,
         },
         {
-            label: "Doanh thu tháng này",
-            value: revenueStats
-                ? `${revenueStats.totalRevenue.month.toLocaleString()} VND`
-                : "—",
+            label: "Doanh thu tháng",
+            value: revenueStats ? `${formatCurrency(revenueStats.totalRevenue.month)} VND` : "—",
             icon: DollarSign,
-            gradient: "from-green-500/10 to-emerald-500/10",
+            gradient: "from-green-500/20 via-green-500/10 to-transparent",
+            borderColor: "border-green-500/20",
             iconBg: "bg-green-500/10",
             iconColor: "text-green-500",
-            borderColor: "border-green-500/20"
+            isLoading: isRevenueLoading,
         },
         {
-            label: "Tổng người đăng ký (theo tháng)",
+            label: "Tổng đăng ký",
             value: revenueStats
                 ? String(revenueStats.plans.reduce((sum, plan) => sum + plan.revenue.month.count, 0))
                 : "—",
             icon: Users,
-            gradient: "from-purple-500/10 to-pink-500/10",
+            gradient: "from-purple-500/20 via-purple-500/10 to-transparent",
+            borderColor: "border-purple-500/20",
             iconBg: "bg-purple-500/10",
             iconColor: "text-purple-500",
-            borderColor: "border-purple-500/20"
+            isLoading: isRevenueLoading,
         },
         {
             label: "Doanh thu năm",
-            value: revenueStats
-                ? `${revenueStats.totalRevenue.year.toLocaleString()} VND`
-                : "—",
+            value: revenueStats ? `${formatCurrency(revenueStats.totalRevenue.year)} VND` : "—",
             icon: TrendingUp,
-            gradient: "from-yellow-500/10 to-amber-500/10",
+            gradient: "from-yellow-500/20 via-yellow-500/10 to-transparent",
+            borderColor: "border-yellow-500/20",
             iconBg: "bg-yellow-500/10",
             iconColor: "text-yellow-500",
-            borderColor: "border-yellow-500/20"
+            isLoading: isRevenueLoading,
         },
-    ], [subscriptionStats, packages.length, defaultPackages.length, revenueStats])
+    ], [subscriptionStats, packages.length, revenueStats, isSubscriptionLoading, isRevenueLoading])
 
     const getColorClasses = (color: string) => {
         const colors: Record<string, { bg: string; text: string; border: string; gradient: string }> = {
@@ -264,246 +223,322 @@ export default function PackageManagement() {
 
     return (
         <>
-            <HeaderAdmin title="Quản lý gói dịch vụ" description="Quản lý các gói đăng ký và dịch vụ" />
+            <HeaderAdmin title="Quản lý gói dịch vụ" description="Thống kê và quản lý các gói đăng ký" />
             <div className="mt-24 p-8 space-y-8">
-                {/* Stats Cards */}
-                <div className="grid gap-6 md:grid-cols-4">
-                    {stats.map((stat) => (
-                        <Card
-                            key={stat.label}
-                            className={`relative overflow-hidden bg-gradient-to-br ${stat.gradient} border ${stat.borderColor} shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+                    <TabsList className="grid w-full max-w-2xl grid-cols-2 bg-muted/50 p-1.5 rounded-xl">
+                        <TabsTrigger
+                            value="overview"
+                            className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-md transition-all"
                         >
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-full -mr-16 -mt-16" />
-                            <CardHeader className="pb-3 relative">
-                                <div className="flex items-center justify-between">
-                                    <CardTitle className="text-sm font-semibold text-foreground/90">{stat.label}</CardTitle>
-                                    <div className={`p-2 rounded-lg ${stat.iconBg} ${stat.iconColor}`}>
-                                        <stat.icon className="w-5 h-5" />
+                            <BarChart3 className="w-4 h-4" />
+                            Tổng quan
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="packages"
+                            className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-md transition-all"
+                        >
+                            <Package className="w-4 h-4" />
+                            Danh sách gói
+                        </TabsTrigger>
+                    </TabsList>
+
+                    {/* Overview Tab */}
+                    <TabsContent value="overview" className="space-y-6">
+                        {/* Stats Cards */}
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                            {stats.map((stat) => (
+                                <Card
+                                    key={stat.label}
+                                    className={`relative overflow-hidden border-2 ${stat.borderColor} bg-gradient-to-br ${stat.gradient} hover:shadow-xl transition-all duration-300 hover:scale-105 group`}
+                                >
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
+                                    <CardHeader className="pb-3 relative">
+                                        <div className="flex items-center justify-between">
+                                            <CardTitle className="text-sm font-semibold text-foreground/90">{stat.label}</CardTitle>
+                                            <div className={`p-2.5 ${stat.iconBg} rounded-xl ${stat.iconColor} shadow-lg group-hover:scale-110 transition-transform`}>
+                                                <stat.icon className="w-5 h-5" />
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="relative">
+                                        {stat.isLoading ? (
+                                            <div className="flex items-center justify-center h-20">
+                                                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div className="text-4xl font-bold text-foreground mb-1">{stat.value}</div>
+                                                <div className="h-1 w-16 bg-gradient-to-r from-transparent via-current to-transparent opacity-20 mt-2" />
+                                            </>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+
+                        {/* Revenue Section */}
+                        <Card className="border-2 border-border/50 shadow-lg">
+                            <CardHeader className="bg-gradient-to-r from-emerald-500/5 to-transparent border-b border-border/50">
+                                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                                    <div>
+                                        <CardTitle className="text-lg font-bold flex items-center gap-2">
+                                            <DollarSign className="w-5 h-5 text-emerald-500" />
+                                            Doanh thu gói dịch vụ
+                                        </CardTitle>
+                                        <p className="text-sm text-muted-foreground mt-1">Tháng {selectedMonth}/{selectedYear}</p>
+                                    </div>
+                                    <div className="flex flex-wrap gap-3">
+                                        <Select
+                                            value={selectedMonth.toString()}
+                                            onValueChange={(value) => setSelectedMonth(Number(value))}
+                                        >
+                                            <SelectTrigger className="w-[140px] bg-background border-2 border-border h-10">
+                                                <SelectValue placeholder="Tháng" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {monthOptions.map((option) => (
+                                                    <SelectItem key={option.value} value={option.value.toString()}>
+                                                        {option.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <Select
+                                            value={selectedYear.toString()}
+                                            onValueChange={(value) => setSelectedYear(Number(value))}
+                                        >
+                                            <SelectTrigger className="w-[140px] bg-background border-2 border-border h-10">
+                                                <SelectValue placeholder="Năm" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {yearOptions.map((option) => (
+                                                    <SelectItem key={option.value} value={option.value.toString()}>
+                                                        {option.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                 </div>
                             </CardHeader>
-                            <CardContent className="relative">
-                                <div className="text-4xl font-bold text-foreground mb-1">
-                                    {stat.value}
-                                </div>
-                                <div className="h-1 w-16 bg-gradient-to-r from-transparent via-current to-transparent opacity-20 mt-2" />
+                            <CardContent className="pt-6">
+                                {isRevenueLoading ? (
+                                    <div className="flex flex-col items-center justify-center py-12">
+                                        <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+                                        <p className="text-muted-foreground">{t('common.loading')}</p>
+                                    </div>
+                                ) : revenueStats ? (
+                                    <div className="space-y-6">
+                                        {/* Revenue Summary */}
+                                        <div className="grid gap-4 md:grid-cols-2">
+                                            <div className="p-6 rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border-2 border-emerald-500/20 text-center">
+                                                <p className="text-sm font-semibold text-muted-foreground mb-2">Doanh thu tháng</p>
+                                                <p className="text-3xl font-bold text-foreground">
+                                                    {formatCurrency(revenueStats.totalRevenue.month)} VND
+                                                </p>
+                                            </div>
+                                            <div className="p-6 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-2 border-blue-500/20 text-center">
+                                                <p className="text-sm font-semibold text-muted-foreground mb-2">Doanh thu năm</p>
+                                                <p className="text-3xl font-bold text-foreground">
+                                                    {formatCurrency(revenueStats.totalRevenue.year)} VND
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Revenue Chart */}
+                                        {revenueChartData.length > 0 && (
+                                            <div className="space-y-4">
+                                                <h3 className="text-lg font-bold text-foreground">Doanh thu theo gói</h3>
+                                                <ResponsiveContainer width="100%" height={300}>
+                                                    <BarChart data={revenueChartData}>
+                                                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                                        <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                                                        <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                                                        <Tooltip
+                                                            contentStyle={{
+                                                                backgroundColor: "hsl(var(--card))",
+                                                                border: "1px solid hsl(var(--border))",
+                                                                borderRadius: "8px",
+                                                            }}
+                                                            formatter={(value: number) => [`${formatCurrency(value)} VND`, ""]}
+                                                        />
+                                                        <Legend />
+                                                        <Bar dataKey="month" fill="hsl(var(--chart-1))" name="Doanh thu tháng" radius={[8, 8, 0, 0]} />
+                                                        <Bar dataKey="year" fill="hsl(var(--chart-2))" name="Doanh thu năm" radius={[8, 8, 0, 0]} />
+                                                    </BarChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center py-12 text-center gap-3">
+                                        <AlertCircle className="w-10 h-10 text-muted-foreground" />
+                                        <p className="text-muted-foreground font-medium">Chưa có dữ liệu doanh thu</p>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
-                    ))}
-                </div>
 
-                {/* Revenue Overview */}
-                <Card className="bg-gradient-to-br from-emerald-500/10 via-card to-card/95 border-emerald-500/20 shadow-lg">
-                    <CardHeader className="pb-4">
-                        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                            <div>
-                                <CardTitle className="text-xl font-bold text-foreground">Doanh thu gói dịch vụ</CardTitle>
-                                <p className="text-sm text-muted-foreground">Theo tháng và tổng năm hiện tại</p>
-                            </div>
-                            <div className="flex flex-wrap gap-3">
-                                <Select
-                                    value={selectedMonth.toString()}
-                                    onValueChange={(value) => setSelectedMonth(Number(value))}
-                                >
-                                    <SelectTrigger className="w-[140px] bg-background border-border text-foreground h-10">
-                                        <SelectValue placeholder="Tháng" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-card border-border">
-                                        {monthOptions.map((option) => (
-                                            <SelectItem key={option.value} value={option.value.toString()}>
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <Select
-                                    value={selectedYear.toString()}
-                                    onValueChange={(value) => setSelectedYear(Number(value))}
-                                >
-                                    <SelectTrigger className="w-[140px] bg-background border-border text-foreground h-10">
-                                        <SelectValue placeholder="Năm" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-card border-border">
-                                        {yearOptions.map((option) => (
-                                            <SelectItem key={option.value} value={option.value.toString()}>
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        {isRevenueLoading ? (
-                            <div className="flex flex-col items-center justify-center py-12">
-                                <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-                                <p className="text-muted-foreground">{t('common.loading')}</p>
-                            </div>
-                        ) : revenueStats ? (
-                            <>
-                                <div className="grid gap-4 md:grid-cols-2">
-                                    <div className="p-4 bg-white/70 rounded-xl border border-emerald-200 shadow-sm">
-                                        <p className="text-sm text-muted-foreground font-medium">Doanh thu tháng</p>
-                                        <p className="text-2xl font-bold text-foreground mt-1">
-                                            {formatCurrency(revenueStats.totalRevenue.month)} VND
-                                        </p>
-                                    </div>
-                                    <div className="p-4 bg-white/70 rounded-xl border border-emerald-200 shadow-sm">
-                                        <p className="text-sm text-muted-foreground font-medium">Doanh thu năm</p>
-                                        <p className="text-2xl font-bold text-foreground mt-1">
-                                            {formatCurrency(revenueStats.totalRevenue.year)} VND
-                                        </p>
-                                    </div>
-                                </div>
+                        {/* Subscribers Distribution */}
+                        {subscribersChartData.length > 0 && (
+                            <div className="grid gap-6 md:grid-cols-2">
+                                <Card className="border-2 border-border/50 shadow-lg">
+                                    <CardHeader className="bg-gradient-to-r from-purple-500/5 to-transparent border-b border-border/50">
+                                        <CardTitle className="flex items-center gap-2">
+                                            <PieChartIcon className="w-5 h-5 text-purple-500" />
+                                            Phân bố người đăng ký
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="pt-6">
+                                        <ResponsiveContainer width="100%" height={300}>
+                                            <PieChart>
+                                                <Pie
+                                                    data={subscribersChartData}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    labelLine={false}
+                                                    label={({ name, percent }: any) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                                    outerRadius={100}
+                                                    fill="#8884d8"
+                                                    dataKey="value"
+                                                >
+                                                    {subscribersChartData.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip />
+                                                <Legend />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </CardContent>
+                                </Card>
 
-                                <div className="mt-6 space-y-4">
-                                    {revenueStats.plans.map((plan) => {
-                                        const planInfo = subscriptionPlanMap[plan.planId]
-                                        const colorClasses = getColorClasses(planInfo?.color || "blue")
-                                        return (
-                                            <Card key={plan.planId} className="border border-border/60 bg-card/90">
-                                                <CardContent className="p-4 space-y-4">
-                                                    <div className="flex flex-wrap items-center justify-between gap-3">
-                                                        <div>
-                                                            <p className="text-base font-semibold text-foreground">
-                                                                {planInfo?.name ?? `Plan #${plan.planId}`}
-                                                            </p>
-                                                            <p className="text-sm text-muted-foreground">
-                                                                {plan.type === "LIFETIME"
-                                                                    ? "Trọn đời"
-                                                                    : plan.durationInDays
-                                                                        ? `${plan.durationInDays} ngày`
-                                                                        : "Không xác định"}
-                                                            </p>
+                                <Card className="border-2 border-border/50 shadow-lg">
+                                    <CardHeader className="bg-gradient-to-r from-blue-500/5 to-transparent border-b border-border/50">
+                                        <CardTitle className="flex items-center gap-2">
+                                            <Users className="w-5 h-5 text-blue-500" />
+                                            Chi tiết đăng ký
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="pt-6">
+                                        {subscriptionStats ? (
+                                            <div className="space-y-3">
+                                                {subscriptionStats.plans.map((plan) => {
+                                                    const planInfo = subscriptionPlanMap[plan.planId]
+                                                    const colorClasses = getColorClasses(planInfo?.color || "blue")
+                                                    return (
+                                                        <div
+                                                            key={plan.planId}
+                                                            className="p-4 rounded-xl border-2 border-border/50 bg-gradient-to-r from-muted/50 to-muted/30 hover:shadow-md transition-all"
+                                                        >
+                                                            <div className="flex items-center justify-between mb-2">
+                                                                <p className="font-semibold text-foreground">
+                                                                    {planInfo?.name || `Plan ${plan.planId}`}
+                                                                </p>
+                                                                <Badge className={`${colorClasses.bg} ${colorClasses.text}`}>
+                                                                    {plan.subscription.tagName}
+                                                                </Badge>
+                                                            </div>
+                                                            <div className="grid grid-cols-2 gap-3 mt-3">
+                                                                <div>
+                                                                    <p className="text-xs text-muted-foreground">Tổng đăng ký</p>
+                                                                    <p className="text-lg font-bold text-foreground">{plan.stats.totalPurchases.toLocaleString()}</p>
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-xs text-muted-foreground">Đang hoạt động</p>
+                                                                    <p className="text-lg font-bold text-foreground">{plan.stats.activeUsers.toLocaleString()}</p>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <Badge className={`px-3 py-1 ${colorClasses.bg} ${colorClasses.text}`}>
-                                                            {plan.subscription.tagName}
-                                                        </Badge>
-                                                    </div>
-                                                    <div className="grid gap-3 sm:grid-cols-2">
-                                                        <div className="p-3 rounded-lg border border-border/50 bg-muted/30">
-                                                            <p className="text-xs text-muted-foreground uppercase tracking-wide">
-                                                                Doanh thu tháng
-                                                            </p>
-                                                            <p className="text-lg font-semibold text-foreground">
-                                                                {formatCurrency(plan.revenue.month.total)} VND
-                                                            </p>
-                                                            <p className="text-xs text-muted-foreground">
-                                                                {plan.revenue.month.count} lượt mua
-                                                            </p>
-                                                        </div>
-                                                        <div className="p-3 rounded-lg border border-border/50 bg-muted/30">
-                                                            <p className="text-xs text-muted-foreground uppercase tracking-wide">
-                                                                Doanh thu năm
-                                                            </p>
-                                                            <p className="text-lg font-semibold text-foreground">
-                                                                {formatCurrency(plan.revenue.year.total)} VND
-                                                            </p>
-                                                            <p className="text-xs text-muted-foreground">
-                                                                {plan.revenue.year.count} lượt mua
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </CardContent>
-                                            </Card>
-                                        )
-                                    })}
-                                </div>
-                            </>
-                        ) : (
-                            <div className="flex flex-col items-center justify-center py-12 text-center gap-3">
-                                <Sparkles className="w-10 h-10 text-muted-foreground" />
-                                <p className="text-muted-foreground font-medium">Chưa có dữ liệu doanh thu</p>
+                                                    )
+                                                })}
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center justify-center h-[300px]">
+                                                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </Card>
                             </div>
                         )}
-                    </CardContent>
-                </Card>
+                    </TabsContent>
 
-                {/* Packages Grid */}
-                <div className="w-full pb-16">
-                    <div className={`grid ${packageGridColumns} gap-6 justify-items-center max-w-6xl mx-auto`}>
-                        {isSubscriptionLoading && !packages ? (
-                            <div className="col-span-full flex flex-col items-center justify-center py-16">
+                    {/* Packages Tab */}
+                    <TabsContent value="packages" className="space-y-6">
+                        {isSubscriptionLoading ? (
+                            <div className="flex flex-col items-center justify-center py-16">
                                 <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
                                 <p className="text-muted-foreground">{t('common.loading')}</p>
                             </div>
                         ) : packages.length > 0 ? (
-                            packages.map((pkg) => {
-                                const colorClasses = getColorClasses(pkg.color)
-                                return (
-                                    <Card
-                                        key={pkg.id}
-                                        className={`w-full group relative overflow-hidden bg-gradient-to-br ${colorClasses.gradient} border-2 ${colorClasses.border} shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex flex-col h-full`}
-                                    >
-                                        {/* Decorative gradient overlay */}
-                                        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-white/5 to-transparent rounded-full -mr-32 -mt-32 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                {packages.map((pkg) => {
+                                    const colorClasses = getColorClasses(pkg.color)
+                                    return (
+                                        <Card
+                                            key={pkg.id}
+                                            className={`group relative overflow-hidden bg-gradient-to-br ${colorClasses.gradient} border-2 ${colorClasses.border} shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}
+                                        >
+                                            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-white/5 to-transparent rounded-full -mr-32 -mt-32 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                                        {/* Popular Badge */}
-                                        {pkg.id === 2 && !remotePackages && (
-                                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                                                <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg font-bold">
-                                                    <Sparkles className="w-3 h-3 mr-1" />
-                                                    Phổ biến nhất
-                                                </Badge>
-                                            </div>
-                                        )}
-
-                                        <CardHeader className="text-center pb-4 relative">
-                                            <div className="flex flex-col items-center gap-2 mb-4">
-                                                <div className={`p-3 rounded-xl ${colorClasses.bg} ${colorClasses.text} border ${colorClasses.border} shadow-lg`}>
-                                                    <Package className="w-8 h-8" />
-                                                </div>
-                                                <div>
-                                                    <CardTitle className={`text-xl font-bold ${colorClasses.text} mb-1`}>{pkg.name}</CardTitle>
-                                                    <p className="text-muted-foreground text-sm">{pkg.nameEn}</p>
-                                                </div>
-                                            </div>
-
-                                            <div className="text-center mb-6 p-4 bg-muted/30 rounded-lg border border-border/50">
-                                                <div className="flex items-baseline justify-center gap-1 mb-1">
-                                                    <span className="text-4xl font-bold text-foreground">{pkg.price.toLocaleString()}</span>
-                                                    <span className="text-muted-foreground">VND</span>
-                                                </div>
-                                                <p className="text-muted-foreground text-sm font-medium">{pkg.duration}</p>
-                                            </div>
-                                        </CardHeader>
-
-                                        <CardContent className="space-y-4 relative flex-1 flex flex-col">
-                                            <div className="space-y-3 mb-6 p-4 bg-card/50 rounded-lg border border-border/50 flex-1">
-                                                {pkg.features.map((feature, index) => (
-                                                    <div key={index} className="flex items-start gap-2">
-                                                        <div className={`p-1 rounded-full ${colorClasses.bg} ${colorClasses.text} mt-0.5 flex-shrink-0`}>
-                                                            <Check className="w-3 h-3" />
-                                                        </div>
-                                                        <span className="text-foreground text-sm font-medium leading-relaxed">{feature}</span>
+                                            <CardHeader className="text-center pb-4 relative">
+                                                <div className="flex flex-col items-center gap-3 mb-4">
+                                                    <div className={`p-3 rounded-xl ${colorClasses.bg} ${colorClasses.text} border-2 ${colorClasses.border} shadow-lg group-hover:scale-110 transition-transform`}>
+                                                        <Package className="w-8 h-8" />
                                                     </div>
-                                                ))}
-                                            </div>
-                                        </CardContent>
-
-                                        <CardFooter className="w-full mt-auto px-0 pt-0">
-                                            <div className="pt-4 border-t border-border/50 space-y-4 w-full">
-                                                <div className="flex items-center justify-between text-sm p-3 bg-muted/30 rounded-lg">
-                                                    <span className="text-muted-foreground font-medium flex items-center gap-2">
-                                                        <Users className="w-4 h-4" />
-                                                        Người đăng ký
-                                                    </span>
-                                                    <span className="text-foreground font-bold text-lg">{pkg.subscribers}</span>
+                                                    <div>
+                                                        <CardTitle className={`text-xl font-bold ${colorClasses.text} mb-1`}>{pkg.name}</CardTitle>
+                                                        <p className="text-muted-foreground text-sm">{pkg.duration}</p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </CardFooter>
-                                    </Card>
-                                )
-                            })
+
+                                                <div className="text-center p-4 bg-muted/30 rounded-xl border border-border/50">
+                                                    <div className="flex items-baseline justify-center gap-1 mb-1">
+                                                        <span className="text-4xl font-bold text-foreground">{pkg.price.toLocaleString()}</span>
+                                                        <span className="text-muted-foreground">VND</span>
+                                                    </div>
+                                                </div>
+                                            </CardHeader>
+
+                                            <CardContent className="space-y-4 relative">
+                                                <div className="space-y-2 mb-4 p-4 bg-card/50 rounded-lg border border-border/50">
+                                                    {pkg.features.slice(0, 4).map((feature) => (
+                                                        <div key={feature} className="flex items-start gap-2">
+                                                            <div className={`p-1 rounded-full ${colorClasses.bg} ${colorClasses.text} mt-0.5 flex-shrink-0`}>
+                                                                <Check className="w-3 h-3" />
+                                                            </div>
+                                                            <span className="text-foreground text-sm leading-relaxed">{feature}</span>
+                                                        </div>
+                                                    ))}
+                                                    {pkg.features.length > 4 && (
+                                                        <p className="text-xs text-muted-foreground text-center mt-2">
+                                                            +{pkg.features.length - 4} tính năng khác
+                                                        </p>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/50">
+                                                    <span className="text-muted-foreground font-medium flex items-center gap-2 text-sm">
+                                                        <Users className="w-4 h-4" />
+                                                        Đăng ký
+                                                    </span>
+                                                    <span className="text-foreground font-bold text-lg">{pkg.subscribers.toLocaleString()}</span>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    )
+                                })}
+                            </div>
                         ) : (
-                            <div className="col-span-full flex flex-col items-center justify-center py-16 text-center gap-3">
+                            <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
                                 <Package className="w-10 h-10 text-muted-foreground" />
-                                <p className="text-muted-foreground font-medium">Chưa có gói dịch vụ nào phù hợp</p>
+                                <p className="text-muted-foreground font-medium">Chưa có gói dịch vụ</p>
                             </div>
                         )}
-                    </div>
-                </div>
+                    </TabsContent>
+                </Tabs>
             </div>
         </>
     )
