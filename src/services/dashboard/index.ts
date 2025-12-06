@@ -9,6 +9,12 @@ const dashboardService = {
             params: { month, year },
         });
     },
+    getDashboardJlptDistribution: async () => {
+        return axiosPrivate.get('/dashboard/user-growth/jlpt-distribution');
+    },
+    getDashboardUserActivation: async () => {
+        return axiosPrivate.get('/dashboard/user-growth/account-activation');
+    },
 }
 
 export default dashboardService;

@@ -38,3 +38,30 @@ export const useGetDashboardRevenue = (month: number, year: number) => {
     return { data: getDashboardRevenueQuery.data, isLoading: getDashboardRevenueQuery.isLoading, error: getDashboardRevenueQuery.error };
 }
 //------------------End------------------//
+
+
+/**
+ * Handle Get Dashboard Jlpt Distribution
+ * @returns 
+ */
+export const useGetDashboardJlptDistribution = () => {
+    const currentLanguage = useSelector(selectCurrentLanguage);
+    const getDashboardJlptDistributionQuery = useQuery({
+        queryKey: ['dashboard-jlpt-distribution', currentLanguage],
+    });
+    return { data: getDashboardJlptDistributionQuery.data, isLoading: getDashboardJlptDistributionQuery.isLoading, error: getDashboardJlptDistributionQuery.error };
+}
+//------------------End------------------//
+
+
+/**
+ * Handle Get Dashboard User Activation
+ * @returns 
+ */
+export const useGetDashboardUserActivation = () => {
+    const currentLanguage = useSelector(selectCurrentLanguage);
+    const getDashboardUserActivationQuery = useQuery({
+        queryKey: ['dashboard-user-activation', currentLanguage],
+    });
+    return { data: getDashboardUserActivationQuery.data, isLoading: getDashboardUserActivationQuery.isLoading, error: getDashboardUserActivationQuery.error };
+}
