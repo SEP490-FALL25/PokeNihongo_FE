@@ -103,3 +103,55 @@ export const DashboardEngagementPopularContentEntitySchema = z.object({
 });
 export type IDashboardEngagementPopularContentEntity = z.infer<typeof DashboardEngagementPopularContentEntitySchema>;
 //------------------End------------------//
+
+
+/**
+ * Dashboard Engagement Sparkles Accumulation Entity Schema
+ */
+export const DashboardEngagementSparklesAccumulationEntitySchema = z.object({
+    distribution: z.object({
+        "0-100": z.object({
+            count: z.number(),
+            percent: z.coerce.number(),
+        }),
+        "101-500": z.object({
+            count: z.number(),
+            percent: z.coerce.number(),
+        }),
+        "501-1000": z.object({
+            count: z.number(),
+            percent: z.coerce.number(),
+        }),
+        "1001-5000": z.object({
+            count: z.number(),
+            percent: z.coerce.number(),
+        }),
+        "5000+": z.object({
+            count: z.number(),
+            percent: z.coerce.number(),
+        }),
+    }),
+    totalUsers: z.number(),
+    averageSparkles: z.number()
+});
+export type IDashboardEngagementSparklesAccumulationEntity = z.infer<typeof DashboardEngagementSparklesAccumulationEntitySchema>;
+//------------------End------------------//
+
+
+//TODO: Dashboard Engagement Battle Activity Entity Schema
+
+/**
+ * Dashboard Engagement Starter Pokemon Distribution Entity Schema
+ */
+export const DashboardEngagementStarterPokemonDistributionEntitySchema = z.object({
+    starters: z.array(z.object({
+        pokemonId: z.number(),
+        nameJp: z.string(),
+        imageUrl: z.string().url(),
+        count: z.number(),
+        percent: z.coerce.number(),
+    })),
+    totalCount: z.number(),
+});
+export type IDashboardEngagementStarterPokemonDistributionEntity = z.infer<typeof DashboardEngagementStarterPokemonDistributionEntitySchema>;
+//------------------End------------------//

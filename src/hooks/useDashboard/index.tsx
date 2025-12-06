@@ -10,6 +10,8 @@ import {
     DashboardUserGrowthNewUserEntitySchema,
     DashboardUserGrowthTotalUserEntitySchema,
     DashboardEngagementPopularContentEntitySchema,
+    DashboardEngagementSparklesAccumulationEntitySchema,
+    DashboardEngagementStarterPokemonDistributionEntitySchema,
 } from "@models/dashboard/dashboard.entity";
 
 /**
@@ -152,5 +154,55 @@ export const useGetDashboardEngagementPopularContent = () => {
         },
     });
     return { data: getDashboardEngagementPopularContentQuery.data, isLoading: getDashboardEngagementPopularContentQuery.isLoading, error: getDashboardEngagementPopularContentQuery.error };
+}
+//------------------End------------------//
+
+
+/**
+ * Handle Get Dashboard Engagement Sparkles Accumulation
+ * @returns 
+ */
+export const useGetDashboardEngagementSparklesAccumulation = () => {
+    const currentLanguage = useSelector(selectCurrentLanguage);
+    const getDashboardEngagementSparklesAccumulationQuery = useQuery({
+        queryKey: ['dashboard-engagement-sparkles-accumulation', currentLanguage],
+        queryFn: async () => {
+            const response = await dashboardService.getEngagementSparklesAccumulation();
+            return DashboardEngagementSparklesAccumulationEntitySchema.parse(response.data?.data);
+        },
+    });
+    return { data: getDashboardEngagementSparklesAccumulationQuery.data, isLoading: getDashboardEngagementSparklesAccumulationQuery.isLoading, error: getDashboardEngagementSparklesAccumulationQuery.error };
+}
+//------------------End------------------//
+
+
+/**
+ * Handle Get Dashboard Engagement Battle Activity
+ * @returns 
+ */
+export const useGetDashboardEngagementBattleActivity = () => {
+    return useQuery({
+        queryKey: ['dashboard-engagement-battle-activity'],
+        queryFn: async () => {
+            const response = await dashboardService.getEngagementBattleActivity();
+            return response.data?.data;
+        },
+    });
+}
+//------------------End------------------//
+
+
+/**
+ * Handle Get Dashboard Engagement Starter Pokemon Distribution
+ * @returns 
+ */
+export const useGetDashboardEngagementStarterPokemonDistribution = () => {
+    return useQuery({
+        queryKey: ['dashboard-engagement-starter-pokemon-distribution'],
+        queryFn: async () => {
+            const response = await dashboardService.getEngagementStarterPokemonDistribution();
+            return DashboardEngagementStarterPokemonDistributionEntitySchema.parse(response.data?.data);
+        },
+    });
 }
 //------------------End------------------//

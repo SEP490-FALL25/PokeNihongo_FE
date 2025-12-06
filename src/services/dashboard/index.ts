@@ -27,6 +27,16 @@ const dashboardService = {
     getEngagementPopularContent: async () => {
         return await axiosPrivate.get('/dashboard/engagement/popular-content');
     },
+    getEngagementSparklesAccumulation: async () => {
+        return await axiosPrivate.get('/dashboard/engagement/sparkles-accumulation');
+    },
+    //TODO: Đợi Pilu làm lại
+    getEngagementBattleActivity: async () => {
+        return await axiosPrivate.get('/dashboard/engagement/battle-activity');
+    },
+    getEngagementStarterPokemonDistribution: async () => {
+        return await axiosPrivate.get('/dashboard/engagement/starter-pokemon-distribution');
+    },
 }
 
 export default dashboardService;
