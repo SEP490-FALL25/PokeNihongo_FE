@@ -15,6 +15,15 @@ const dashboardService = {
     getDashboardUserActivation: async () => {
         return axiosPrivate.get('/dashboard/user-growth/account-activation');
     },
+    getDashboardUserGrowthActiveUser: async (period: string) => { // year, week, month, day
+        return axiosPrivate.get(`/dashboard/user-growth/active-users?period=${period}`);
+    },
+    getDashboardUserGrowthNewUser: async (period: string) => { // year, week, month, day
+        return axiosPrivate.get(`/dashboard/user-growth/new-users?period=${period}`);
+    },
+    getDashboardUserGrowthTotalUser: async () => {
+        return axiosPrivate.get('/dashboard/user-growth/total-users');
+    },
 }
 
 export default dashboardService;

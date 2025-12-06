@@ -65,3 +65,46 @@ export const useGetDashboardUserActivation = () => {
     });
     return { data: getDashboardUserActivationQuery.data, isLoading: getDashboardUserActivationQuery.isLoading, error: getDashboardUserActivationQuery.error };
 }
+//------------------End------------------//
+
+
+/**
+ * Handle Get Dashboard User Growth Active User
+ * @returns 
+ */
+export const useGetDashboardUserGrowthActiveUser = (period: string) => {
+    const currentLanguage = useSelector(selectCurrentLanguage);
+    const getDashboardUserGrowthActiveUserQuery = useQuery({
+        queryKey: ['dashboard-user-growth-active-user', period, currentLanguage],
+    });
+    return { data: getDashboardUserGrowthActiveUserQuery.data, isLoading: getDashboardUserGrowthActiveUserQuery.isLoading, error: getDashboardUserGrowthActiveUserQuery.error };
+}
+//------------------End------------------//
+
+
+/**
+ * Handle Get Dashboard User Growth New User
+ * @returns 
+ */
+export const useGetDashboardUserGrowthNewUser = (period: string) => {
+    const currentLanguage = useSelector(selectCurrentLanguage);
+    const getDashboardUserGrowthNewUserQuery = useQuery({
+        queryKey: ['dashboard-user-growth-new-user', period, currentLanguage],
+    });
+    return { data: getDashboardUserGrowthNewUserQuery.data, isLoading: getDashboardUserGrowthNewUserQuery.isLoading, error: getDashboardUserGrowthNewUserQuery.error };
+}
+//------------------End------------------//
+
+
+/**
+ * Handle Get Dashboard User Growth Total User
+ * @returns 
+ */
+export const useGetDashboardUserGrowthTotalUser = () => {
+    const currentLanguage = useSelector(selectCurrentLanguage);
+    const getDashboardUserGrowthTotalUserQuery = useQuery({
+        queryKey: ['dashboard-user-growth-total-user', currentLanguage],
+    });
+    return { data: getDashboardUserGrowthTotalUserQuery.data, isLoading: getDashboardUserGrowthTotalUserQuery.isLoading, error: getDashboardUserGrowthTotalUserQuery.error };
+}
+//------------------End------------------//

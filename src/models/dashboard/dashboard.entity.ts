@@ -52,3 +52,37 @@ const DashboardUserActivationEntitySchema = z.object({
 
 export type IDashboardUserActivationEntity = z.infer<typeof DashboardUserActivationEntitySchema>;
 //------------------End------------------//
+
+
+/**
+ * Dashboard User Growth Active User Entity Schema
+ */
+const DashboardUserGrowthActiveUserEntitySchema = z.object({
+    activeUsers: z.number(),
+    period: z.string(),
+});
+
+export type IDashboardUserGrowthActiveUserEntity = z.infer<typeof DashboardUserGrowthActiveUserEntitySchema>;
+//------------------End------------------//
+
+
+/**
+ * Dashboard User Growth New User Entity Schema
+ */
+const DashboardUserGrowthNewUserEntitySchema = z.object({
+    count: z.number(),
+    period: z.string(),
+});
+
+export type IDashboardUserGrowthNewUserEntity = z.infer<typeof DashboardUserGrowthNewUserEntitySchema>;
+//------------------End------------------//
+
+
+/**
+ * Dashboard User Growth Total User Entity Schema
+ */
+const DashboardUserGrowthTotalUserEntitySchema = z.object({
+    total: z.number(),
+});
+
+export type IDashboardUserGrowthTotalUserEntity = z.infer<typeof DashboardUserGrowthTotalUserEntitySchema>;
