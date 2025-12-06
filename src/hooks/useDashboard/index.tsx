@@ -3,6 +3,13 @@ import dashboardService from "@services/dashboard";
 import { DashboardRevenueEntitySchema, DashboardSubscriptionPlanEntitySchema } from "@models/subscription/entity";
 import { useSelector } from "react-redux";
 import { selectCurrentLanguage } from "@redux/features/language/selector";
+import {
+    DashboardJlptDistributionEntitySchema,
+    DashboardUserActivationEntitySchema,
+    DashboardUserGrowthActiveUserEntitySchema,
+    DashboardUserGrowthNewUserEntitySchema,
+    DashboardUserGrowthTotalUserEntitySchema,
+} from "@models/dashboard/dashboard.entity";
 
 /**
  * Handle Get Dashboard Subscription Plan
@@ -48,6 +55,17 @@ export const useGetDashboardJlptDistribution = () => {
     const currentLanguage = useSelector(selectCurrentLanguage);
     const getDashboardJlptDistributionQuery = useQuery({
         queryKey: ['dashboard-jlpt-distribution', currentLanguage],
+        queryFn: async () => {
+            const response = await dashboardService.getDashboardJlptDistribution();
+            // Try response.data?.data first, fallback to response.data
+            const dataToParse = response.data?.data ?? response.data;
+            const result = DashboardJlptDistributionEntitySchema.safeParse(dataToParse);
+            if (!result.success) {
+                console.error('JLPT Distribution validation error:', result.error);
+                throw result.error;
+            }
+            return result.data;
+        },
     });
     return { data: getDashboardJlptDistributionQuery.data, isLoading: getDashboardJlptDistributionQuery.isLoading, error: getDashboardJlptDistributionQuery.error };
 }
@@ -62,6 +80,10 @@ export const useGetDashboardUserActivation = () => {
     const currentLanguage = useSelector(selectCurrentLanguage);
     const getDashboardUserActivationQuery = useQuery({
         queryKey: ['dashboard-user-activation', currentLanguage],
+        queryFn: async () => {
+            const response = await dashboardService.getDashboardUserActivation();
+            return DashboardUserActivationEntitySchema.parse(response.data?.data);
+        },
     });
     return { data: getDashboardUserActivationQuery.data, isLoading: getDashboardUserActivationQuery.isLoading, error: getDashboardUserActivationQuery.error };
 }
@@ -76,6 +98,10 @@ export const useGetDashboardUserGrowthActiveUser = (period: string) => {
     const currentLanguage = useSelector(selectCurrentLanguage);
     const getDashboardUserGrowthActiveUserQuery = useQuery({
         queryKey: ['dashboard-user-growth-active-user', period, currentLanguage],
+        queryFn: async () => {
+            const response = await dashboardService.getDashboardUserGrowthActiveUser(period);
+            return DashboardUserGrowthActiveUserEntitySchema.parse(response.data?.data);
+        },
     });
     return { data: getDashboardUserGrowthActiveUserQuery.data, isLoading: getDashboardUserGrowthActiveUserQuery.isLoading, error: getDashboardUserGrowthActiveUserQuery.error };
 }
@@ -90,6 +116,10 @@ export const useGetDashboardUserGrowthNewUser = (period: string) => {
     const currentLanguage = useSelector(selectCurrentLanguage);
     const getDashboardUserGrowthNewUserQuery = useQuery({
         queryKey: ['dashboard-user-growth-new-user', period, currentLanguage],
+        queryFn: async () => {
+            const response = await dashboardService.getDashboardUserGrowthNewUser(period);
+            return DashboardUserGrowthNewUserEntitySchema.parse(response.data?.data);
+        },
     });
     return { data: getDashboardUserGrowthNewUserQuery.data, isLoading: getDashboardUserGrowthNewUserQuery.isLoading, error: getDashboardUserGrowthNewUserQuery.error };
 }
@@ -104,6 +134,10 @@ export const useGetDashboardUserGrowthTotalUser = () => {
     const currentLanguage = useSelector(selectCurrentLanguage);
     const getDashboardUserGrowthTotalUserQuery = useQuery({
         queryKey: ['dashboard-user-growth-total-user', currentLanguage],
+        queryFn: async () => {
+            const response = await dashboardService.getDashboardUserGrowthTotalUser();
+            return DashboardUserGrowthTotalUserEntitySchema.parse(response.data?.data);
+        },
     });
     return { data: getDashboardUserGrowthTotalUserQuery.data, isLoading: getDashboardUserGrowthTotalUserQuery.isLoading, error: getDashboardUserGrowthTotalUserQuery.error };
 }

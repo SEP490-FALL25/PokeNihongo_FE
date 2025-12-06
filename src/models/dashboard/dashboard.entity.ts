@@ -7,21 +7,22 @@ const DashboardJlptDistributionEntitySchema = z.object({
     summary: z.object({
         N3: z.object({
             total: z.number(),
-            percent: z.number(),
+            percent: z.coerce.number(),
         }),
         N4: z.object({
             total: z.number(),
-            percent: z.number(),
+            percent: z.coerce.number(),
         }),
         N5: z.object({
             total: z.number(),
-            percent: z.number(),
+            percent: z.coerce.number(),
         }),
     }),
     totalUsers: z.number(),
 });
 
 export type IDashboardJlptDistributionEntity = z.infer<typeof DashboardJlptDistributionEntitySchema>;
+export { DashboardJlptDistributionEntitySchema };
 //------------------End------------------//
 
 
@@ -34,23 +35,24 @@ const DashboardUserActivationEntitySchema = z.object({
     }),
     pending_test: z.object({
         count: z.number(),
-        percent: z.number(),
+        percent: z.coerce.number(),
     }),
     test_again: z.object({
         count: z.number(),
-        percent: z.number(),
+        percent: z.coerce.number(),
     }),
     pending_choose_level_jlpt: z.object({
         count: z.number(),
-        percent: z.number(),
+        percent: z.coerce.number(),
     }),
     pending_choose_pokemon: z.object({
         count: z.number(),
-        percent: z.number(),
+        percent: z.coerce.number(),
     }),
 });
 
 export type IDashboardUserActivationEntity = z.infer<typeof DashboardUserActivationEntitySchema>;
+export { DashboardUserActivationEntitySchema };
 //------------------End------------------//
 
 
@@ -63,6 +65,7 @@ const DashboardUserGrowthActiveUserEntitySchema = z.object({
 });
 
 export type IDashboardUserGrowthActiveUserEntity = z.infer<typeof DashboardUserGrowthActiveUserEntitySchema>;
+export { DashboardUserGrowthActiveUserEntitySchema };
 //------------------End------------------//
 
 
@@ -75,6 +78,7 @@ const DashboardUserGrowthNewUserEntitySchema = z.object({
 });
 
 export type IDashboardUserGrowthNewUserEntity = z.infer<typeof DashboardUserGrowthNewUserEntitySchema>;
+export { DashboardUserGrowthNewUserEntitySchema };
 //------------------End------------------//
 
 
@@ -86,3 +90,5 @@ const DashboardUserGrowthTotalUserEntitySchema = z.object({
 });
 
 export type IDashboardUserGrowthTotalUserEntity = z.infer<typeof DashboardUserGrowthTotalUserEntitySchema>;
+export { DashboardUserGrowthTotalUserEntitySchema };
+//------------------End------------------//

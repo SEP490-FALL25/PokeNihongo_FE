@@ -10,19 +10,19 @@ const dashboardService = {
         });
     },
     getDashboardJlptDistribution: async () => {
-        return axiosPrivate.get('/dashboard/user-growth/jlpt-distribution');
+        return await axiosPrivate.get('/dashboard/user-growth/jlpt-distribution');
     },
     getDashboardUserActivation: async () => {
-        return axiosPrivate.get('/dashboard/user-growth/account-activation');
+        return await axiosPrivate.get('/dashboard/user-growth/account-activation');
     },
     getDashboardUserGrowthActiveUser: async (period: string) => { // year, week, month, day
-        return axiosPrivate.get(`/dashboard/user-growth/active-users?period=${period}`);
+        return await axiosPrivate.get(`/dashboard/user-growth/active-users?period=${period}`);
     },
     getDashboardUserGrowthNewUser: async (period: string) => { // year, week, month, day
-        return axiosPrivate.get(`/dashboard/user-growth/new-users?period=${period}`);
+        return await axiosPrivate.get(`/dashboard/user-growth/new-users?period=${period}`);
     },
     getDashboardUserGrowthTotalUser: async () => {
-        return axiosPrivate.get('/dashboard/user-growth/total-users');
+        return await axiosPrivate.get('/dashboard/user-growth/total-users');
     },
 }
 
