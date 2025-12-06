@@ -174,7 +174,7 @@ const AdminDashboard = () => {
                                             fill="#8884d8"
                                             dataKey="value"
                                         >
-                                            {jlptChartData.map((entry, index) => (
+                                            {jlptChartData.map((_entry, index) => (
                                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                             ))}
                                         </Pie>

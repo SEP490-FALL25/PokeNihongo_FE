@@ -24,6 +24,9 @@ const dashboardService = {
     getDashboardUserGrowthTotalUser: async () => {
         return await axiosPrivate.get('/dashboard/user-growth/total-users');
     },
+    getEngagementPopularContent: async () => {
+        return await axiosPrivate.get('/dashboard/engagement/popular-content');
+    },
 }
 
 export default dashboardService;

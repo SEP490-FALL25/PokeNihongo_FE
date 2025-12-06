@@ -3,7 +3,7 @@ import { z } from "zod";
 /**
  * Dashboard Jlpt Distribution Entity Schema
  */
-const DashboardJlptDistributionEntitySchema = z.object({
+export const DashboardJlptDistributionEntitySchema = z.object({
     summary: z.object({
         N3: z.object({
             total: z.number(),
@@ -22,14 +22,13 @@ const DashboardJlptDistributionEntitySchema = z.object({
 });
 
 export type IDashboardJlptDistributionEntity = z.infer<typeof DashboardJlptDistributionEntitySchema>;
-export { DashboardJlptDistributionEntitySchema };
 //------------------End------------------//
 
 
 /**
  * Dashboard User Activation Entity Schema
  */
-const DashboardUserActivationEntitySchema = z.object({
+export const DashboardUserActivationEntitySchema = z.object({
     summary: z.object({
         total: z.number(),
     }),
@@ -52,43 +51,55 @@ const DashboardUserActivationEntitySchema = z.object({
 });
 
 export type IDashboardUserActivationEntity = z.infer<typeof DashboardUserActivationEntitySchema>;
-export { DashboardUserActivationEntitySchema };
 //------------------End------------------//
 
 
 /**
  * Dashboard User Growth Active User Entity Schema
  */
-const DashboardUserGrowthActiveUserEntitySchema = z.object({
+export const DashboardUserGrowthActiveUserEntitySchema = z.object({
     activeUsers: z.number(),
     period: z.string(),
 });
 
 export type IDashboardUserGrowthActiveUserEntity = z.infer<typeof DashboardUserGrowthActiveUserEntitySchema>;
-export { DashboardUserGrowthActiveUserEntitySchema };
 //------------------End------------------//
 
 
 /**
  * Dashboard User Growth New User Entity Schema
  */
-const DashboardUserGrowthNewUserEntitySchema = z.object({
+export const DashboardUserGrowthNewUserEntitySchema = z.object({
     count: z.number(),
     period: z.string(),
 });
 
 export type IDashboardUserGrowthNewUserEntity = z.infer<typeof DashboardUserGrowthNewUserEntitySchema>;
-export { DashboardUserGrowthNewUserEntitySchema };
 //------------------End------------------//
 
 
 /**
  * Dashboard User Growth Total User Entity Schema
  */
-const DashboardUserGrowthTotalUserEntitySchema = z.object({
+export const DashboardUserGrowthTotalUserEntitySchema = z.object({
     total: z.number(),
 });
 
 export type IDashboardUserGrowthTotalUserEntity = z.infer<typeof DashboardUserGrowthTotalUserEntitySchema>;
-export { DashboardUserGrowthTotalUserEntitySchema };
+//------------------End------------------//
+
+
+/**
+ * Dashboard Engagement Popular Content Entity Schema
+ */
+export const DashboardEngagementPopularContentEntitySchema = z.object({
+    topContent: z.array(z.object({
+        lessonId: z.number(),
+        titleKey: z.string(),
+        titleJp: z.string(),
+        titleTranslation: z.string(),
+        completedCount: z.number(),
+    })),
+});
+export type IDashboardEngagementPopularContentEntity = z.infer<typeof DashboardEngagementPopularContentEntitySchema>;
 //------------------End------------------//

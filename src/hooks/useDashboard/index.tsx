@@ -9,6 +9,7 @@ import {
     DashboardUserGrowthActiveUserEntitySchema,
     DashboardUserGrowthNewUserEntitySchema,
     DashboardUserGrowthTotalUserEntitySchema,
+    DashboardEngagementPopularContentEntitySchema,
 } from "@models/dashboard/dashboard.entity";
 
 /**
@@ -57,14 +58,7 @@ export const useGetDashboardJlptDistribution = () => {
         queryKey: ['dashboard-jlpt-distribution', currentLanguage],
         queryFn: async () => {
             const response = await dashboardService.getDashboardJlptDistribution();
-            // Try response.data?.data first, fallback to response.data
-            const dataToParse = response.data?.data ?? response.data;
-            const result = DashboardJlptDistributionEntitySchema.safeParse(dataToParse);
-            if (!result.success) {
-                console.error('JLPT Distribution validation error:', result.error);
-                throw result.error;
-            }
-            return result.data;
+            return DashboardJlptDistributionEntitySchema.parse(response.data?.data);
         },
     });
     return { data: getDashboardJlptDistributionQuery.data, isLoading: getDashboardJlptDistributionQuery.isLoading, error: getDashboardJlptDistributionQuery.error };
@@ -140,5 +134,23 @@ export const useGetDashboardUserGrowthTotalUser = () => {
         },
     });
     return { data: getDashboardUserGrowthTotalUserQuery.data, isLoading: getDashboardUserGrowthTotalUserQuery.isLoading, error: getDashboardUserGrowthTotalUserQuery.error };
+}
+//------------------End------------------//
+
+
+/**
+ * Handle Get Dashboard Engagement Popular Content
+ * @returns 
+ */
+export const useGetDashboardEngagementPopularContent = () => {
+    const currentLanguage = useSelector(selectCurrentLanguage);
+    const getDashboardEngagementPopularContentQuery = useQuery({
+        queryKey: ['dashboard-engagement-popular-content', currentLanguage],
+        queryFn: async () => {
+            const response = await dashboardService.getEngagementPopularContent();
+            return DashboardEngagementPopularContentEntitySchema.parse(response.data?.data);
+        },
+    });
+    return { data: getDashboardEngagementPopularContentQuery.data, isLoading: getDashboardEngagementPopularContentQuery.isLoading, error: getDashboardEngagementPopularContentQuery.error };
 }
 //------------------End------------------//
