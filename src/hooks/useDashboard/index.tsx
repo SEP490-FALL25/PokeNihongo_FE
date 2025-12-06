@@ -201,13 +201,14 @@ export const useGetDashboardEngagementBattleActivity = () => {
  */
 export const useGetDashboardEngagementStarterPokemonDistribution = () => {
     const currentLanguage = useSelector(selectCurrentLanguage);
-    return useQuery({
+    const getDashboardEngagementStarterPokemonDistributionQuery = useQuery({
         queryKey: ['dashboard-engagement-starter-pokemon-distribution', currentLanguage],
         queryFn: async () => {
             const response = await dashboardService.getEngagementStarterPokemonDistribution();
             return DashboardEngagementStarterPokemonDistributionEntitySchema.parse(response.data?.data);
         },
     });
+    return { data: getDashboardEngagementStarterPokemonDistributionQuery.data, isLoading: getDashboardEngagementStarterPokemonDistributionQuery.isLoading, error: getDashboardEngagementStarterPokemonDistributionQuery.error };
 }
 //------------------End------------------//
 
@@ -218,13 +219,14 @@ export const useGetDashboardEngagementStarterPokemonDistribution = () => {
  */
 export const useGetDashboardEngagementStreakRelention = () => {
     const currentLanguage = useSelector(selectCurrentLanguage);
-    return useQuery({
+    const getDashboardEngagementStreakRelentionQuery = useQuery({
         queryKey: ['dashboard-engagement-streak-relention', currentLanguage],
         queryFn: async () => {
             const response = await dashboardService.getEngagementStreakRelention();
             return DashboardEngagementStreakRelentionEntitySchema.parse(response.data?.data);
         },
     });
+    return { data: getDashboardEngagementStreakRelentionQuery.data, isLoading: getDashboardEngagementStreakRelentionQuery.isLoading, error: getDashboardEngagementStreakRelentionQuery.error };
 }
 //------------------End------------------//
 
@@ -235,12 +237,13 @@ export const useGetDashboardEngagementStreakRelention = () => {
  */
 export const useGetDashboardContentPerformanceCompleteRate = () => {
     const currentLanguage = useSelector(selectCurrentLanguage);
-    return useQuery({
+    const getDashboardContentPerformanceCompleteRateQuery = useQuery({
         queryKey: ['dashboard-content-performance-complete-rate', currentLanguage],
         queryFn: async () => {
             const response = await dashboardService.getContentPerformanceCompleteRate();
             return DashboardContentPerformanceCompleteRateEntitySchema.parse(response.data?.data);
         },
     });
-}   
+    return { data: getDashboardContentPerformanceCompleteRateQuery.data, isLoading: getDashboardContentPerformanceCompleteRateQuery.isLoading, error: getDashboardContentPerformanceCompleteRateQuery.error };
+}
 //------------------End------------------//

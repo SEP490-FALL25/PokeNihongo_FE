@@ -1,12 +1,16 @@
 import HeaderAdmin from "@organisms/Header/Admin"
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card"
-import { Users, BookOpen, Languages, TrendingUp, Sparkles, CheckCircle2, Clock, ArrowUpRight, AlertCircle, UserCheck, UserX, Loader2 } from "lucide-react"
+import { Users, Languages, TrendingUp, Sparkles, Clock, ArrowUpRight, AlertCircle, UserCheck, UserX, Loader2, Trophy, BookOpen } from "lucide-react"
 import {
     useGetDashboardJlptDistribution,
     useGetDashboardUserActivation,
     useGetDashboardUserGrowthActiveUser,
     useGetDashboardUserGrowthNewUser,
     useGetDashboardUserGrowthTotalUser,
+    useGetDashboardEngagementSparklesAccumulation,
+    useGetDashboardEngagementStarterPokemonDistribution,
+    useGetDashboardEngagementStreakRelention,
+    useGetDashboardEngagementPopularContent,
 } from "@hooks/useDashboard"
 import { useState } from "react"
 import {
@@ -29,12 +33,15 @@ const AdminDashboard = () => {
     // Fetch data
     const { data: totalUserData, isLoading: isLoadingTotalUser } = useGetDashboardUserGrowthTotalUser()
     const { data: jlptDistributionData, isLoading: isLoadingJlpt } = useGetDashboardJlptDistribution()
-
     const { data: userActivationData, isLoading: isLoadingActivation } = useGetDashboardUserActivation()
     const { data: activeUserData, isLoading: isLoadingActiveUser } = useGetDashboardUserGrowthActiveUser(period)
     const { data: newUserData, isLoading: isLoadingNewUser } = useGetDashboardUserGrowthNewUser(period)
+    const { data: sparklesData, isLoading: isLoadingSparkles } = useGetDashboardEngagementSparklesAccumulation()
+    const { data: starterPokemonData, isLoading: isLoadingStarterPokemon } = useGetDashboardEngagementStarterPokemonDistribution()
+    const { data: streakData, isLoading: isLoadingStreak } = useGetDashboardEngagementStreakRelention()
+    const { data: popularContentData, isLoading: isLoadingPopularContent } = useGetDashboardEngagementPopularContent()
 
-    // Prepare JLPT Distribution chart data
+    // Prepare chart data
     const jlptChartData = jlptDistributionData
         ? [
             { name: "N5", value: jlptDistributionData.summary.N5.total },
@@ -43,7 +50,24 @@ const AdminDashboard = () => {
         ]
         : []
 
+    const sparklesChartData = sparklesData
+        ? [
+            { name: "0-100", value: sparklesData.distribution["0-100"].count },
+            { name: "101-500", value: sparklesData.distribution["101-500"].count },
+            { name: "501-1000", value: sparklesData.distribution["501-1000"].count },
+            { name: "1001-5000", value: sparklesData.distribution["1001-5000"].count },
+            { name: "5000+", value: sparklesData.distribution["5000+"].count },
+        ]
+        : []
+
+    const starterPokemonChartData = starterPokemonData?.starters || []
+
     const COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))"]
+
+    // Helper function to format percent
+    const formatPercent = (percent: number) => {
+        return percent > 1 ? percent.toFixed(1) : (percent * 100).toFixed(1)
+    }
 
     const stats = [
         {
@@ -361,7 +385,7 @@ const AdminDashboard = () => {
                                     <div className="flex-1">
                                         <p className="text-sm font-semibold text-foreground">Chờ làm bài test</p>
                                         <p className="text-xs text-muted-foreground mt-1">
-                                            {userActivationData.pending_test.count.toLocaleString()} người dùng ({(userActivationData.pending_test.percent * 100).toFixed(1)}%)
+                                            {userActivationData.pending_test.count.toLocaleString()} người dùng ({formatPercent(userActivationData.pending_test.percent)}%)
                                         </p>
                                     </div>
                                     <div className="text-2xl font-bold text-orange-500">{userActivationData.pending_test.count.toLocaleString()}</div>
@@ -374,7 +398,7 @@ const AdminDashboard = () => {
                                     <div className="flex-1">
                                         <p className="text-sm font-semibold text-foreground">Cần test lại</p>
                                         <p className="text-xs text-muted-foreground mt-1">
-                                            {userActivationData.test_again.count.toLocaleString()} người dùng ({(userActivationData.test_again.percent * 100).toFixed(1)}%)
+                                            {userActivationData.test_again.count.toLocaleString()} người dùng ({formatPercent(userActivationData.test_again.percent)}%)
                                         </p>
                                     </div>
                                     <div className="text-2xl font-bold text-yellow-500">{userActivationData.test_again.count.toLocaleString()}</div>
@@ -387,7 +411,7 @@ const AdminDashboard = () => {
                                     <div className="flex-1">
                                         <p className="text-sm font-semibold text-foreground">Chờ chọn cấp độ JLPT</p>
                                         <p className="text-xs text-muted-foreground mt-1">
-                                            {userActivationData.pending_choose_level_jlpt.count.toLocaleString()} người dùng ({(userActivationData.pending_choose_level_jlpt.percent * 100).toFixed(1)}%)
+                                            {userActivationData.pending_choose_level_jlpt.count.toLocaleString()} người dùng ({formatPercent(userActivationData.pending_choose_level_jlpt.percent)}%)
                                         </p>
                                     </div>
                                     <div className="text-2xl font-bold text-blue-500">{userActivationData.pending_choose_level_jlpt.count.toLocaleString()}</div>
@@ -400,7 +424,7 @@ const AdminDashboard = () => {
                                     <div className="flex-1">
                                         <p className="text-sm font-semibold text-foreground">Chờ chọn Pokemon</p>
                                         <p className="text-xs text-muted-foreground mt-1">
-                                            {userActivationData.pending_choose_pokemon.count.toLocaleString()} người dùng ({(userActivationData.pending_choose_pokemon.percent * 100).toFixed(1)}%)
+                                            {userActivationData.pending_choose_pokemon.count.toLocaleString()} người dùng ({formatPercent(userActivationData.pending_choose_pokemon.percent)}%)
                                         </p>
                                     </div>
                                     <div className="text-2xl font-bold text-purple-500">{userActivationData.pending_choose_pokemon.count.toLocaleString()}</div>
@@ -409,6 +433,212 @@ const AdminDashboard = () => {
                         </CardContent>
                     </Card>
                 )}
+
+                {/* Engagement Section */}
+                <div className="space-y-6">
+                    <h2 className="text-2xl font-bold text-foreground">Tương tác & Tham gia</h2>
+
+                    <div className="grid gap-6 md:grid-cols-2">
+                        {/* Sparkles Accumulation */}
+                        {sparklesData && (
+                            <Card className="bg-gradient-to-br from-card via-card to-card/95 border-border shadow-md">
+                                <CardHeader className="pb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-primary/10 rounded-lg">
+                                            <Sparkles className="w-5 h-5 text-primary" />
+                                        </div>
+                                        <CardTitle className="text-xl font-bold text-foreground">Phân bố Sparkles</CardTitle>
+                                    </div>
+                                    {sparklesData && (
+                                        <div className="mt-2 space-y-1">
+                                            <p className="text-sm text-muted-foreground">
+                                                Tổng: {sparklesData.totalUsers.toLocaleString()} người dùng
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">
+                                                Trung bình: {sparklesData.averageSparkles.toLocaleString()} sparkles
+                                            </p>
+                                        </div>
+                                    )}
+                                </CardHeader>
+                                <CardContent>
+                                    {isLoadingSparkles ? (
+                                        <div className="h-[300px] flex items-center justify-center">
+                                            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                                        </div>
+                                    ) : sparklesChartData.length > 0 ? (
+                                        <ResponsiveContainer width="100%" height={300}>
+                                            <BarChart data={sparklesChartData}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                                <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
+                                                <YAxis stroke="hsl(var(--muted-foreground))" />
+                                                <Tooltip
+                                                    contentStyle={{
+                                                        backgroundColor: "hsl(var(--card))",
+                                                        border: "1px solid hsl(var(--border))",
+                                                        borderRadius: "8px",
+                                                    }}
+                                                />
+                                                <Bar dataKey="value" fill="hsl(var(--chart-2))" />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    ) : (
+                                        <div className="h-[300px] flex items-center justify-center text-muted-foreground bg-muted/20 rounded-lg border border-border/50">
+                                            <div className="text-center">
+                                                <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                                                <p>Không có dữ liệu</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        )}
+
+                        {/* Starter Pokemon Distribution */}
+                        {starterPokemonData && (
+                            <Card className="bg-gradient-to-br from-card via-card to-card/95 border-border shadow-md">
+                                <CardHeader className="pb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-primary/10 rounded-lg">
+                                            <Trophy className="w-5 h-5 text-primary" />
+                                        </div>
+                                        <CardTitle className="text-xl font-bold text-foreground">Phân bố Starter Pokemon</CardTitle>
+                                    </div>
+                                    {starterPokemonData && (
+                                        <p className="text-sm text-muted-foreground mt-2">
+                                            Tổng: {starterPokemonData.totalCount.toLocaleString()} người dùng
+                                        </p>
+                                    )}
+                                </CardHeader>
+                                <CardContent>
+                                    {isLoadingStarterPokemon ? (
+                                        <div className="h-[300px] flex items-center justify-center">
+                                            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                                        </div>
+                                    ) : starterPokemonChartData.length > 0 ? (
+                                        <ResponsiveContainer width="100%" height={300}>
+                                            <PieChart>
+                                                <Pie
+                                                    data={starterPokemonChartData}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    labelLine={false}
+                                                    label={({ nameJp, percent }: any) => `${nameJp}: ${(percent * 100).toFixed(1)}%`}
+                                                    outerRadius={100}
+                                                    fill="#8884d8"
+                                                    dataKey="count"
+                                                >
+                                                    {starterPokemonChartData.map((_entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip
+                                                    contentStyle={{
+                                                        backgroundColor: "hsl(var(--card))",
+                                                        border: "1px solid hsl(var(--border))",
+                                                        borderRadius: "8px",
+                                                    }}
+                                                />
+                                                <Legend />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    ) : (
+                                        <div className="h-[300px] flex items-center justify-center text-muted-foreground bg-muted/20 rounded-lg border border-border/50">
+                                            <div className="text-center">
+                                                <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                                                <p>Không có dữ liệu</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        )}
+                    </div>
+
+                    {/* Streak Retention */}
+                    {streakData && (
+                        <Card className="bg-gradient-to-br from-card via-card to-card/95 border-border shadow-md">
+                            <CardHeader className="pb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-primary/10 rounded-lg">
+                                        <TrendingUp className="w-5 h-5 text-primary" />
+                                    </div>
+                                    <CardTitle className="text-xl font-bold text-foreground">Duy trì chuỗi học tập</CardTitle>
+                                </div>
+                                {streakData && (
+                                    <p className="text-sm text-muted-foreground mt-2">
+                                        Tổng: {streakData.totalUsers.toLocaleString()} người dùng
+                                    </p>
+                                )}
+                            </CardHeader>
+                            <CardContent>
+                                {isLoadingStreak ? (
+                                    <div className="h-[200px] flex items-center justify-center">
+                                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                                    </div>
+                                ) : streakData ? (
+                                    <div className="grid md:grid-cols-2 gap-4">
+                                        <div className="p-4 rounded-lg bg-muted/20 border border-border/50">
+                                            <p className="text-sm font-semibold text-foreground mb-2">Chuỗi hàng ngày</p>
+                                            <p className="text-2xl font-bold text-foreground">{streakData.daily_streak.count.toLocaleString()}</p>
+                                            <p className="text-xs text-muted-foreground mt-1">{formatPercent(streakData.daily_streak.percent)}% người dùng</p>
+                                        </div>
+                                        <div className="p-4 rounded-lg bg-muted/20 border border-border/50">
+                                            <p className="text-sm font-semibold text-foreground mb-2">Chuỗi hàng tháng</p>
+                                            <p className="text-2xl font-bold text-foreground">{streakData.monthly_streak.count.toLocaleString()}</p>
+                                            <p className="text-xs text-muted-foreground mt-1">{formatPercent(streakData.monthly_streak.percent)}% người dùng</p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="h-[200px] flex items-center justify-center text-muted-foreground bg-muted/20 rounded-lg border border-border/50">
+                                        <div className="text-center">
+                                            <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                                            <p>Không có dữ liệu</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Popular Content */}
+                    {popularContentData && popularContentData.topContent.length > 0 && (
+                        <Card className="bg-gradient-to-br from-card via-card to-card/95 border-border shadow-md">
+                            <CardHeader className="pb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-primary/10 rounded-lg">
+                                        <BookOpen className="w-5 h-5 text-primary" />
+                                    </div>
+                                    <CardTitle className="text-xl font-bold text-foreground">Nội dung phổ biến</CardTitle>
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                {isLoadingPopularContent ? (
+                                    <div className="h-[300px] flex items-center justify-center">
+                                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {popularContentData.topContent.slice(0, 5).map((content, index) => (
+                                            <div key={content.lessonId} className="flex items-center gap-4 p-3 rounded-lg bg-muted/20 border border-border/50 hover:bg-muted/30 transition-all">
+                                                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center font-bold text-primary">
+                                                    {index + 1}
+                                                </div>
+                                                <div className="flex-1">
+                                                    <p className="text-sm font-semibold text-foreground">{content.titleTranslation || content.titleJp}</p>
+                                                    <p className="text-xs text-muted-foreground mt-1">{content.titleJp}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-sm font-bold text-foreground">{content.completedCount.toLocaleString()}</p>
+                                                    <p className="text-xs text-muted-foreground">hoàn thành</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    )}
+                </div>
             </div>
         </>
     )
