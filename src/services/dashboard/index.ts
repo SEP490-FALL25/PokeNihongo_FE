@@ -37,6 +37,12 @@ const dashboardService = {
     getEngagementStarterPokemonDistribution: async () => {
         return await axiosPrivate.get('/dashboard/engagement/starter-pokemon-distribution');
     },
+    getEngagementStreakRelention: async () => {
+        return await axiosPrivate.get('/dashboard/engagement/streak-retention');
+    },
+    getContentPerformanceCompleteRate: async () => {
+        return await axiosPrivate.get('/dashboard/content-performance/completion-rate');
+    },
 }
 
 export default dashboardService;

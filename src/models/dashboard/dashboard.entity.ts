@@ -155,3 +155,40 @@ export const DashboardEngagementStarterPokemonDistributionEntitySchema = z.objec
 });
 export type IDashboardEngagementStarterPokemonDistributionEntity = z.infer<typeof DashboardEngagementStarterPokemonDistributionEntitySchema>;
 //------------------End------------------//
+
+
+/**
+ * Dashboard Engagement Streak Relention Entity Schema
+ */
+export const DashboardEngagementStreakRelentionEntitySchema = z.object({
+    daily_streak: z.object({
+        count: z.number(),
+        percent: z.coerce.number(),
+    }),
+    monthly_streak: z.object({
+        count: z.number(),
+        percent: z.coerce.number(),
+    }),
+    totalUsers: z.number(),
+});
+export type IDashboardEngagementStreakRelentionEntity = z.infer<typeof DashboardEngagementStreakRelentionEntitySchema>;
+//------------------End------------------//
+
+
+/**
+ * Dashboard Content Performance Complete Rate Entity Schema
+ */
+export const DashboardContentPerformanceCompleteRateEntitySchema = z.object({
+    lessonCompletionRates: z.array(z.object({
+        lessonId: z.number(),
+        titleKey: z.string(),
+        titleJp: z.string(),
+        titleTranslation: z.string(),
+        totalAttempts: z.number(),
+        completedCount: z.number(),
+        completionRate: z.coerce.number(),
+    })),
+});
+
+export type IDashboardContentPerformanceCompleteRateEntity = z.infer<typeof DashboardContentPerformanceCompleteRateEntitySchema>;
+//------------------End------------------//

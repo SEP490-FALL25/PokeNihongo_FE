@@ -12,6 +12,8 @@ import {
     DashboardEngagementPopularContentEntitySchema,
     DashboardEngagementSparklesAccumulationEntitySchema,
     DashboardEngagementStarterPokemonDistributionEntitySchema,
+    DashboardEngagementStreakRelentionEntitySchema,
+    DashboardContentPerformanceCompleteRateEntitySchema,
 } from "@models/dashboard/dashboard.entity";
 
 /**
@@ -181,8 +183,9 @@ export const useGetDashboardEngagementSparklesAccumulation = () => {
  * @returns 
  */
 export const useGetDashboardEngagementBattleActivity = () => {
+    const currentLanguage = useSelector(selectCurrentLanguage);
     return useQuery({
-        queryKey: ['dashboard-engagement-battle-activity'],
+        queryKey: ['dashboard-engagement-battle-activity', currentLanguage],
         queryFn: async () => {
             const response = await dashboardService.getEngagementBattleActivity();
             return response.data?.data;
@@ -197,12 +200,47 @@ export const useGetDashboardEngagementBattleActivity = () => {
  * @returns 
  */
 export const useGetDashboardEngagementStarterPokemonDistribution = () => {
+    const currentLanguage = useSelector(selectCurrentLanguage);
     return useQuery({
-        queryKey: ['dashboard-engagement-starter-pokemon-distribution'],
+        queryKey: ['dashboard-engagement-starter-pokemon-distribution', currentLanguage],
         queryFn: async () => {
             const response = await dashboardService.getEngagementStarterPokemonDistribution();
             return DashboardEngagementStarterPokemonDistributionEntitySchema.parse(response.data?.data);
         },
     });
 }
+//------------------End------------------//
+
+
+/**
+ * Handle Get Dashboard Engagement Streak Relention
+ * @returns 
+ */
+export const useGetDashboardEngagementStreakRelention = () => {
+    const currentLanguage = useSelector(selectCurrentLanguage);
+    return useQuery({
+        queryKey: ['dashboard-engagement-streak-relention', currentLanguage],
+        queryFn: async () => {
+            const response = await dashboardService.getEngagementStreakRelention();
+            return DashboardEngagementStreakRelentionEntitySchema.parse(response.data?.data);
+        },
+    });
+}
+//------------------End------------------//
+
+
+/**
+ * Handle Get Dashboard Content Performance Complete Rate
+ * @returns 
+ */
+export const useGetDashboardContentPerformanceCompleteRate = () => {
+    const currentLanguage = useSelector(selectCurrentLanguage);
+    return useQuery({
+        queryKey: ['dashboard-content-performance-complete-rate', currentLanguage],
+        queryFn: async () => {
+            const response = await dashboardService.getContentPerformanceCompleteRate();
+            return DashboardContentPerformanceCompleteRateEntitySchema.parse(response.data?.data);
+        },
+    });
+}   
 //------------------End------------------//
