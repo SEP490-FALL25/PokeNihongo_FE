@@ -58,7 +58,13 @@ const PrivateRoute = ({ allowedRoles }: PrivateRouteProps) => {
     }
 
     if (!hasAccess) {
-        return <Navigate to={ROUTES.AUTH.UNAUTHORIZED} replace />;
+        const fallbackRoute =
+            userRole === ROLE.ADMIN
+                ? ROUTES.ADMIN.ROOT
+                : userRole === ROLE.MANAGER
+                    ? ROUTES.MANAGER.ROOT
+                    : ROUTES.AUTH.UNAUTHORIZED;
+        return <Navigate to={fallbackRoute} replace />;
     }
 
     return <Outlet />;
