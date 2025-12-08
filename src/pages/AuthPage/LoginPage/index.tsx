@@ -9,10 +9,13 @@ import { CookiesService } from '@utils/cookies';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@constants/route';
 import { decodeJWT } from '@utils/token';
-import { COOKIES, ROLE_ID } from '@constants/common';
+import { COOKIES, ROLE_ID, ROLE } from '@constants/common';
+import { useDispatch } from 'react-redux';
+import { setAuthState } from '@redux/features/auth/slice';
 
 const LoginPage = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     /**
      * Handle form
@@ -29,6 +32,17 @@ const LoginPage = () => {
         },
     });
 
+    const mapRoleIdToRole = (roleId?: number | null) => {
+        switch (roleId) {
+            case ROLE_ID.ADMIN:
+                return ROLE.ADMIN;
+            case ROLE_ID.MANAGER:
+                return ROLE.MANAGER;
+            default:
+                return null;
+        }
+    };
+
     const onSubmit = async (data: ILoginFormDataRequest) => {
         try {
             setIsLoading(true);
@@ -36,19 +50,24 @@ const LoginPage = () => {
             CookiesService.set(COOKIES.ACCESS_TOKEN, res.data.data.accessToken);
             const decodeToken = decodeJWT();
             console.log('decodeToken', decodeToken);
-            switch (decodeToken?.roleId) {
-                case ROLE_ID.ADMIN:
-                    toast.success('Đăng nhập thành công');
-                    navigate(ROUTES.ADMIN.ROOT);
-                    break;
-                case ROLE_ID.MANAGER:
-                    toast.success('Đăng nhập thành công');
-                    navigate(ROUTES.MANAGER.ROOT);
-                    break;
-                default:
-                    toast.error('Đăng nhập thất bại');
-                    break;
+            const mappedRole = mapRoleIdToRole((decodeToken as any)?.roleId);
+            const decodedUserId = (decodeToken as any)?.userId ?? ((decodeToken as any)?.sub ? Number((decodeToken as any)?.sub) : null);
+
+            dispatch(
+                setAuthState({
+                    username: (decodeToken as any)?.username ?? null,
+                    userId: decodedUserId ?? null,
+                    userRole: mappedRole,
+                }),
+            );
+
+            if (!mappedRole) {
+                toast.error('Đăng nhập thất bại');
+                return;
             }
+
+            toast.success('Đăng nhập thành công');
+            navigate(mappedRole === ROLE.ADMIN ? ROUTES.ADMIN.ROOT : ROUTES.MANAGER.ROOT);
         } catch (error) {
             console.log(error);
             toast.error('Đăng nhập thất bại');
