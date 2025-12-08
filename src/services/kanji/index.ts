@@ -31,6 +31,10 @@ const kanjiService = {
         return axiosPrivate.post('/kanji/with-meanings', data);
     },
 
+    updateKanjiWithMeaning: async (identifier: string | number, data: Partial<IKanjiWithMeaningRequest>) => {
+        return axiosPrivate.put(`/kanji/${identifier}/with-meanings`, data);
+    },
+
     deleteKanji: async (id: number) => {
         return axiosPrivate.delete(`/kanji/${id}`);
     },
