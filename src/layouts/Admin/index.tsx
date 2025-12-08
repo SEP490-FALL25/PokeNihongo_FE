@@ -1,5 +1,5 @@
 import { Outlet, useLocation, NavLink, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Users, BarChart3, LogOut, Menu, Trophy, Package, Brain, Calendar, Gift, LucideIcon, Store, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, Users, LogOut, Menu, Trophy, Package, Brain, Gift, LucideIcon, Store, ShieldCheck } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "@ui/Button";
 import { cn } from "@utils/CN";
@@ -14,6 +14,7 @@ import { CookiesService } from "@utils/cookies";
 import { COOKIES, ROLE_ID } from "@constants/common";
 import { decodeJWT } from "@utils/token";
 import NotFoundPage from "@pages/NotFoundPage";
+import { JwtPayload } from "jwt-decode";
 
 interface NavigationItem {
   name: string;
@@ -73,16 +74,6 @@ const AdminLayout = () => {
       ],
     },
     {
-      name: t("navigation.analytics"),
-      href: ROUTES.ADMIN.ANALYTICS,
-      icon: BarChart3,
-    },
-    {
-      name: t("navigation.dailyQuests"),
-      href: ROUTES.ADMIN.DAILY_QUEST_MANAGEMENT,
-      icon: Calendar,
-    },
-    {
       name: t("navigation.rewards"),
       href: ROUTES.ADMIN.REWARD_MANAGEMENT,
       icon: Gift,
@@ -117,7 +108,10 @@ const AdminLayout = () => {
   /**
    * Handle check role
    */
-  const isAdmin = useMemo(() => decodeJWT()?.roleId === ROLE_ID.ADMIN, []);
+  const isAdmin = useMemo(() => {
+    const token = decodeJWT() as JwtPayload & { roleId?: number };
+    return token?.roleId === ROLE_ID.ADMIN;
+  }, []);
   if (!isAdmin) {
     CookiesService.remove(COOKIES.ACCESS_TOKEN);
     return <NotFoundPage />;
