@@ -19,6 +19,7 @@ import { toast } from "react-toastify";
 import TabListLevelJLBT from "@organisms/TabListLevelJLBT";
 import DeleteConfirmKanji from "./components/DeleteConfirmKanji";
 import { useTranslation } from "react-i18next";
+import UpdateKanjiDialog from "./components/UpdateKanjiDialog";
 
 interface KanjiVocabulary {
     isAddKanjiDialogOpen: boolean;
@@ -39,6 +40,7 @@ const KanjiVocabulary = ({ isAddKanjiDialogOpen, setIsAddKanjiDialogOpen }: Kanj
     const [searchQuery, setSearchQuery] = useState<string>("");
     const debouncedSearchQuery = useDebounce(searchQuery, 500);
     const [kanjiIdToDelete, setKanjiIdToDelete] = useState<number | null>(null);
+    const [kanjiToEdit, setKanjiToEdit] = useState<KanjiManagement | null>(null);
     //--------------------End--------------------//
 
     /**
@@ -371,7 +373,13 @@ const KanjiVocabulary = ({ isAddKanjiDialogOpen, setIsAddKanjiDialogOpen }: Kanj
                                             <TableCell className="w-40">{k.onyomi}</TableCell>
                                             <TableCell className="w-40">{k.kunyomi}</TableCell>
                                             <TableCell className="text-right w-28">
-                                                <Button variant="ghost" size="icon"><Edit className="w-4 h-4" /></Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => setKanjiToEdit(k)}
+                                                >
+                                                    <Edit className="w-4 h-4" />
+                                                </Button>
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
@@ -418,6 +426,10 @@ const KanjiVocabulary = ({ isAddKanjiDialogOpen, setIsAddKanjiDialogOpen }: Kanj
             <DeleteConfirmKanji
                 kanjiIdToDelete={kanjiIdToDelete}
                 setKanjiIdToDelete={setKanjiIdToDelete}
+            />
+            <UpdateKanjiDialog
+                kanjiToEdit={kanjiToEdit}
+                onClose={() => setKanjiToEdit(null)}
             />
         </Card>
     )

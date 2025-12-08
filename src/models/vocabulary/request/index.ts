@@ -1,4 +1,4 @@
-import { TranslationsSchema } from "@models/translation/request";
+import { TranslationsSchema, TranslationsType } from "@models/translation/request";
 import { z } from "zod";
 
 export const CreateVocabularyFullMultipartSchema = z.object({
@@ -16,3 +16,12 @@ export const CreateVocabularyFullMultipartSchema = z.object({
 })
 
 export type ICreateVocabularyFullMultipartType = z.infer<typeof CreateVocabularyFullMultipartSchema>
+
+export interface IUpdateVocabularyPayload {
+    reading?: string;
+    level_n?: number | string;
+    word_type_id?: number | string;
+    translations?: string | TranslationsType;
+    imageUrl?: File | null;
+    audioUrl?: File | null;
+}

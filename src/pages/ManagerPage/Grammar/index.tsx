@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Input } from "@ui/Input";
 import { Card, CardContent, CardFooter, CardHeader } from "@ui/Card";
@@ -9,8 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import PaginationControls from "@ui/PaginationControls";
 import { Alert, AlertDescription, AlertTitle } from "@ui/Alert";
 import { Skeleton } from "@ui/Skeleton";
-import { BookOpenCheck, Plus, RefreshCcw } from "lucide-react";
-import { useGrammarList } from "@hooks/useGrammar";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@ui/Dialog";
+import { BookOpenCheck, Pencil, Plus, RefreshCcw, Trash2 } from "lucide-react";
+import { useGrammarList, useUpdateGrammar, useDeleteGrammar } from "@hooks/useGrammar";
 import { useDebounce } from "@hooks/useDebounce";
 import { formatDateTime } from "@utils/date";
 import HeaderAdmin from "@organisms/Header/Admin";
@@ -64,6 +65,11 @@ const LEVEL_BADGE_STYLES: Record<string, string> = {
 
 type SortColumn = "level" | "createdAt" | "updatedAt";
 
+type EditGrammarForm = {
+    structure: string;
+    level: GrammarLevelValue;
+};
+
 const GrammarManagementPage = () => {
     const { t } = useTranslation();
     const [searchValue, setSearchValue] = useState<string>("");
@@ -74,6 +80,9 @@ const GrammarManagementPage = () => {
     const [selectedLevel, setSelectedLevel] = useState<GrammarLevelValue>("all");
     const [sortBy, setSortBy] = useState<SortColumn>("createdAt");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+    const [editingGrammar, setEditingGrammar] = useState<GrammarItem | null>(null);
+    const [editForm, setEditForm] = useState<EditGrammarForm>({ structure: "", level: "N5" });
+    const [grammarToDelete, setGrammarToDelete] = useState<GrammarItem | null>(null);
 
     const { data, isLoading, isFetching, error, refetch } = useGrammarList({
         page,
@@ -83,6 +92,8 @@ const GrammarManagementPage = () => {
         sortBy,
         sort: sortDirection,
     });
+    const updateGrammar = useUpdateGrammar();
+    const deleteGrammar = useDeleteGrammar();
 
     const grammarResponse = (data ?? {}) as GrammarListResponse;
     const grammars = grammarResponse.results ?? [];
@@ -121,6 +132,57 @@ const GrammarManagementPage = () => {
         void refetch?.();
     };
 
+    const openEditDialog = (grammar: GrammarItem) => {
+        setEditingGrammar(grammar);
+        setEditForm({
+            structure: grammar.structure || grammar.title || "",
+            level: getLevelValue(grammar),
+        });
+    };
+
+    const closeEditDialog = () => {
+        if (updateGrammar.isPending) return;
+        setEditingGrammar(null);
+    };
+
+    const handleUpdateSubmit = async (event: FormEvent) => {
+        event.preventDefault();
+        if (!editingGrammar) return;
+        const trimmedStructure = editForm.structure.trim();
+        if (!trimmedStructure) return;
+        try {
+            await updateGrammar.mutateAsync({
+                id: editingGrammar.id,
+                data: {
+                    structure: trimmedStructure,
+                    level: editForm.level,
+                },
+            });
+            closeEditDialog();
+        } catch {
+            // toast handled in hook
+        }
+    };
+
+    const openDeleteDialog = (grammar: GrammarItem) => {
+        setGrammarToDelete(grammar);
+    };
+
+    const closeDeleteDialog = () => {
+        if (deleteGrammar.isPending) return;
+        setGrammarToDelete(null);
+    };
+
+    const handleDelete = async () => {
+        if (!grammarToDelete) return;
+        try {
+            await deleteGrammar.mutateAsync(grammarToDelete.id);
+            closeDeleteDialog();
+        } catch {
+            // toast handled in hook
+        }
+    };
+
     const getLevelLabel = (grammar: GrammarItem) => {
         if (typeof grammar.level === "string" && grammar.level.trim() !== "") {
             return grammar.level.toUpperCase();
@@ -132,6 +194,14 @@ const GrammarManagementPage = () => {
             return `N${grammar.levelN}`;
         }
         return t("managerGrammar.allLevels");
+    };
+
+    const getLevelValue = (grammar: GrammarItem): GrammarLevelValue => {
+        const normalized = getLevelLabel(grammar).toUpperCase();
+        if (["N5", "N4", "N3", "N2", "N1"].includes(normalized)) {
+            return normalized as GrammarLevelValue;
+        }
+        return "N5";
     };
 
     const getLevelClassName = (label: string) =>
@@ -270,6 +340,9 @@ const GrammarManagementPage = () => {
                                             currentSort={sortDirection}
                                             onSort={(key) => handleSort(key as SortColumn)}
                                         />
+                                    <TableHead className="text-right w-36">
+                                        {t("managerGrammar.columns.actions", { defaultValue: "Thao tác" })}
+                                    </TableHead>
                                     </TableRow>
                                 </TableHeader>
 
@@ -294,6 +367,26 @@ const GrammarManagementPage = () => {
                                                     </TableCell>
                                                     <TableCell>{formatDateTime(grammar.createdAt)}</TableCell>
                                                     <TableCell>{formatDateTime(grammar.updatedAt)}</TableCell>
+                                                <TableCell className="text-right space-x-2">
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="h-8 w-8"
+                                                        onClick={() => openEditDialog(grammar)}
+                                                    >
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 text-destructive"
+                                                        onClick={() => openDeleteDialog(grammar)}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </TableCell>
                                                 </TableRow>
                                             );
                                         })}
@@ -327,6 +420,110 @@ const GrammarManagementPage = () => {
                     </CardFooter>
                 </Card>
             </div>
+            <Dialog open={Boolean(editingGrammar)} onOpenChange={(open) => (!open ? closeEditDialog() : null)}>
+                <DialogContent className="max-w-lg bg-white">
+                    <DialogHeader>
+                        <DialogTitle>{t("managerGrammar.editTitle", { defaultValue: "Chỉnh sửa ngữ pháp" })}</DialogTitle>
+                        <DialogDescription>
+                            {t("managerGrammar.editSubtitle", { defaultValue: "Cập nhật cấu trúc và cấp độ" })}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form className="space-y-4" onSubmit={handleUpdateSubmit}>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-foreground">
+                                {t("managerGrammar.columns.structure")}
+                            </label>
+                            <Input
+                                value={editForm.structure}
+                                onChange={(event) => setEditForm((prev) => ({ ...prev, structure: event.target.value }))}
+                                placeholder={t("managerGrammar.structurePlaceholder", { defaultValue: "Ví dụ: ~です" })}
+                                autoFocus
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-foreground">
+                                {t("managerGrammar.columns.level")}
+                            </label>
+                            <Select
+                                value={editForm.level}
+                                onValueChange={(value) => setEditForm((prev) => ({ ...prev, level: value as GrammarLevelValue }))}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder={t("managerGrammar.levelLabel")} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {levelOptions
+                                        .filter((option) => option !== "all")
+                                        .map((option) => (
+                                            <SelectItem key={option} value={option}>
+                                                {option}
+                                            </SelectItem>
+                                        ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {updateGrammar.isError ? (
+                            <Alert variant="destructive">
+                                <AlertTitle>{t("common.error")}</AlertTitle>
+                                <AlertDescription>
+                                    {(updateGrammar.error as ApiError | undefined)?.response?.data?.message ||
+                                        (updateGrammar.error as ApiError | undefined)?.message ||
+                                        t("updateGrammar.error.general", { defaultValue: "Có lỗi xảy ra khi cập nhật" })}
+                                </AlertDescription>
+                            </Alert>
+                        ) : null}
+
+                        <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+                            <Button type="button" variant="ghost" onClick={closeEditDialog} disabled={updateGrammar.isPending}>
+                                {t("common.cancel")}
+                            </Button>
+                            <Button type="submit" disabled={updateGrammar.isPending || !editForm.structure.trim()}>
+                                {t("managerGrammar.saveButton", { defaultValue: "Lưu thay đổi" })}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={Boolean(grammarToDelete)} onOpenChange={(open) => (!open ? closeDeleteDialog() : null)}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="text-destructive">
+                            {t("managerGrammar.deleteTitle", { defaultValue: "Xóa ngữ pháp" })}
+                        </DialogTitle>
+                        <DialogDescription>
+                            {t("managerGrammar.deleteSubtitle", { defaultValue: "Thao tác này không thể hoàn tác" })}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">
+                            {t("managerGrammar.deleteConfirm", {
+                                defaultValue: "Bạn có chắc muốn xóa ngữ pháp",
+                            })}{" "}
+                            <span className="font-semibold text-foreground">
+                                {grammarToDelete?.structure || grammarToDelete?.title || "—"}
+                            </span>
+                            ?
+                        </p>
+                    </div>
+                    <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+                        <Button type="button" variant="ghost" onClick={closeDeleteDialog} disabled={deleteGrammar.isPending}>
+                            {t("common.cancel")}
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={handleDelete}
+                            disabled={deleteGrammar.isPending}
+                        >
+                            {t("managerGrammar.deleteButton", { defaultValue: "Xóa" })}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
             <CreateGrammarDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} />
         </>
     );

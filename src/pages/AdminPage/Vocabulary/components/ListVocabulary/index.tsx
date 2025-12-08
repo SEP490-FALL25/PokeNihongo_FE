@@ -17,6 +17,7 @@ import { Skeleton } from "@ui/Skeleton";
 import TabListLevelJLBT from "@organisms/TabListLevelJLBT";
 import DeleteConfirmVocabulary from "./components/DeleteConfirmVocabulary";
 import { useTranslation } from "react-i18next";
+import UpdateVocabularyDialog from "./components/UpdateVocabularyDialog";
 
 interface Vocabulary {
     isAddVocabularyDialogOpen: boolean;
@@ -37,6 +38,7 @@ const ListVocabulary = ({ isAddVocabularyDialogOpen, setIsAddVocabularyDialogOpe
     const [sortBy, setSortBy] = useState<string | undefined>("createdAt");
     const [sort, setSort] = useState<"asc" | "desc" | undefined>("desc");
     const [vocabularyIdToDelete, setVocabularyIdToDelete] = useState<number | null>(null);
+    const [vocabularyToEdit, setVocabularyToEdit] = useState<MODELS.VocabularyForUpdate | null>(null);
     const { data: vocabularies, isLoading } = useVocabularyList({
         page: page,
         limit: itemsPerPage,
@@ -274,7 +276,7 @@ const ListVocabulary = ({ isAddVocabularyDialogOpen, setIsAddVocabularyDialogOpe
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-right w-28">
-                                                <Button variant="ghost" size="icon">
+                                                <Button variant="ghost" size="icon" onClick={() => setVocabularyToEdit(vocab)}>
                                                     <Edit className="h-4 w-4" />
                                                 </Button>
                                                 <Button
@@ -310,6 +312,10 @@ const ListVocabulary = ({ isAddVocabularyDialogOpen, setIsAddVocabularyDialogOpe
             <DeleteConfirmVocabulary
                 vocabularyIdToDelete={vocabularyIdToDelete}
                 setVocabularyIdToDelete={setVocabularyIdToDelete}
+            />
+            <UpdateVocabularyDialog
+                vocabulary={vocabularyToEdit}
+                onClose={() => setVocabularyToEdit(null)}
             />
         </Card>
     )

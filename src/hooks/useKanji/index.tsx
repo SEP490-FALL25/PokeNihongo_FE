@@ -52,6 +52,29 @@ export const useCreateKanjiWithMeaning = () => {
 };
 
 /**
+ * Handle Update Kanji with meanings
+ * @returns useMutation to update kanji
+ */
+export const useUpdateKanjiWithMeaning = () => {
+    const queryClient = useQueryClient();
+    const { t } = useTranslation();
+
+    return useMutation({
+        mutationFn: ({ identifier, data }: { identifier: string | number; data: Partial<IKanjiWithMeaningRequest> }) =>
+            kanjiService.updateKanjiWithMeaning(identifier, data),
+        onSuccess: (response: any) => {
+            queryClient.invalidateQueries({ queryKey: ['kanji-list'] });
+            queryClient.invalidateQueries({ queryKey: ['kanji-list-management'] });
+            toast.success(response?.data?.message || t('vocabulary.kanji.updateSuccess'));
+        },
+        onError: (error: any) => {
+            toast.error(error?.response?.data?.message || t('vocabulary.kanji.updateError'));
+        },
+    });
+};
+//-------------------------------End-------------------------------//
+
+/**
  * Handle Delete Kanji
  * @returns useMutation to delete kanji
  */

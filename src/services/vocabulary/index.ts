@@ -1,5 +1,5 @@
 import { axiosPrivate } from "@configs/axios";
-import { ICreateVocabularyFullMultipartType } from "@models/vocabulary/request";
+import { ICreateVocabularyFullMultipartType, IUpdateVocabularyPayload } from "@models/vocabulary/request";
 import { IQueryRequest } from "@models/common/request";
 
 const vocabularyService = {
@@ -47,8 +47,44 @@ const vocabularyService = {
     getStatistics: async () => {
         return axiosPrivate.get('/vocabulary/statistics');
     },
-    putVocabulary: async (wordJp: number, regenerateAudio: boolean, data: any) => {
-        return axiosPrivate.put(`/vocabulary/by-word/${wordJp}?regenerateAudio=${regenerateAudio}`, data);
+    putVocabulary: async (wordJp: string, payload: IUpdateVocabularyPayload, regenerateAudio: boolean = false) => {
+        const formData = new FormData();
+        formData.append("wordJp", wordJp);
+
+        if (payload.reading !== undefined) {
+            formData.append("reading", String(payload.reading));
+        }
+
+        if (payload.level_n !== undefined && payload.level_n !== null) {
+            formData.append("level_n", String(payload.level_n));
+        }
+
+        if (payload.word_type_id !== undefined && payload.word_type_id !== null) {
+            formData.append("word_type_id", String(payload.word_type_id));
+        }
+
+        if (payload.translations) {
+            const translationsValue = typeof payload.translations === "string"
+                ? payload.translations
+                : JSON.stringify(payload.translations);
+            formData.append("translations", translationsValue);
+        }
+
+        if (payload.imageUrl) {
+            formData.append("imageUrl", payload.imageUrl);
+        }
+
+        if (payload.audioUrl) {
+            formData.append("audioUrl", payload.audioUrl);
+        }
+
+        return axiosPrivate.put(
+            `/vocabulary/by-word/${encodeURIComponent(wordJp)}?regenerateAudio=${Boolean(regenerateAudio)}`,
+            formData,
+            {
+                headers: { "Content-Type": "multipart/form-data" },
+            }
+        );
     },
     deleteVocabulary: async (id: number) => {
         return axiosPrivate.delete(`/vocabulary/${id}`);
