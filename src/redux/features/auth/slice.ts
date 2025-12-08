@@ -6,15 +6,24 @@ const editorSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        username: (state, action) => {
-            state.username = action.payload;
+        setAuthState: (state, action) => {
+            const { username, userId, userRole } = action.payload;
+            state.username = username ?? state.username;
+            state.userId = userId ?? state.userId;
+            state.userRole = userRole ?? state.userRole;
+        },
+        resetAuthState: (state) => {
+            state.username = null;
+            state.userId = null;
+            state.userRole = null;
         },
     },
 });
 
 
 export const {
-    username
+    setAuthState,
+    resetAuthState,
 } = editorSlice.actions;
 export default editorSlice.reducer;
 

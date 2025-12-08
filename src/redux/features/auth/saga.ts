@@ -1,5 +1,5 @@
 import { takeLatest } from "redux-saga/effects";
-import { username } from "./slice";
+import { setAuthState } from "./slice";
 
 /**
  * Login saga
@@ -11,5 +11,5 @@ function* login(action: any): Generator<any, void, any> {
 //---------------End------------------//
 
 export function* watchEditorAuthSaga() {
-    yield takeLatest(username.type, login);
+    yield takeLatest(setAuthState.type, login);
 }  

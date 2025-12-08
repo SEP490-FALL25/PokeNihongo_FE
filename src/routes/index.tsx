@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import { ROUTES } from "@constants/route"
-// import PrivateRoute from "../layouts/PrivateProute"
-// import { ROLE } from "@constants/common"
+import PrivateRoute from "@layouts/PrivateProute"
+import { ROLE } from "@constants/common"
 // import PersistToken from "../layouts/PersistToken"
 import LoginPage from "@pages/AuthPage/LoginPage"
 import AuthLayout from "@layouts/Auth"
@@ -53,7 +53,7 @@ const RouterComponent = () => {
             children: [
                 //Admin routes
                 {
-                    // element: <PrivateRoute allowedRoles={[ROLE.ADMIN]} />,
+                    element: <PrivateRoute allowedRoles={[ROLE.ADMIN]} />,
                     children: [
                         {
                             element: <AdminLayout />,
@@ -79,6 +79,11 @@ const RouterComponent = () => {
                                 { path: ROUTES.ADMIN.PERMISSION_MANAGEMENT, element: <PermissionManagement /> },
                             ],
                         },
+                    ],
+                },
+                {
+                    element: <PrivateRoute allowedRoles={[ROLE.MANAGER]} />,
+                    children: [
                         {
                             element: <ManagerLayout />,
                             children: [
