@@ -125,9 +125,27 @@ const UpdateVocabularyDialog = ({ vocabulary, onClose }: UpdateVocabularyDialogP
                             />
                         </div>
                         {(vocabulary?.imageUrl || vocabulary?.audioUrl) && (
-                            <div className="text-xs text-muted-foreground space-y-1">
-                                {vocabulary?.imageUrl && <p>{t("vocabulary.updateDialog.currentImage", "Ảnh hiện tại")}: {vocabulary.imageUrl}</p>}
-                                {vocabulary?.audioUrl && <p>{t("vocabulary.updateDialog.currentAudio", "Audio hiện tại")}: {vocabulary.audioUrl}</p>}
+                            <div className="space-y-2">
+                                {vocabulary?.imageUrl && (
+                                    <div className="space-y-1">
+                                        <p className="text-xs text-muted-foreground">{t("vocabulary.updateDialog.currentImage", "Ảnh hiện tại")}</p>
+                                        <div className="w-40 h-28 rounded-md border border-dashed border-gray-200 overflow-hidden bg-muted/30">
+                                            <img
+                                                src={vocabulary.imageUrl}
+                                                alt="current vocabulary"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                                {vocabulary?.audioUrl && (
+                                    <div className="space-y-1">
+                                        <p className="text-xs text-muted-foreground">{t("vocabulary.updateDialog.currentAudio", "Audio hiện tại")}</p>
+                                        <audio controls className="w-full">
+                                            <source src={vocabulary.audioUrl} />
+                                        </audio>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
