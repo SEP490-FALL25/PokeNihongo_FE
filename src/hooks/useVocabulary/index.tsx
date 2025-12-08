@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import vocabularyService from "@services/vocabulary";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
+import { IUpdateVocabularyPayload } from "@models/vocabulary/request";
 
 /**
  * hanlde Vocabulary List
@@ -51,6 +52,27 @@ export const useDeleteVocabulary = () => {
         },
         onError: (error: any) => {
             toast.error(error?.response?.data?.message || t('vocabulary.deleteError'));
+        },
+    });
+};
+//--------------------------------End--------------------------------//
+
+/**
+ * Handle Update Vocabulary
+ * @returns useMutation to update vocabulary
+ */
+export const useUpdateVocabulary = () => {
+    const queryClient = useQueryClient();
+    const { t } = useTranslation();
+    return useMutation({
+        mutationFn: ({ wordJp, regenerateAudio = false, payload }: { wordJp: string; regenerateAudio?: boolean; payload: IUpdateVocabularyPayload }) =>
+            vocabularyService.putVocabulary(wordJp, payload, regenerateAudio),
+        onSuccess: (data: any) => {
+            queryClient.invalidateQueries({ queryKey: ['vocabulary-list'] });
+            toast.success(data?.message || t('vocabulary.updateSuccess'));
+        },
+        onError: (error: any) => {
+            toast.error(error?.response?.data?.message || t('vocabulary.updateError'));
         },
     });
 };
