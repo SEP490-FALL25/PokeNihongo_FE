@@ -14,4 +14,11 @@ export const CreateGrammarRequest = z.object({
 });
 
 export type ICreateGrammarRequest = z.infer<typeof CreateGrammarRequest>;
+
+export const UpdateGrammarRequest = CreateGrammarRequest.pick({
+    structure: true,
+    level: true,
+});
+
+export type IUpdateGrammarRequest = z.infer<typeof UpdateGrammarRequest>;
 //------------------End------------------//

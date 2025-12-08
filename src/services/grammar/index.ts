@@ -1,6 +1,6 @@
 import { axiosPrivate } from "@configs/axios";
 import { IQueryRequest } from "@models/common/request";
-import { ICreateGrammarRequest } from "@models/grammar/request";
+import { ICreateGrammarRequest, IUpdateGrammarRequest } from "@models/grammar/request";
 
 const grammarService = {
   getAllGrammars: async (data: IQueryRequest & { level?: string }) => {
@@ -19,6 +19,14 @@ const grammarService = {
 
   createGrammar: async (data: ICreateGrammarRequest) => {
     return await axiosPrivate.post("/grammars", data);
+  },
+
+  updateGrammar: async (id: number, data: IUpdateGrammarRequest) => {
+    return await axiosPrivate.put(`/grammars/${id}`, data);
+  },
+
+  deleteGrammar: async (id: number) => {
+    return await axiosPrivate.delete(`/grammars/${id}`);
   },
 };
 
