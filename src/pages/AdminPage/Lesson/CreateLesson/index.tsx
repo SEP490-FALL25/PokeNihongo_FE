@@ -47,7 +47,7 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
     const isEditMode = !!lessonId;
     const createLessonMutation = useCreateLesson();
     const updateLessonMutation = useUpdateLesson();
-    
+
     // Fetch lesson data if in edit mode
     const { data: lessonData, isLoading: isLoadingLesson } = useGetLessonById(lessonId);
 
@@ -120,7 +120,7 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
             if (lessonData.titleJp) {
                 titleJp = lessonData.titleJp;
             } else if (lessonData.title && Array.isArray(lessonData.title)) {
-                const jaTitle = lessonData.title.find((item: { language?: string }) => 
+                const jaTitle = lessonData.title.find((item: { language?: string }) =>
                     item.language === 'ja' || item.language === 'lang_3' || item.language?.includes('ja')
                 );
                 if (jaTitle && jaTitle.value) {
@@ -185,10 +185,10 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
     });
 
     const rewards = rewardListData?.results || [];
-    
+
     // Store selected rewards for display
     const [selectedRewardsMap, setSelectedRewardsMap] = useState<Record<number, IRewardEntityType>>({});
-    
+
     // Sync selected rewards map when modal opens or rewards data changes
     useEffect(() => {
         const currentRewards = rewardListData?.results || [];
@@ -206,7 +206,7 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
             });
         }
     }, [isRewardModalOpen, rewardListData?.results, formData.rewardIds]);
-    
+
     // Get selected rewards for chips display
     const getSelectedRewards = (): IRewardEntityType[] => {
         if (!formData.rewardIds || formData.rewardIds.length === 0) return [];
@@ -270,11 +270,11 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
         setFormData(prev => {
             const currentRewardIds = prev.rewardIds || [];
             const isSelected = currentRewardIds.includes(rewardId);
-            
+
             const newRewardIds = isSelected
                 ? currentRewardIds.filter(id => id !== rewardId)
                 : [...currentRewardIds, rewardId];
-            
+
             // Update selected rewards map
             if (reward && !isSelected) {
                 setSelectedRewardsMap(prev => ({
@@ -288,7 +288,7 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                     return newMap;
                 });
             }
-            
+
             return {
                 ...prev,
                 rewardIds: newRewardIds
@@ -357,39 +357,26 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
     };
 
     const getRewardTypeLabel = (type: string) => {
-        switch (type) {
-            case REWARD_TYPE.LESSON: return 'LESSON';
-            case REWARD_TYPE.DAILY_REQUEST: return 'DAILY_REQUEST';
-            case REWARD_TYPE.EVENT: return 'EVENT';
-            case REWARD_TYPE.ACHIEVEMENT: return 'ACHIEVEMENT';
-            case REWARD_TYPE.LEVEL: return 'LEVEL';
-            default: return type;
-        }
+        return t(`reward.rewardType${type}`, { defaultValue: type });
     };
 
     const getRewardTargetLabel = (target: string) => {
-        switch (target) {
-            case REWARD_TARGET.EXP: return 'EXP';
-            case REWARD_TARGET.POKEMON: return 'POKEMON';
-            case REWARD_TARGET.POKE_COINS: return 'POKE_COINS';
-            case REWARD_TARGET.SPARKLES: return 'SPARKLES';
-            default: return target;
-        }
+        return t(`reward.rewardTarget${target}`, { defaultValue: target });
     };
 
     const getRewardName = (reward: IRewardEntityType) => {
         // For admin API, rewards may have nameTranslations array or nameTranslation string
-        const rewardWithTranslations = reward as IRewardEntityType & { 
-            nameTranslations?: Array<{ key: string; value: string }> 
+        const rewardWithTranslations = reward as IRewardEntityType & {
+            nameTranslations?: Array<{ key: string; value: string }>
         };
-        
+
         if (rewardWithTranslations.nameTranslations) {
-            return rewardWithTranslations.nameTranslations.find((t) => t.key === 'vi')?.value 
-                || rewardWithTranslations.nameTranslations.find((t) => t.key === 'en')?.value 
+            return rewardWithTranslations.nameTranslations.find((t) => t.key === 'vi')?.value
+                || rewardWithTranslations.nameTranslations.find((t) => t.key === 'en')?.value
                 || rewardWithTranslations.nameKey;
         }
-        
-        return reward.nameTranslation || reward.nameKey || `Reward #${reward.id}`;
+
+        return reward.nameTranslation || reward.nameKey || `${t('common.reward')} #${reward.id}`;
     };
 
     // Real-time validation on blur
@@ -508,254 +495,254 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                             <p className="text-sm text-muted-foreground">{t('createLesson.loadingLesson')}</p>
                         </div>
                     ) : (
-                    <div className="space-y-6">
-                        {/* Thông tin cơ bản */}
-                        <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
-                            <CardHeader className="pb-4">
-                                <CardTitle className="flex items-center gap-2 text-lg">
-                                    <FileText className="h-5 w-5 text-primary" />
-                                    {t('createLesson.basicInfo')}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                                {/* Tiêu đề tiếng Nhật */}
-                                <div className="space-y-2">
-                                    <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                                        <Globe className="h-4 w-4 text-primary" />
-                                        {t('createLesson.titleJp')} *
-                                    </label>
-                                    <Input
-                                        placeholder="挨拶の基本"
-                                        className="bg-background border-border text-foreground h-11 text-base"
-                                        value={formData.titleJp}
-                                        onChange={(e) => handleInputChange('titleJp', e.target.value)}
-                                        onBlur={() => handleBlur('titleJp')}
-                                    />
-                                    {errors.titleJp && <p className="text-sm text-red-500 flex items-center gap-1">
-                                        <X className="h-3 w-3" />
-                                        {errors.titleJp}
-                                    </p>}
-                                </div>
+                        <div className="space-y-6">
+                            {/* Thông tin cơ bản */}
+                            <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
+                                <CardHeader className="pb-4">
+                                    <CardTitle className="flex items-center gap-2 text-lg">
+                                        <FileText className="h-5 w-5 text-primary" />
+                                        {t('createLesson.basicInfo')}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-6">
+                                    {/* Tiêu đề tiếng Nhật */}
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                                            <Globe className="h-4 w-4 text-primary" />
+                                            {t('createLesson.titleJp')} *
+                                        </label>
+                                        <Input
+                                            placeholder="挨拶の基本"
+                                            className="bg-background border-border text-foreground h-11 text-base"
+                                            value={formData.titleJp}
+                                            onChange={(e) => handleInputChange('titleJp', e.target.value)}
+                                            onBlur={() => handleBlur('titleJp')}
+                                        />
+                                        {errors.titleJp && <p className="text-sm text-red-500 flex items-center gap-1">
+                                            <X className="h-3 w-3" />
+                                            {errors.titleJp}
+                                        </p>}
+                                    </div>
 
-                                {/* Dịch thuật */}
-                                <div className="space-y-3">
-                                    <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                                        <Languages className="h-4 w-4 text-primary" />
-                                        {t('createLesson.translations')} *
-                                    </label>
+                                    {/* Dịch thuật */}
                                     <div className="space-y-3">
-                                        {formData.translations.meaning.map((translation, index) => (
-                                            <div key={index} className="space-y-2">
-                                                <label className="text-xs font-medium text-muted-foreground uppercase">
-                                                    {translation.language_code}
-                                                </label>
-                                                <Input
-                                                    placeholder={
-                                                        index === 0
-                                                            ? t('createLesson.translationPlaceholderVi')
-                                                            : t('createLesson.translationPlaceholderEn')
-                                                    }
-                                                    value={translation.value}
-                                                    onChange={(e) => handleTranslationChange(index, 'value', e.target.value)}
-                                                    onBlur={() => { }}
-                                                    className="bg-background border-border text-foreground h-10"
-                                                />
-                                            </div>
-                                        ))}
+                                        <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                                            <Languages className="h-4 w-4 text-primary" />
+                                            {t('createLesson.translations')} *
+                                        </label>
+                                        <div className="space-y-3">
+                                            {formData.translations.meaning.map((translation, index) => (
+                                                <div key={index} className="space-y-2">
+                                                    <label className="text-xs font-medium text-muted-foreground uppercase">
+                                                        {translation.language_code}
+                                                    </label>
+                                                    <Input
+                                                        placeholder={
+                                                            index === 0
+                                                                ? t('createLesson.translationPlaceholderVi')
+                                                                : t('createLesson.translationPlaceholderEn')
+                                                        }
+                                                        value={translation.value}
+                                                        onChange={(e) => handleTranslationChange(index, 'value', e.target.value)}
+                                                        onBlur={() => { }}
+                                                        className="bg-background border-border text-foreground h-10"
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                        {errors.translation_0 && <p className="text-sm text-red-500 flex items-center gap-1">
+                                            <X className="h-3 w-3" />
+                                            {errors.translation_0}
+                                        </p>}
+                                        {errors.translation_1 && <p className="text-sm text-red-500 flex items-center gap-1">
+                                            <X className="h-3 w-3" />
+                                            {errors.translation_1}
+                                        </p>}
                                     </div>
-                                    {errors.translation_0 && <p className="text-sm text-red-500 flex items-center gap-1">
-                                        <X className="h-3 w-3" />
-                                        {errors.translation_0}
-                                    </p>}
-                                    {errors.translation_1 && <p className="text-sm text-red-500 flex items-center gap-1">
-                                        <X className="h-3 w-3" />
-                                        {errors.translation_1}
-                                    </p>}
-                                </div>
-                            </CardContent>
-                        </Card>
+                                </CardContent>
+                            </Card>
 
-                        {/* Cấu hình bài học */}
-                        <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
-                            <CardHeader className="pb-4">
-                                <CardTitle className="flex items-center gap-2 text-lg">
-                                    <Layers className="h-5 w-5 text-primary" />
-                                    {t('createLesson.lessonConfig')}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                                {/* Cấp độ JLPT */}
-                                <div className="space-y-2">
-                                    <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                                        {t('createLesson.level')} *
-                                        <Badge variant="outline" className="text-xs bg-gray-700 text-gray-700 font-medium border border-gray-200">JLPT</Badge>
-                                    </label>
-                                    <Select value={formData.levelJlpt.toString()} onValueChange={(value) => handleInputChange('levelJlpt', parseInt(value))}>
-                                        <SelectTrigger
-                                            className="bg-background border-border text-foreground h-11"
-                                            onBlur={() => handleBlur('levelJlpt')}
+                            {/* Cấu hình bài học */}
+                            <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
+                                <CardHeader className="pb-4">
+                                    <CardTitle className="flex items-center gap-2 text-lg">
+                                        <Layers className="h-5 w-5 text-primary" />
+                                        {t('createLesson.lessonConfig')}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-6">
+                                    {/* Cấp độ JLPT */}
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                                            {t('createLesson.level')} *
+                                            <Badge variant="outline" className="text-xs bg-gray-700 text-gray-700 font-medium border border-gray-200">JLPT</Badge>
+                                        </label>
+                                        <Select value={formData.levelJlpt.toString()} onValueChange={(value) => handleInputChange('levelJlpt', parseInt(value))}>
+                                            <SelectTrigger
+                                                className="bg-background border-border text-foreground h-11"
+                                                onBlur={() => handleBlur('levelJlpt')}
+                                            >
+                                                <SelectValue placeholder={t('createLesson.selectLevel')} />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-card border-border">
+                                                <SelectItem value="5">
+                                                    <div className="flex items-center gap-2">
+                                                        <Badge variant="secondary" className="text-xs">N5</Badge>
+                                                        <span>{t('createLesson.startLevel')}</span>
+                                                    </div>
+                                                </SelectItem>
+                                                <SelectItem value="4">
+                                                    <div className="flex items-center gap-2">
+                                                        <Badge variant="secondary" className="text-xs">N4</Badge>
+                                                        <span>{t('createLesson.basicLevel')}</span>
+                                                    </div>
+                                                </SelectItem>
+                                                <SelectItem value="3">
+                                                    <div className="flex items-center gap-2">
+                                                        <Badge variant="secondary" className="text-xs">N3</Badge>
+                                                        <span>{t('createLesson.intermediateLevel')}</span>
+                                                    </div>
+                                                </SelectItem>
+                                                <SelectItem value="2">
+                                                    <div className="flex items-center gap-2">
+                                                        <Badge variant="secondary" className="text-xs">N2</Badge>
+                                                        <span>{t('createLesson.upperIntermediateLevel')}</span>
+                                                    </div>
+                                                </SelectItem>
+                                                <SelectItem value="1">
+                                                    <div className="flex items-center gap-2">
+                                                        <Badge variant="secondary" className="text-xs">N1</Badge>
+                                                        <span>{t('createLesson.advancedLevel')}</span>
+                                                    </div>
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.levelJlpt && <p className="text-sm text-red-500 flex items-center gap-1">
+                                            <X className="h-3 w-3" />
+                                            {errors.levelJlpt}
+                                        </p>}
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {/* Thời lượng */}
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                                                <Clock className="h-4 w-4 text-primary" />
+                                                {t('createLesson.timeMinutes')} *
+                                            </label>
+                                            <Input
+                                                type="number"
+                                                placeholder="45"
+                                                className="bg-background border-border text-foreground h-11"
+                                                value={formData.estimatedTimeMinutes}
+                                                onChange={(e) => handleInputChange('estimatedTimeMinutes', parseInt(e.target.value) || 0)}
+                                                onBlur={() => handleBlur('estimatedTimeMinutes')}
+                                            />
+                                            {errors.estimatedTimeMinutes && <p className="text-sm text-red-500 flex items-center gap-1">
+                                                <X className="h-3 w-3" />
+                                                {errors.estimatedTimeMinutes}
+                                            </p>}
+                                        </div>
+
+                                        {/* Phiên bản */}
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                                                <FileText className="h-4 w-4 text-primary" />
+                                                {t('createLesson.version')} *
+                                            </label>
+                                            <Input
+                                                placeholder="1.0.0"
+                                                className="bg-background border-border text-foreground h-11"
+                                                value={formData.version}
+                                                onChange={(e) => handleInputChange('version', e.target.value)}
+                                                onBlur={() => handleBlur('version')}
+                                            />
+                                            {errors.version && <p className="text-sm text-red-500 flex items-center gap-1">
+                                                <X className="h-3 w-3" />
+                                                {errors.version}
+                                            </p>}
+                                        </div>
+                                    </div>
+
+                                    {/* Phần thưởng */}
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                                            <Gift className="h-4 w-4 text-primary" />
+                                            {t('createLesson.rewardId')} *
+                                        </label>
+                                        <div
+                                            className="min-h-[60px] w-full rounded-lg border-2 border-gray-200 bg-background p-3 cursor-pointer hover:border-primary/50 transition-colors"
+                                            onClick={() => setIsRewardModalOpen(true)}
                                         >
-                                            <SelectValue placeholder={t('createLesson.selectLevel')} />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-card border-border">
-                                            <SelectItem value="5">
-                                                <div className="flex items-center gap-2">
-                                                    <Badge variant="secondary" className="text-xs">N5</Badge>
-                                                    <span>{t('createLesson.startLevel')}</span>
-                                                </div>
-                                            </SelectItem>
-                                            <SelectItem value="4">
-                                                <div className="flex items-center gap-2">
-                                                    <Badge variant="secondary" className="text-xs">N4</Badge>
-                                                    <span>{t('createLesson.basicLevel')}</span>
-                                                </div>
-                                            </SelectItem>
-                                            <SelectItem value="3">
-                                                <div className="flex items-center gap-2">
-                                                    <Badge variant="secondary" className="text-xs">N3</Badge>
-                                                    <span>{t('createLesson.intermediateLevel')}</span>
-                                                </div>
-                                            </SelectItem>
-                                            <SelectItem value="2">
-                                                <div className="flex items-center gap-2">
-                                                    <Badge variant="secondary" className="text-xs">N2</Badge>
-                                                    <span>{t('createLesson.upperIntermediateLevel')}</span>
-                                                </div>
-                                            </SelectItem>
-                                            <SelectItem value="1">
-                                                <div className="flex items-center gap-2">
-                                                    <Badge variant="secondary" className="text-xs">N1</Badge>
-                                                    <span>{t('createLesson.advancedLevel')}</span>
-                                                </div>
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.levelJlpt && <p className="text-sm text-red-500 flex items-center gap-1">
-                                        <X className="h-3 w-3" />
-                                        {errors.levelJlpt}
-                                    </p>}
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {/* Thời lượng */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                                            <Clock className="h-4 w-4 text-primary" />
-                                            {t('createLesson.timeMinutes')} *
-                                        </label>
-                                        <Input
-                                            type="number"
-                                            placeholder="45"
-                                            className="bg-background border-border text-foreground h-11"
-                                            value={formData.estimatedTimeMinutes}
-                                            onChange={(e) => handleInputChange('estimatedTimeMinutes', parseInt(e.target.value) || 0)}
-                                            onBlur={() => handleBlur('estimatedTimeMinutes')}
-                                        />
-                                        {errors.estimatedTimeMinutes && <p className="text-sm text-red-500 flex items-center gap-1">
-                                            <X className="h-3 w-3" />
-                                            {errors.estimatedTimeMinutes}
-                                        </p>}
-                                    </div>
-
-                                    {/* Phiên bản */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                                            <FileText className="h-4 w-4 text-primary" />
-                                            {t('createLesson.version')} *
-                                        </label>
-                                        <Input
-                                            placeholder="1.0.0"
-                                            className="bg-background border-border text-foreground h-11"
-                                            value={formData.version}
-                                            onChange={(e) => handleInputChange('version', e.target.value)}
-                                            onBlur={() => handleBlur('version')}
-                                        />
-                                        {errors.version && <p className="text-sm text-red-500 flex items-center gap-1">
-                                            <X className="h-3 w-3" />
-                                            {errors.version}
-                                        </p>}
-                                    </div>
-                                </div>
-
-                                {/* Phần thưởng */}
-                                <div className="space-y-2">
-                                    <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                                        <Gift className="h-4 w-4 text-primary" />
-                                        {t('createLesson.rewardId')} *
-                                    </label>
-                                    <div 
-                                        className="min-h-[60px] w-full rounded-lg border-2 border-gray-200 bg-background p-3 cursor-pointer hover:border-primary/50 transition-colors"
-                                        onClick={() => setIsRewardModalOpen(true)}
-                                    >
-                                        {formData.rewardIds && formData.rewardIds.length > 0 ? (
-                                            <div className="flex flex-wrap gap-2">
-                                                {getSelectedRewards().map((reward) => (
-                                                    <Badge
-                                                        key={reward.id}
-                                                        variant="secondary"
-                                                        className="flex items-center gap-1 bg-blue-100 text-blue-900 border-blue-300 px-2 py-1 pr-1"
-                                                    >
-                                                        <span className="text-sm font-medium">{getRewardName(reward)}</span>
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleRemoveReward(reward.id);
-                                                            }}
-                                                            className="ml-1 hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+                                            {formData.rewardIds && formData.rewardIds.length > 0 ? (
+                                                <div className="flex flex-wrap gap-2">
+                                                    {getSelectedRewards().map((reward) => (
+                                                        <Badge
+                                                            key={reward.id}
+                                                            variant="secondary"
+                                                            className="flex items-center gap-1 bg-blue-100 text-blue-900 border-blue-300 px-2 py-1 pr-1"
                                                         >
-                                                            <X className="h-3 w-3" />
-                                                        </button>
-                                                    </Badge>
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <span className="text-sm text-muted-foreground">
-                                                {t('createLesson.rewardSelectHint')}
-                                            </span>
+                                                            <span className="text-sm font-medium">{getRewardName(reward)}</span>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleRemoveReward(reward.id);
+                                                                }}
+                                                                className="ml-1 hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+                                                            >
+                                                                <X className="h-3 w-3" />
+                                                            </button>
+                                                        </Badge>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <span className="text-sm text-muted-foreground">
+                                                    {t('createLesson.rewardSelectHint')}
+                                                </span>
+                                            )}
+                                        </div>
+                                        {errors.rewardIds && (
+                                            <p className="text-sm text-red-500 flex items-center gap-1">
+                                                <X className="h-3 w-3" />
+                                                {errors.rewardIds}
+                                            </p>
+                                        )}
+                                        {(formData.rewardIds && formData.rewardIds.length > 0) && (
+                                            <p className="text-xs text-muted-foreground">
+                                                {t('createLesson.rewardSelectedCount', { count: formData.rewardIds.length })}
+                                            </p>
                                         )}
                                     </div>
-                                    {errors.rewardIds && (
-                                        <p className="text-sm text-red-500 flex items-center gap-1">
-                                            <X className="h-3 w-3" />
-                                            {errors.rewardIds}
-                                        </p>
-                                    )}
-                                    {(formData.rewardIds && formData.rewardIds.length > 0) && (
-                                        <p className="text-xs text-muted-foreground">
-                                            {t('createLesson.rewardSelectedCount', { count: formData.rewardIds.length })}
-                                        </p>
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
+                                </CardContent>
+                            </Card>
 
-                        {/* Trạng thái xuất bản */}
-                        <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
-                            <CardContent className="pt-6">
-                                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-blue-100 rounded-lg">
-                                            <Send className="h-5 w-5 text-blue-600" />
+                            {/* Trạng thái xuất bản */}
+                            <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
+                                <CardContent className="pt-6">
+                                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-blue-100 rounded-lg">
+                                                <Send className="h-5 w-5 text-blue-600" />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="isPublished" className="text-sm font-semibold text-foreground cursor-pointer">
+                                                    {t('createLesson.publishNow')}
+                                                </label>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {t('createLesson.publishDescription')}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <label htmlFor="isPublished" className="text-sm font-semibold text-foreground cursor-pointer">
-                                                {t('createLesson.publishNow')}
-                                            </label>
-                                            <p className="text-xs text-muted-foreground">
-                                                {t('createLesson.publishDescription')}
-                                            </p>
-                                        </div>
+                                        <Switch
+                                            id="isPublished"
+                                            checked={formData.isPublished}
+                                            onCheckedChange={(checked) => handleInputChange('isPublished', checked)}
+                                            className="data-[state=checked]:bg-blue-600"
+                                        />
                                     </div>
-                                    <Switch
-                                        id="isPublished"
-                                        checked={formData.isPublished}
-                                        onCheckedChange={(checked) => handleInputChange('isPublished', checked)}
-                                        className="data-[state=checked]:bg-blue-600"
-                                    />
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
                     )}
                 </div>
 
@@ -874,16 +861,15 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                                 <div className="p-2 space-y-2">
                                     {rewards.map((reward: IRewardEntityType) => {
                                         const isSelected = modalSelectedRewardIds.includes(reward.id);
-                                        
+
                                         return (
                                             <div
                                                 key={reward.id}
-                                                className={`flex items-start space-x-3 p-3 rounded-lg border-2 transition-all cursor-pointer ${
-                                                    isSelected 
-                                                        ? 'bg-blue-50 border-blue-300 shadow-sm' 
-                                                        : 'bg-white border-gray-200 hover:border-blue-200 hover:bg-blue-50/50'
-                                                }`}
-                                    onClick={() => toggleModalReward(reward.id)}
+                                                className={`flex items-start space-x-3 p-3 rounded-lg border-2 transition-all cursor-pointer ${isSelected
+                                                    ? 'bg-blue-50 border-blue-300 shadow-sm'
+                                                    : 'bg-white border-gray-200 hover:border-blue-200 hover:bg-blue-50/50'
+                                                    }`}
+                                                onClick={() => toggleModalReward(reward.id)}
                                             >
                                                 <div className="mt-0.5">
                                                     <Checkbox
@@ -893,20 +879,19 @@ const CreateLesson = ({ setIsAddDialogOpen, lessonId = null }: CreateLessonProps
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex flex-col gap-2">
-                                                        <span className={`text-sm font-semibold ${
-                                                            isSelected ? 'text-blue-900' : 'text-gray-900'
-                                                        }`}>
+                                                        <span className={`text-sm font-semibold ${isSelected ? 'text-blue-900' : 'text-gray-900'
+                                                            }`}>
                                                             {getRewardName(reward)}
                                                         </span>
                                                         <div className="flex items-center gap-2 flex-wrap">
-                                                            <Badge 
-                                                                variant="outline" 
+                                                            <Badge
+                                                                variant="outline"
                                                                 className="text-xs bg-gray-700 text-gray-700 font-medium border border-gray-200"
                                                             >
                                                                 {getRewardTypeLabel(reward.rewardType)}
                                                             </Badge>
-                                                            <Badge 
-                                                                variant="secondary" 
+                                                            <Badge
+                                                                variant="secondary"
                                                                 className="text-xs bg-gray-100 text-gray-700 font-medium border border-gray-200"
                                                             >
                                                                 {getRewardTargetLabel(reward.rewardTarget)}
