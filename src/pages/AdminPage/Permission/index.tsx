@@ -13,8 +13,10 @@ import { Switch } from "@ui/Switch";
 import { Button } from "@ui/Button";
 import { IPermissionEntity as IPermission } from "@models/permission/entity";
 import HeaderAdmin from "@organisms/Header/Admin";
+import { useTranslation } from "react-i18next";
 
 const PermissionManagement = () => {
+    const { t } = useTranslation();
     /**
      * Role List
      */
@@ -176,8 +178,8 @@ const PermissionManagement = () => {
     return (
         <>
             <HeaderAdmin
-                title="Permission Management"
-                description="Manage role-based access control"
+                title={t('permission.title')}
+                description={t('permission.description')}
             />
             <div className="mt-24 min-h-screen bg-gray-50">
                 <div className="max-w-[1600px] mx-auto p-3 md:p-4 lg:p-6 space-y-4">
@@ -188,9 +190,9 @@ const PermissionManagement = () => {
                             <div className="flex items-center gap-1.5">
                                 <span className="text-base">⚙️</span>
                                 <div>
-                                    <CardTitle className="text-base font-bold text-gray-900">Configuration</CardTitle>
+                                    <CardTitle className="text-base font-bold text-gray-900">{t('permission.config.title')}</CardTitle>
                                     <p className="text-xs text-gray-600 mt-0.5">
-                                        Select role and apply filters
+                                        {t('permission.config.subtitle')}
                                     </p>
                                 </div>
                             </div>
@@ -200,11 +202,11 @@ const PermissionManagement = () => {
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
                                         <span className="text-sm">👤</span>
-                                        Select Role
+                                        {t('permission.config.selectRole')}
                                     </label>
                                     <Select onValueChange={(val) => handleSelectRole({ target: { value: val } } as any)} disabled={roleLoading} value={String(safeRoleId)}>
                                         <SelectTrigger className="h-9 border border-gray-200 hover:border-blue-400 transition-all duration-200 shadow-sm hover:shadow bg-white text-sm">
-                                            <SelectValue placeholder="Choose a role..." />
+                                            <SelectValue placeholder={t('permission.config.selectRolePlaceholder')} />
                                         </SelectTrigger>
                                         <SelectContent className="border-gray-200 bg-white">
                                             {roleData?.results?.map((r: any) => (
@@ -222,10 +224,10 @@ const PermissionManagement = () => {
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
                                         <span className="text-sm">📦</span>
-                                        Filter by Module
+                                        {t('permission.config.filterByModule')}
                                     </label>
                                     <Input
-                                        placeholder="e.g. User, Lesson..."
+                                        placeholder={t('permission.config.filterByModulePlaceholder')}
                                         value={moduleSearch}
                                         onChange={(e) => setModuleSearch(e.target.value)}
                                         className="h-9 border border-gray-200 hover:border-blue-400 transition-all duration-200 shadow-sm hover:shadow focus-visible:border-blue-500 bg-white text-sm"
@@ -235,10 +237,10 @@ const PermissionManagement = () => {
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
                                         <span className="text-sm">🔗</span>
-                                        Filter by Path
+                                        {t('permission.config.filterByPath')}
                                     </label>
                                     <Input
-                                        placeholder="e.g. /wallet, /api/users..."
+                                        placeholder={t('permission.config.filterByPathPlaceholder')}
                                         value={pathSearch}
                                         onChange={(e) => setPathSearch(e.target.value)}
                                         className="h-9 border border-gray-200 hover:border-blue-400 transition-all duration-200 shadow-sm hover:shadow focus-visible:border-blue-500 bg-white text-sm"
@@ -256,11 +258,11 @@ const PermissionManagement = () => {
                                     <div className="flex items-center gap-1.5">
                                         <span className="text-lg">✨</span>
                                         <CardTitle className="text-base font-bold text-gray-900">
-                                            Permissions Matrix
+                                            {t('permission.matrix.title')}
                                         </CardTitle>
                                     </div>
                                     <p className="text-xs text-gray-600">
-                                        Configure access permissions
+                                        {t('permission.matrix.description')}
                                     </p>
                                     {selectedIds.size > 0 && (
                                         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 border border-blue-200 rounded-lg">
@@ -269,7 +271,7 @@ const PermissionManagement = () => {
                                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
                                             </span>
                                             <span className="text-xs font-bold text-blue-700">
-                                                {selectedIds.size} selected
+                                                {selectedIds.size} {t('permission.matrix.selected')}
                                             </span>
                                         </div>
                                     )}
@@ -284,12 +286,12 @@ const PermissionManagement = () => {
                                         {isUpdating ? (
                                             <>
                                                 <span className="animate-spin mr-1.5 text-sm">⏳</span>
-                                                Saving...
+                                                {t('permission.matrix.saving')}
                                             </>
                                         ) : (
                                             <>
                                                 <span className="mr-1.5 text-sm">💾</span>
-                                                Save Changes
+                                                {t('permission.matrix.saveChanges')}
                                             </>
                                         )}
                                     </Button>
@@ -305,7 +307,7 @@ const PermissionManagement = () => {
                                         onCheckedChange={toggleSelectAllOnPage}
                                     />
                                     <label htmlFor="select-all-page" className="text-xs font-bold cursor-pointer hover:text-blue-600 transition-colors select-none text-gray-700">
-                                        Select All
+                                        {t('permission.matrix.selectAll')}
                                     </label>
                                 </div>
                                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-gray-200 hover:border-blue-300 transition-all duration-200 shadow-sm">
@@ -315,7 +317,7 @@ const PermissionManagement = () => {
                                         onCheckedChange={(val) => setExpandedModules(val ? paginatedModuleKeys : [])}
                                     />
                                     <label htmlFor="expand-all" className="text-xs font-bold cursor-pointer hover:text-blue-600 transition-colors select-none text-gray-700">
-                                        Expand All
+                                        {t('permission.matrix.expandAll')}
                                     </label>
                                 </div>
                             </div>
@@ -358,13 +360,13 @@ const PermissionManagement = () => {
                                                         <div className="text-left">
                                                             <span className="font-bold text-sm text-gray-900 block">{moduleName}</span>
                                                             <span className="text-[10px] font-semibold text-gray-500">
-                                                                {items.length} {items.length !== 1 ? 'permissions' : 'permission'}
+                                                                {items.length} {items.length !== 1 ? t('permission.matrix.permissions') : t('permission.matrix.permission')}
                                                             </span>
                                                         </div>
                                                     </div>
                                                     <div className="ml-auto flex items-center gap-2 pr-1">
                                                         <label htmlFor={`select-module-${moduleName}`} className="text-xs font-bold text-gray-600 cursor-pointer hover:text-blue-600 transition-colors select-none">
-                                                            Enable All
+                                                            {t('permission.matrix.enableAll')}
                                                         </label>
                                                         <Switch
                                                             id={`select-module-${moduleName}`}
@@ -416,9 +418,9 @@ const PermissionManagement = () => {
                                     {!moduleKeys.length && (
                                         <div className="text-center py-12 px-6 bg-white rounded-xl border border-dashed border-gray-300">
                                             <div className="text-5xl mb-3 animate-bounce">🔍</div>
-                                            <h3 className="font-bold text-base mb-2 text-gray-900">No Permissions Found</h3>
+                                            <h3 className="font-bold text-base mb-2 text-gray-900">{t('permission.matrix.noPermissionsFound')}</h3>
                                             <p className="text-xs text-gray-600 max-w-md mx-auto">
-                                                No permissions match your current search criteria.
+                                                {t('permission.matrix.noPermissionsMatch')}
                                             </p>
                                         </div>
                                     )}

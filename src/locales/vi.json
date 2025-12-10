@@ -40,7 +40,12 @@
         "all": "Tất cả",
         "minutes": "phút",
         "retry": "Thử lại",
-        "clearAll": "Xóa hết"
+        "clearAll": "Xóa hết",
+        "perPage": " / trang",
+        "goToPreviousPage": "Đi tới trang trước",
+        "goToNextPage": "Đi tới trang sau",
+        "morePages": "Thêm trang",
+        "itemsRange": "{{start}}-{{end}} trong tổng {{total}} mục"
     },
     "tournaments": {
         "title": "Quản lý giải đấu",
@@ -200,6 +205,76 @@
             "note": "Hành động này không thể hoàn tác.",
             "confirmAction": "Xoá mùa giải",
             "deleting": "Đang xoá..."
+        },
+        "list": {
+            "title": "Danh sách giải đấu",
+            "createTournament": "Tạo giải đấu",
+            "stats": {
+                "totalTournaments": "Tổng giải đấu",
+                "activeTournaments": "Đang diễn ra",
+                "totalParticipants": "Tổng người tham gia",
+                "monthlyRewards": "Giải thưởng tháng này"
+            },
+            "filters": {
+                "search": "Tìm kiếm",
+                "searchPlaceholder": "Tìm kiếm giải đấu...",
+                "status": "Trạng thái",
+                "statusPlaceholder": "Trạng thái",
+                "startDate": "Ngày bắt đầu",
+                "startDatePlaceholder": "Chọn ngày bắt đầu",
+                "endDate": "Ngày kết thúc",
+                "endDatePlaceholder": "Chọn ngày kết thúc",
+                "openStatus": "Trạng thái mở",
+                "openStatusPlaceholder": "Trạng thái mở",
+                "all": "Tất cả",
+                "opened": "Đã mở",
+                "notOpened": "Chưa mở",
+                "clearFilters": "Xóa bộ lọc"
+            },
+            "status": {
+                "active": "Đang diễn ra",
+                "preview": "Xem trước",
+                "expired": "Đã kết thúc",
+                "inactive": "Không hoạt động",
+                "unknown": "Không xác định"
+            },
+            "messages": {
+                "loading": "Đang tải dữ liệu...",
+                "error": "Có lỗi xảy ra khi tải dữ liệu",
+                "noTournaments": "Không tìm thấy giải đấu nào"
+            },
+            "card": {
+                "opened": "Đã mở",
+                "time": "Thời gian"
+            }
+        }
+    },
+    "permission": {
+        "title": "Quản lý quyền",
+        "description": "Quản lý kiểm soát truy cập dựa trên vai trò",
+        "config": {
+            "title": "Cấu hình",
+            "subtitle": "Chọn vai trò và áp dụng bộ lọc",
+            "selectRole": "Chọn Vai trò",
+            "selectRolePlaceholder": "Chọn vai trò...",
+            "filterByModule": "Lọc theo Module",
+            "filterByModulePlaceholder": "ví dụ: User, Lesson...",
+            "filterByPath": "Lọc theo Path",
+            "filterByPathPlaceholder": "ví dụ: /wallet, /api/users..."
+        },
+        "matrix": {
+            "title": "Ma trận Quyền",
+            "description": "Cấu hình quyền truy cập",
+            "selected": "đã chọn",
+            "saving": "Đang lưu...",
+            "saveChanges": "Lưu thay đổi",
+            "selectAll": "Chọn tất cả",
+            "expandAll": "Mở rộng tất cả",
+            "enableAll": "Bật tất cả",
+            "permission": "quyền",
+            "permissions": "quyền",
+            "noPermissionsFound": "Không tìm thấy quyền",
+            "noPermissionsMatch": "Không có quyền nào khớp với tiêu chí tìm kiếm hiện tại của bạn."
         }
     },
     "notFoundPage": {
@@ -1639,5 +1714,105 @@
         "createNoId": "Không nhận được ID từ server sau khi tạo",
         "unknownError": "Đã xảy ra lỗi không mong muốn",
         "testTypeLabel": "Loại"
+    },
+    "packageManagement": {
+        "title": "Quản lý gói dịch vụ",
+        "description": "Thống kê và quản lý các gói đăng ký",
+        "tabs": {
+            "overview": "Tổng quan",
+            "packages": "Danh sách gói"
+        },
+        "stats": {
+            "totalPackages": "Tổng gói dịch vụ",
+            "monthlyRevenue": "Doanh thu tháng",
+            "totalSubscriptions": "Tổng đăng ký",
+            "yearlyRevenue": "Doanh thu năm"
+        },
+        "revenue": {
+            "title": "Doanh thu gói dịch vụ",
+            "monthly": "Doanh thu tháng",
+            "yearly": "Doanh thu năm",
+            "byPackage": "Doanh thu theo gói",
+            "noData": "Chưa có dữ liệu doanh thu"
+        },
+        "subscribers": {
+            "distribution": "Phân bố người đăng ký",
+            "details": "Chi tiết đăng ký",
+            "totalPurchases": "Tổng đăng ký",
+            "activeUsers": "Đang hoạt động"
+        },
+        "packages": {
+            "noPackages": "Chưa có gói dịch vụ",
+            "subscribers": "Đăng ký",
+            "moreFeatures": "+{{count}} tính năng khác",
+            "lifetime": "Trọn đời",
+            "days": "{{count}} ngày"
+        },
+        "month": "Tháng",
+        "year": "Năm"
+    },
+    "dashboard": {
+        "title": "Tổng quan",
+        "description": "Thống kê và phân tích hệ thống",
+        "tabs": {
+            "overview": "Tổng quan",
+            "users": "Người dùng",
+            "engagement": "Tương tác"
+        },
+        "stats": {
+            "totalUsers": "Tổng người dùng",
+            "activeUsers": "Người dùng hoạt động",
+            "newUsers": "Người dùng mới",
+            "notActivated": "Chưa kích hoạt"
+        },
+        "jlpt": {
+            "title": "Phân bố cấp độ JLPT",
+            "users": "người dùng"
+        },
+        "activation": {
+            "title": "Trạng thái kích hoạt",
+            "detailsTitle": "Chi tiết trạng thái kích hoạt",
+            "pendingTest": "Chờ test",
+            "testAgain": "Test lại",
+            "pendingChooseJlpt": "Chờ chọn JLPT",
+            "pendingChoosePokemon": "Chờ chọn Pokemon",
+            "notTakenTest": "Không làm kiểm tra đầu vào",
+            "retryTest": "Thử lại kiểm tra đầu vào",
+            "notChosenJlpt": "Chưa chọn trình độ JLPT",
+            "choosingPokemon": "Đang chọn Pokemon"
+        },
+        "popularContent": {
+            "title": "Nội dung phổ biến nhất",
+            "completed": "hoàn thành"
+        },
+        "userStats": {
+            "title": "Thống kê người dùng",
+            "activeUsers": "Người dùng hoạt động",
+            "newUsers": "Người dùng mới",
+            "usersPer": "người dùng"
+        },
+        "period": {
+            "day": "Theo ngày",
+            "week": "Theo tuần",
+            "month": "Theo tháng",
+            "year": "Theo năm"
+        },
+        "sparkles": {
+            "title": "Phân bố Sparkles",
+            "total": "Tổng",
+            "average": "Trung bình",
+            "users": "người dùng"
+        },
+        "starterPokemon": {
+            "title": "Starter Pokemon",
+            "users": "người dùng"
+        },
+        "streak": {
+            "title": "Duy trì chuỗi học tập",
+            "users": "người dùng",
+            "daily": "Chuỗi hàng ngày",
+            "monthly": "Chuỗi hàng tháng",
+            "usersPercent": "% người dùng"
+        }
     }
 }

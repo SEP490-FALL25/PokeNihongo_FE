@@ -1,6 +1,7 @@
 import { Rows } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select";
 import { EnhancedPagination } from "@ui/Pagination";
+import { useTranslation } from "react-i18next";
 
 interface PaginationControlsProps {
     currentPage: number;
@@ -23,6 +24,7 @@ const PaginationControls = ({
     itemsPerPageOptions = [15, 30, 45, 60],
     isLoading = false
 }: PaginationControlsProps) => {
+    const { t } = useTranslation();
     const handleItemsPerPageChange = (value: string) => {
         onItemsPerPageChange(parseInt(value));
     };
@@ -37,7 +39,7 @@ const PaginationControls = ({
                     </SelectTrigger>
                     <SelectContent className="bg-card border-border">
                         {itemsPerPageOptions.map(size => (
-                            <SelectItem key={size} value={String(size)}>{size} / trang</SelectItem>
+                            <SelectItem key={size} value={String(size)}>{size}{t('common.perPage')}</SelectItem>
                         ))}
                     </SelectContent>
                 </Select>

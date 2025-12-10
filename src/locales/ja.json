@@ -40,7 +40,12 @@
         "all": "すべて",
         "minutes": "分",
         "retry": "再試行",
-        "clearAll": "すべてクリア"
+        "clearAll": "すべてクリア",
+        "perPage": " / ページ",
+        "goToPreviousPage": "前のページへ",
+        "goToNextPage": "次のページへ",
+        "morePages": "その他のページ",
+        "itemsRange": "{{total}}件中 {{start}}-{{end}}件"
     },
     "tournaments": {
         "title": "トーナメント管理",
@@ -191,6 +196,76 @@
             "note": "この操作は取り消せません。",
             "confirmAction": "シーズンを削除",
             "deleting": "削除中..."
+        },
+        "list": {
+            "title": "トーナメント一覧",
+            "createTournament": "トーナメント作成",
+            "stats": {
+                "totalTournaments": "総トーナメント数",
+                "activeTournaments": "開催中",
+                "totalParticipants": "総参加者数",
+                "monthlyRewards": "今月の報酬"
+            },
+            "filters": {
+                "search": "検索",
+                "searchPlaceholder": "トーナメントを検索...",
+                "status": "状態",
+                "statusPlaceholder": "状態",
+                "startDate": "開始日",
+                "startDatePlaceholder": "開始日を選択",
+                "endDate": "終了日",
+                "endDatePlaceholder": "終了日を選択",
+                "openStatus": "公開状態",
+                "openStatusPlaceholder": "公開状態",
+                "all": "すべて",
+                "opened": "公開済み",
+                "notOpened": "未公開",
+                "clearFilters": "フィルターをクリア"
+            },
+            "status": {
+                "active": "開催中",
+                "preview": "プレビュー",
+                "expired": "終了済み",
+                "inactive": "非アクティブ",
+                "unknown": "不明"
+            },
+            "messages": {
+                "loading": "データを読み込み中...",
+                "error": "データの読み込み中にエラーが発生しました",
+                "noTournaments": "トーナメントが見つかりません"
+            },
+            "card": {
+                "opened": "公開済み",
+                "time": "時間"
+            }
+        }
+    },
+    "permission": {
+        "title": "権限管理",
+        "description": "ロールベースのアクセス制御を管理",
+        "config": {
+            "title": "設定",
+            "subtitle": "ロールを選択してフィルターを適用",
+            "selectRole": "ロールを選択",
+            "selectRolePlaceholder": "ロールを選択...",
+            "filterByModule": "モジュールでフィルター",
+            "filterByModulePlaceholder": "例: User, Lesson...",
+            "filterByPath": "パスでフィルター",
+            "filterByPathPlaceholder": "例: /wallet, /api/users..."
+        },
+        "matrix": {
+            "title": "権限マトリックス",
+            "description": "アクセス権限を設定",
+            "selected": "選択済み",
+            "saving": "保存中...",
+            "saveChanges": "変更を保存",
+            "selectAll": "すべて選択",
+            "expandAll": "すべて展開",
+            "enableAll": "すべて有効化",
+            "permission": "権限",
+            "permissions": "権限",
+            "noPermissionsFound": "権限が見つかりません",
+            "noPermissionsMatch": "現在の検索条件に一致する権限がありません。"
         }
     },
     "notFoundPage": {
@@ -1620,5 +1695,105 @@
         "createNoId": "作成後にサーバーからIDを受け取れませんでした",
         "unknownError": "予期しないエラーが発生しました",
         "testTypeLabel": "種類"
+    },
+    "packageManagement": {
+        "title": "パッケージ管理",
+        "description": "サブスクリプションパッケージの統計と管理",
+        "tabs": {
+            "overview": "概要",
+            "packages": "パッケージ一覧"
+        },
+        "stats": {
+            "totalPackages": "総パッケージ数",
+            "monthlyRevenue": "月間収益",
+            "totalSubscriptions": "総登録数",
+            "yearlyRevenue": "年間収益"
+        },
+        "revenue": {
+            "title": "パッケージ収益",
+            "monthly": "月間収益",
+            "yearly": "年間収益",
+            "byPackage": "パッケージ別収益",
+            "noData": "収益データがありません"
+        },
+        "subscribers": {
+            "distribution": "登録者分布",
+            "details": "登録詳細",
+            "totalPurchases": "総購入数",
+            "activeUsers": "アクティブユーザー"
+        },
+        "packages": {
+            "noPackages": "パッケージがありません",
+            "subscribers": "登録者",
+            "moreFeatures": "さらに{{count}}機能",
+            "lifetime": "生涯",
+            "days": "{{count}}日"
+        },
+        "month": "月",
+        "year": "年"
+    },
+    "dashboard": {
+        "title": "概要",
+        "description": "システム統計と分析",
+        "tabs": {
+            "overview": "概要",
+            "users": "ユーザー",
+            "engagement": "エンゲージメント"
+        },
+        "stats": {
+            "totalUsers": "総ユーザー数",
+            "activeUsers": "アクティブユーザー",
+            "newUsers": "新規ユーザー",
+            "notActivated": "未アクティベート"
+        },
+        "jlpt": {
+            "title": "JLPTレベル分布",
+            "users": "ユーザー"
+        },
+        "activation": {
+            "title": "アクティベーション状態",
+            "detailsTitle": "アクティベーション状態の詳細",
+            "pendingTest": "テスト待ち",
+            "testAgain": "再テスト",
+            "pendingChooseJlpt": "JLPT選択待ち",
+            "pendingChoosePokemon": "ポケモン選択待ち",
+            "notTakenTest": "入門テスト未受験",
+            "retryTest": "入門テスト再受験",
+            "notChosenJlpt": "JLPTレベル未選択",
+            "choosingPokemon": "ポケモン選択中"
+        },
+        "popularContent": {
+            "title": "最も人気のあるコンテンツ",
+            "completed": "完了"
+        },
+        "userStats": {
+            "title": "ユーザー統計",
+            "activeUsers": "アクティブユーザー",
+            "newUsers": "新規ユーザー",
+            "usersPer": "ユーザー"
+        },
+        "period": {
+            "day": "日別",
+            "week": "週別",
+            "month": "月別",
+            "year": "年別"
+        },
+        "sparkles": {
+            "title": "スパークル分布",
+            "total": "合計",
+            "average": "平均",
+            "users": "ユーザー"
+        },
+        "starterPokemon": {
+            "title": "スターターポケモン",
+            "users": "ユーザー"
+        },
+        "streak": {
+            "title": "学習ストリーク維持",
+            "users": "ユーザー",
+            "daily": "日次ストリーク",
+            "monthly": "月次ストリーク",
+            "usersPercent": "%ユーザー"
+        }
     }
 }

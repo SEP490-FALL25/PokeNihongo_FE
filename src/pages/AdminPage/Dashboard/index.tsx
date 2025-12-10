@@ -2,6 +2,7 @@ import HeaderAdmin from "@organisms/Header/Admin"
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/Tabs"
 import { Users, Languages, TrendingUp, Sparkles, Clock, AlertCircle, UserCheck, UserX, Loader2, Trophy, BookOpen, BarChart3 } from "lucide-react"
+import { useTranslation } from "react-i18next"
 import {
     useGetDashboardJlptDistribution,
     useGetDashboardUserActivation,
@@ -29,6 +30,7 @@ import {
 } from "recharts"
 
 const AdminDashboard = () => {
+    const { t } = useTranslation()
     const [period, setPeriod] = useState<string>("month")
     const [activeTab, setActiveTab] = useState<string>("overview")
 
@@ -70,10 +72,15 @@ const AdminDashboard = () => {
         return percent > 1 ? percent.toFixed(1) : (percent * 100).toFixed(1)
     }
 
+    // Helper function to translate period
+    const translatePeriod = (periodValue: string) => {
+        return t(`dashboard.period.${periodValue}` as any) || periodValue
+    }
+
     // Overview Stats
     const overviewStats = [
         {
-            title: "Tổng người dùng",
+            title: t('dashboard.stats.totalUsers'),
             value: totalUserData?.total?.toLocaleString() || "0",
             icon: Users,
             gradient: "from-blue-500/20 via-blue-500/10 to-transparent",
@@ -83,7 +90,7 @@ const AdminDashboard = () => {
             isLoading: isLoadingTotalUser,
         },
         {
-            title: "Người dùng hoạt động",
+            title: t('dashboard.stats.activeUsers'),
             value: activeUserData?.activeUsers?.toLocaleString() || "0",
             icon: UserCheck,
             gradient: "from-green-500/20 via-green-500/10 to-transparent",
@@ -93,7 +100,7 @@ const AdminDashboard = () => {
             isLoading: isLoadingActiveUser,
         },
         {
-            title: "Người dùng mới",
+            title: t('dashboard.stats.newUsers'),
             value: newUserData?.count?.toLocaleString() || "0",
             icon: TrendingUp,
             gradient: "from-purple-500/20 via-purple-500/10 to-transparent",
@@ -103,7 +110,7 @@ const AdminDashboard = () => {
             isLoading: isLoadingNewUser,
         },
         {
-            title: "Chưa kích hoạt",
+            title: t('dashboard.stats.notActivated'),
             value: userActivationData?.summary?.total?.toLocaleString() || "0",
             icon: UserX,
             gradient: "from-orange-500/20 via-orange-500/10 to-transparent",
@@ -116,7 +123,7 @@ const AdminDashboard = () => {
 
     return (
         <>
-            <HeaderAdmin title="Tổng quan" description="Thống kê và phân tích hệ thống" />
+            <HeaderAdmin title={t('dashboard.title')} description={t('dashboard.description')} />
 
             <div className="p-8 mt-24 space-y-8">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -126,21 +133,21 @@ const AdminDashboard = () => {
                             className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-md transition-all"
                         >
                             <BarChart3 className="w-4 h-4" />
-                            Tổng quan
+                            {t('dashboard.tabs.overview')}
                         </TabsTrigger>
                         <TabsTrigger
                             value="users"
                             className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-md transition-all"
                         >
                             <Users className="w-4 h-4" />
-                            Người dùng
+                            {t('dashboard.tabs.users')}
                         </TabsTrigger>
                         <TabsTrigger
                             value="engagement"
                             className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-md transition-all"
                         >
                             <Sparkles className="w-4 h-4" />
-                            Tương tác
+                            {t('dashboard.tabs.engagement')}
                         </TabsTrigger>
                     </TabsList>
 
@@ -186,10 +193,10 @@ const AdminDashboard = () => {
                                             <Languages className="w-5 h-5 text-blue-500" />
                                         </div>
                                         <div>
-                                            <p className="text-lg font-bold">Phân bố cấp độ JLPT</p>
+                                            <p className="text-lg font-bold">{t('dashboard.jlpt.title')}</p>
                                             {jlptDistributionData && (
                                                 <p className="text-sm text-muted-foreground font-normal">
-                                                    {jlptDistributionData.totalUsers.toLocaleString()} người dùng
+                                                    {jlptDistributionData.totalUsers.toLocaleString()} {t('dashboard.jlpt.users')}
                                                 </p>
                                             )}
                                         </div>
@@ -236,7 +243,7 @@ const AdminDashboard = () => {
                                         <div className="p-2 bg-green-500/10 rounded-lg">
                                             <UserCheck className="w-5 h-5 text-green-500" />
                                         </div>
-                                        <p className="text-lg font-bold">Trạng thái kích hoạt</p>
+                                        <p className="text-lg font-bold">{t('dashboard.activation.title')}</p>
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="pt-6">
@@ -247,10 +254,10 @@ const AdminDashboard = () => {
                                     ) : userActivationData ? (
                                         <ResponsiveContainer width="100%" height={250}>
                                             <BarChart data={[
-                                                { name: "Chờ test", value: userActivationData.pending_test.count },
-                                                { name: "Test lại", value: userActivationData.test_again.count },
-                                                { name: "Chờ chọn JLPT", value: userActivationData.pending_choose_level_jlpt.count },
-                                                { name: "Chờ chọn Pokemon", value: userActivationData.pending_choose_pokemon.count },
+                                                { name: t('dashboard.activation.pendingTest'), value: userActivationData.pending_test.count },
+                                                { name: t('dashboard.activation.testAgain'), value: userActivationData.test_again.count },
+                                                { name: t('dashboard.activation.pendingChooseJlpt'), value: userActivationData.pending_choose_level_jlpt.count },
+                                                { name: t('dashboard.activation.pendingChoosePokemon'), value: userActivationData.pending_choose_pokemon.count },
                                             ]}>
                                                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                                                 <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
@@ -276,7 +283,7 @@ const AdminDashboard = () => {
                                         <div className="p-2 bg-purple-500/10 rounded-lg">
                                             <BookOpen className="w-5 h-5 text-purple-500" />
                                         </div>
-                                        <p className="text-lg font-bold">Nội dung phổ biến nhất</p>
+                                        <p className="text-lg font-bold">{t('dashboard.popularContent.title')}</p>
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="pt-6">
@@ -302,7 +309,7 @@ const AdminDashboard = () => {
                                                     </div>
                                                     <div className="text-right px-3 py-2 rounded-lg bg-primary/5">
                                                         <p className="text-base font-bold text-foreground">{content.completedCount.toLocaleString()}</p>
-                                                        <p className="text-xs text-muted-foreground">hoàn thành</p>
+                                                        <p className="text-xs text-muted-foreground">{t('dashboard.popularContent.completed')}</p>
                                                     </div>
                                                 </div>
                                             ))}
@@ -319,16 +326,16 @@ const AdminDashboard = () => {
                         <Card className="border-2 border-border/50 shadow-lg">
                             <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent border-b border-border/50">
                                 <div className="flex items-center justify-between">
-                                    <CardTitle className="text-lg font-bold">Thống kê người dùng</CardTitle>
+                                    <CardTitle className="text-lg font-bold">{t('dashboard.userStats.title')}</CardTitle>
                                     <select
                                         value={period}
                                         onChange={(e) => setPeriod(e.target.value)}
                                         className="px-4 py-2 text-sm border-2 border-border rounded-lg bg-background hover:border-primary/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20"
                                     >
-                                        <option value="day">Theo ngày</option>
-                                        <option value="week">Theo tuần</option>
-                                        <option value="month">Theo tháng</option>
-                                        <option value="year">Theo năm</option>
+                                        <option value="day">{t('dashboard.period.day')}</option>
+                                        <option value="week">{t('dashboard.period.week')}</option>
+                                        <option value="month">{t('dashboard.period.month')}</option>
+                                        <option value="year">{t('dashboard.period.year')}</option>
                                     </select>
                                 </div>
                             </CardHeader>
@@ -337,7 +344,7 @@ const AdminDashboard = () => {
                                     <div className="p-8 rounded-xl bg-gradient-to-br from-green-500/10 via-green-500/5 to-transparent border-2 border-green-500/20 text-center hover:shadow-lg transition-all duration-300 hover:scale-105">
                                         <div className="mb-4">
                                             <UserCheck className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                                            <p className="text-sm font-semibold text-muted-foreground">Người dùng hoạt động</p>
+                                            <p className="text-sm font-semibold text-muted-foreground">{t('dashboard.userStats.activeUsers')}</p>
                                         </div>
                                         {isLoadingActiveUser ? (
                                             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mx-auto" />
@@ -347,7 +354,7 @@ const AdminDashboard = () => {
                                                     {activeUserData?.activeUsers.toLocaleString() || "0"}
                                                 </p>
                                                 <p className="text-xs text-muted-foreground bg-muted/50 px-3 py-1 rounded-full inline-block">
-                                                    người dùng/{activeUserData?.period || period}
+                                                    {t('dashboard.userStats.usersPer')}/{translatePeriod(activeUserData?.period || period)}
                                                 </p>
                                             </>
                                         )}
@@ -355,7 +362,7 @@ const AdminDashboard = () => {
                                     <div className="p-8 rounded-xl bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-transparent border-2 border-purple-500/20 text-center hover:shadow-lg transition-all duration-300 hover:scale-105">
                                         <div className="mb-4">
                                             <TrendingUp className="h-8 w-8 text-purple-500 mx-auto mb-2" />
-                                            <p className="text-sm font-semibold text-muted-foreground">Người dùng mới</p>
+                                            <p className="text-sm font-semibold text-muted-foreground">{t('dashboard.userStats.newUsers')}</p>
                                         </div>
                                         {isLoadingNewUser ? (
                                             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mx-auto" />
@@ -365,7 +372,7 @@ const AdminDashboard = () => {
                                                     {newUserData?.count.toLocaleString() || "0"}
                                                 </p>
                                                 <p className="text-xs text-muted-foreground bg-muted/50 px-3 py-1 rounded-full inline-block">
-                                                    người dùng/{newUserData?.period || period}
+                                                    {t('dashboard.userStats.usersPer')}/{translatePeriod(newUserData?.period || period)}
                                                 </p>
                                             </>
                                         )}
@@ -382,14 +389,14 @@ const AdminDashboard = () => {
                                         <div className="p-2 bg-orange-500/10 rounded-lg">
                                             <Clock className="w-5 h-5 text-orange-500" />
                                         </div>
-                                        <p className="text-lg font-bold">Chi tiết trạng thái kích hoạt</p>
+                                        <p className="text-lg font-bold">{t('dashboard.activation.detailsTitle')}</p>
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="pt-6">
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div className="p-5 rounded-xl border-2 border-orange-500/20 bg-gradient-to-br from-orange-500/10 to-orange-500/5 hover:shadow-lg transition-all duration-300 hover:scale-105 group">
                                             <div className="flex items-center justify-between mb-3">
-                                                <p className="text-sm font-semibold text-foreground">Không làm kiểm tra đầu vào</p>
+                                                <p className="text-sm font-semibold text-foreground">{t('dashboard.activation.notTakenTest')}</p>
                                                 <Clock className="h-5 w-5 text-orange-500 group-hover:scale-110 transition-transform" />
                                             </div>
                                             <p className="text-3xl font-bold text-foreground mb-1">{userActivationData.pending_test.count.toLocaleString()}</p>
@@ -399,7 +406,7 @@ const AdminDashboard = () => {
                                         </div>
                                         <div className="p-5 rounded-xl border-2 border-yellow-500/20 bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 hover:shadow-lg transition-all duration-300 hover:scale-105 group">
                                             <div className="flex items-center justify-between mb-3">
-                                                <p className="text-sm font-semibold text-foreground">Thử lại kiểm tra đầu vào</p>
+                                                <p className="text-sm font-semibold text-foreground">{t('dashboard.activation.retryTest')}</p>
                                                 <AlertCircle className="h-5 w-5 text-yellow-500 group-hover:scale-110 transition-transform" />
                                             </div>
                                             <p className="text-3xl font-bold text-foreground mb-1">{userActivationData.test_again.count.toLocaleString()}</p>
@@ -409,7 +416,7 @@ const AdminDashboard = () => {
                                         </div>
                                         <div className="p-5 rounded-xl border-2 border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-blue-500/5 hover:shadow-lg transition-all duration-300 hover:scale-105 group">
                                             <div className="flex items-center justify-between mb-3">
-                                                <p className="text-sm font-semibold text-foreground">Chưa chọn trình độ JLPT</p>
+                                                <p className="text-sm font-semibold text-foreground">{t('dashboard.activation.notChosenJlpt')}</p>
                                                 <Languages className="h-5 w-5 text-blue-500 group-hover:scale-110 transition-transform" />
                                             </div>
                                             <p className="text-3xl font-bold text-foreground mb-1">{userActivationData.pending_choose_level_jlpt.count.toLocaleString()}</p>
@@ -419,7 +426,7 @@ const AdminDashboard = () => {
                                         </div>
                                         <div className="p-5 rounded-xl border-2 border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-purple-500/5 hover:shadow-lg transition-all duration-300 hover:scale-105 group">
                                             <div className="flex items-center justify-between mb-3">
-                                                <p className="text-sm font-semibold text-foreground">Đang chọn Pokemon</p>
+                                                <p className="text-sm font-semibold text-foreground">{t('dashboard.activation.choosingPokemon')}</p>
                                                 <Sparkles className="h-5 w-5 text-purple-500 group-hover:scale-110 transition-transform" />
                                             </div>
                                             <p className="text-3xl font-bold text-foreground mb-1">{userActivationData.pending_choose_pokemon.count.toLocaleString()}</p>
@@ -445,10 +452,10 @@ const AdminDashboard = () => {
                                                 <Sparkles className="w-5 h-5 text-yellow-500" />
                                             </div>
                                             <div>
-                                                <p className="text-lg font-bold">Phân bố Sparkles</p>
+                                                <p className="text-lg font-bold">{t('dashboard.sparkles.title')}</p>
                                                 <div className="mt-2 space-y-1 text-sm text-muted-foreground font-normal">
-                                                    <p>Tổng: {sparklesData.totalUsers.toLocaleString()} người dùng</p>
-                                                    <p>Trung bình: {sparklesData.averageSparkles.toLocaleString()} sparkles</p>
+                                                    <p>{t('dashboard.sparkles.total')}: {sparklesData.totalUsers.toLocaleString()} {t('dashboard.sparkles.users')}</p>
+                                                    <p>{t('dashboard.sparkles.average')}: {sparklesData.averageSparkles.toLocaleString()} sparkles</p>
                                                 </div>
                                             </div>
                                         </CardTitle>
@@ -486,9 +493,9 @@ const AdminDashboard = () => {
                                                 <Trophy className="w-5 h-5 text-amber-500" />
                                             </div>
                                             <div>
-                                                <p className="text-lg font-bold">Starter Pokemon</p>
+                                                <p className="text-lg font-bold">{t('dashboard.starterPokemon.title')}</p>
                                                 <p className="text-sm text-muted-foreground font-normal mt-1">
-                                                    {starterPokemonData.totalCount.toLocaleString()} người dùng
+                                                    {starterPokemonData.totalCount.toLocaleString()} {t('dashboard.starterPokemon.users')}
                                                 </p>
                                             </div>
                                         </CardTitle>
@@ -539,9 +546,9 @@ const AdminDashboard = () => {
                                             <TrendingUp className="w-5 h-5 text-emerald-500" />
                                         </div>
                                         <div>
-                                            <p className="text-lg font-bold">Duy trì chuỗi học tập</p>
+                                            <p className="text-lg font-bold">{t('dashboard.streak.title')}</p>
                                             <p className="text-sm text-muted-foreground font-normal mt-1">
-                                                {streakData.totalUsers.toLocaleString()} người dùng
+                                                {streakData.totalUsers.toLocaleString()} {t('dashboard.streak.users')}
                                             </p>
                                         </div>
                                     </CardTitle>
@@ -554,17 +561,17 @@ const AdminDashboard = () => {
                                     ) : (
                                         <div className="grid md:grid-cols-2 gap-4">
                                             <div className="p-8 rounded-xl border-2 border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 text-center hover:shadow-lg transition-all duration-300 hover:scale-105">
-                                                <p className="text-sm font-semibold text-muted-foreground mb-3">Chuỗi hàng ngày</p>
+                                                <p className="text-sm font-semibold text-muted-foreground mb-3">{t('dashboard.streak.daily')}</p>
                                                 <p className="text-4xl font-bold text-foreground mb-2">{streakData.daily_streak.count.toLocaleString()}</p>
                                                 <p className="text-xs text-muted-foreground bg-emerald-500/10 px-3 py-1 rounded-full inline-block">
-                                                    {formatPercent(streakData.daily_streak.percent)}% người dùng
+                                                    {formatPercent(streakData.daily_streak.percent)}{t('dashboard.streak.usersPercent')}
                                                 </p>
                                             </div>
                                             <div className="p-8 rounded-xl border-2 border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-blue-500/5 text-center hover:shadow-lg transition-all duration-300 hover:scale-105">
-                                                <p className="text-sm font-semibold text-muted-foreground mb-3">Chuỗi hàng tháng</p>
+                                                <p className="text-sm font-semibold text-muted-foreground mb-3">{t('dashboard.streak.monthly')}</p>
                                                 <p className="text-4xl font-bold text-foreground mb-2">{streakData.monthly_streak.count.toLocaleString()}</p>
                                                 <p className="text-xs text-muted-foreground bg-blue-500/10 px-3 py-1 rounded-full inline-block">
-                                                    {formatPercent(streakData.monthly_streak.percent)}% người dùng
+                                                    {formatPercent(streakData.monthly_streak.percent)}{t('dashboard.streak.usersPercent')}
                                                 </p>
                                             </div>
                                         </div>

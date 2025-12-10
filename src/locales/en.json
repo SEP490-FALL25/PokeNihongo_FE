@@ -41,6 +41,11 @@
         "minutes": "minutes",
         "retry": "Retry",
         "clearAll": "Clear all",
+        "perPage": " / page",
+        "goToPreviousPage": "Go to previous page",
+        "goToNextPage": "Go to next page",
+        "morePages": "More pages",
+        "itemsRange": "{{start}}-{{end}} of {{total}} items",
         "created": "Created",
         "published": "Published",
         "draft": "Draft",
@@ -211,6 +216,76 @@
             "note": "This action cannot be undone.",
             "confirmAction": "Delete season",
             "deleting": "Deleting..."
+        },
+        "list": {
+            "title": "Tournament List",
+            "createTournament": "Create Tournament",
+            "stats": {
+                "totalTournaments": "Total Tournaments",
+                "activeTournaments": "Active",
+                "totalParticipants": "Total Participants",
+                "monthlyRewards": "Monthly Rewards"
+            },
+            "filters": {
+                "search": "Search",
+                "searchPlaceholder": "Search tournaments...",
+                "status": "Status",
+                "statusPlaceholder": "Status",
+                "startDate": "Start Date",
+                "startDatePlaceholder": "Select start date",
+                "endDate": "End Date",
+                "endDatePlaceholder": "Select end date",
+                "openStatus": "Open Status",
+                "openStatusPlaceholder": "Open Status",
+                "all": "All",
+                "opened": "Opened",
+                "notOpened": "Not Opened",
+                "clearFilters": "Clear Filters"
+            },
+            "status": {
+                "active": "Active",
+                "preview": "Preview",
+                "expired": "Expired",
+                "inactive": "Inactive",
+                "unknown": "Unknown"
+            },
+            "messages": {
+                "loading": "Loading data...",
+                "error": "An error occurred while loading data",
+                "noTournaments": "No tournaments found"
+            },
+            "card": {
+                "opened": "Opened",
+                "time": "Time"
+            }
+        }
+    },
+    "permission": {
+        "title": "Permission Management",
+        "description": "Manage role-based access control",
+        "config": {
+            "title": "Configuration",
+            "subtitle": "Select role and apply filters",
+            "selectRole": "Select Role",
+            "selectRolePlaceholder": "Choose a role...",
+            "filterByModule": "Filter by Module",
+            "filterByModulePlaceholder": "e.g. User, Lesson...",
+            "filterByPath": "Filter by Path",
+            "filterByPathPlaceholder": "e.g. /wallet, /api/users..."
+        },
+        "matrix": {
+            "title": "Permissions Matrix",
+            "description": "Configure access permissions",
+            "selected": "selected",
+            "saving": "Saving...",
+            "saveChanges": "Save Changes",
+            "selectAll": "Select All",
+            "expandAll": "Expand All",
+            "enableAll": "Enable All",
+            "permission": "permission",
+            "permissions": "permissions",
+            "noPermissionsFound": "No Permissions Found",
+            "noPermissionsMatch": "No permissions match your current search criteria."
         }
     },
     "notFoundPage": {
@@ -1642,5 +1717,105 @@
         "createNoId": "No ID returned from server after creation",
         "unknownError": "An unexpected error occurred",
         "testTypeLabel": "Type"
+    },
+    "packageManagement": {
+        "title": "Package Management",
+        "description": "Statistics and management of subscription packages",
+        "tabs": {
+            "overview": "Overview",
+            "packages": "Package List"
+        },
+        "stats": {
+            "totalPackages": "Total Packages",
+            "monthlyRevenue": "Monthly Revenue",
+            "totalSubscriptions": "Total Subscriptions",
+            "yearlyRevenue": "Yearly Revenue"
+        },
+        "revenue": {
+            "title": "Package Revenue",
+            "monthly": "Monthly Revenue",
+            "yearly": "Yearly Revenue",
+            "byPackage": "Revenue by Package",
+            "noData": "No revenue data available"
+        },
+        "subscribers": {
+            "distribution": "Subscriber Distribution",
+            "details": "Subscription Details",
+            "totalPurchases": "Total Purchases",
+            "activeUsers": "Active Users"
+        },
+        "packages": {
+            "noPackages": "No packages available",
+            "subscribers": "Subscribers",
+            "moreFeatures": "+{{count}} more features",
+            "lifetime": "Lifetime",
+            "days": "{{count}} days"
+        },
+        "month": "Month",
+        "year": "Year"
+    },
+    "dashboard": {
+        "title": "Overview",
+        "description": "System statistics and analysis",
+        "tabs": {
+            "overview": "Overview",
+            "users": "Users",
+            "engagement": "Engagement"
+        },
+        "stats": {
+            "totalUsers": "Total Users",
+            "activeUsers": "Active Users",
+            "newUsers": "New Users",
+            "notActivated": "Not Activated"
+        },
+        "jlpt": {
+            "title": "JLPT Level Distribution",
+            "users": "users"
+        },
+        "activation": {
+            "title": "Activation Status",
+            "detailsTitle": "Activation Status Details",
+            "pendingTest": "Pending Test",
+            "testAgain": "Test Again",
+            "pendingChooseJlpt": "Pending Choose JLPT",
+            "pendingChoosePokemon": "Pending Choose Pokemon",
+            "notTakenTest": "Not Taken Test",
+            "retryTest": "Retry Test",
+            "notChosenJlpt": "Not Chosen JLPT Level",
+            "choosingPokemon": "Choosing Pokemon"
+        },
+        "popularContent": {
+            "title": "Most Popular Content",
+            "completed": "completed"
+        },
+        "userStats": {
+            "title": "User Statistics",
+            "activeUsers": "Active Users",
+            "newUsers": "New Users",
+            "usersPer": "users"
+        },
+        "period": {
+            "day": "By Day",
+            "week": "By Week",
+            "month": "By Month",
+            "year": "By Year"
+        },
+        "sparkles": {
+            "title": "Sparkles Distribution",
+            "total": "Total",
+            "average": "Average",
+            "users": "users"
+        },
+        "starterPokemon": {
+            "title": "Starter Pokemon",
+            "users": "users"
+        },
+        "streak": {
+            "title": "Learning Streak Retention",
+            "users": "users",
+            "daily": "Daily Streak",
+            "monthly": "Monthly Streak",
+            "usersPercent": "% users"
+        }
     }
 }

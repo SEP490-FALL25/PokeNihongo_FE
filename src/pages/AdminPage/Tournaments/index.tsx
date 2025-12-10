@@ -99,7 +99,7 @@ export default function TournamentManagement() {
 
         return [
             {
-                label: "Tổng giải đấu",
+                label: t('tournaments.list.stats.totalTournaments'),
                 value: totalTournaments.toString(),
                 icon: Trophy,
                 gradient: "from-yellow-500/20 to-amber-500/20",
@@ -108,7 +108,7 @@ export default function TournamentManagement() {
                 borderColor: "border-yellow-500/20"
             },
             {
-                label: "Đang diễn ra",
+                label: t('tournaments.list.stats.activeTournaments'),
                 value: activeTournaments.toString(),
                 icon: Calendar,
                 gradient: "from-blue-500/20 to-cyan-500/20",
@@ -117,7 +117,7 @@ export default function TournamentManagement() {
                 borderColor: "border-blue-500/20"
             },
             {
-                label: "Tổng người tham gia",
+                label: t('tournaments.list.stats.totalParticipants'),
                 value: totalParticipants.toString() || "0",
                 icon: Users,
                 gradient: "from-green-500/20 to-emerald-500/20",
@@ -126,7 +126,7 @@ export default function TournamentManagement() {
                 borderColor: "border-green-500/20"
             },
             {
-                label: "Giải thưởng tháng này",
+                label: t('tournaments.list.stats.monthlyRewards'),
                 value: monthlyRewards.toString() || "0",
                 icon: Award,
                 gradient: "from-purple-500/20 to-pink-500/20",
@@ -135,7 +135,7 @@ export default function TournamentManagement() {
                 borderColor: "border-purple-500/20"
             },
         ]
-    }, [tournamentsList, pagination])
+    }, [tournamentsList, pagination, t])
 
     // Handle clear filters
     const handleClearFilters = () => {
@@ -158,23 +158,23 @@ export default function TournamentManagement() {
     const BRIGHTENED_BATTLE_STATUS_CONFIG: StatusStyleConfig = {
         [BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE]: {
             colorClass: "bg-gradient-to-r from-green-500/50 to-emerald-500/50 text-green-700 border-2 border-green-500/70 shadow-md",
-            label: "Đang diễn ra",
+            label: t('tournaments.list.status.active'),
         },
         [BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.PREVIEW]: {
             colorClass: "bg-gradient-to-r from-blue-500/50 to-cyan-500/50 text-blue-700 border-2 border-blue-500/70 shadow-md",
-            label: "Xem trước",
+            label: t('tournaments.list.status.preview'),
         },
         [BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.EXPIRED]: {
             colorClass: "bg-gradient-to-r from-gray-500/50 to-slate-500/50 text-gray-700 border-2 border-gray-500/70 shadow-md",
-            label: "Đã kết thúc",
+            label: t('tournaments.list.status.expired'),
         },
         [BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.INACTIVE]: {
             colorClass: "bg-gradient-to-r from-red-500/50 to-rose-500/50 text-red-700 border-2 border-red-500/70 shadow-md",
-            label: "Không hoạt động",
+            label: t('tournaments.list.status.inactive'),
         },
         DEFAULT: {
             colorClass: "bg-gradient-to-r from-gray-500/50 to-slate-500/50 text-gray-700 border-2 border-gray-500/70 shadow-md",
-            label: "Không xác định",
+            label: t('tournaments.list.status.unknown'),
         },
     }
 
@@ -228,14 +228,14 @@ export default function TournamentManagement() {
                                 <div className="p-2 bg-primary/10 rounded-lg">
                                     <Trophy className="w-5 h-5 text-primary" />
                                 </div>
-                                <CardTitle className="text-xl font-bold text-foreground">Danh sách giải đấu</CardTitle>
+                                <CardTitle className="text-xl font-bold text-foreground">{t('tournaments.list.title')}</CardTitle>
                             </div>
                             <Button
                                 className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 shadow-lg"
                                 onClick={() => setShowAddDialog(true)}
                             >
                                 <Plus className="w-4 h-4 mr-2" />
-                                Tạo giải đấu
+                                {t('tournaments.list.createTournament')}
                             </Button>
                         </div>
                     </CardHeader>
@@ -245,13 +245,13 @@ export default function TournamentManagement() {
                             <div className="flex flex-col lg:flex-row gap-4">
                                 <div className="flex-1">
                                     <label className="text-sm font-medium text-foreground mb-2 block">
-                                        Tìm kiếm
+                                        {t('tournaments.list.filters.search')}
                                     </label>
                                     <div className="relative">
                                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
                                         <Input
                                             type="text"
-                                            placeholder="Tìm kiếm giải đấu..."
+                                            placeholder={t('tournaments.list.filters.searchPlaceholder')}
                                             value={searchQuery}
                                             onChange={(e) => {
                                                 setSearchQuery(e.target.value)
@@ -263,7 +263,7 @@ export default function TournamentManagement() {
                                 </div>
                                 <div className="lg:w-[220px]">
                                     <label className="text-sm font-medium text-foreground mb-2 block">
-                                        Trạng thái
+                                        {t('tournaments.list.filters.status')}
                                     </label>
                                     <Select
                                         value={selectedStatus}
@@ -273,10 +273,10 @@ export default function TournamentManagement() {
                                         }}
                                     >
                                         <SelectTrigger className="w-full bg-background border-border text-foreground h-11 shadow-sm">
-                                            <SelectValue placeholder="Trạng thái" />
+                                            <SelectValue placeholder={t('tournaments.list.filters.statusPlaceholder')} />
                                         </SelectTrigger>
                                         <SelectContent className="bg-card border-border">
-                                            <SelectItem value="all">Tất cả</SelectItem>
+                                            <SelectItem value="all">{t('tournaments.list.filters.all')}</SelectItem>
                                             <SelectItem value={BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE}>
                                                 {getStatusText(BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE, BATTLE_STATUS_CONFIG)}
                                             </SelectItem>
@@ -298,7 +298,7 @@ export default function TournamentManagement() {
                             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                                 <div>
                                     <label className="text-sm font-medium text-foreground mb-2 block">
-                                        Ngày bắt đầu
+                                        {t('tournaments.list.filters.startDate')}
                                     </label>
                                     <CustomDatePicker
                                         value={filterStartDate}
@@ -306,7 +306,7 @@ export default function TournamentManagement() {
                                             setFilterStartDate(date)
                                             setCurrentPage(1)
                                         }}
-                                        placeholder="Chọn ngày bắt đầu"
+                                        placeholder={t('tournaments.list.filters.startDatePlaceholder')}
                                         dayPickerProps={{
                                             disabled: false
                                         }}
@@ -314,7 +314,7 @@ export default function TournamentManagement() {
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium text-foreground mb-2 block">
-                                        Ngày kết thúc
+                                        {t('tournaments.list.filters.endDate')}
                                     </label>
                                     <CustomDatePicker
                                         value={filterEndDate}
@@ -322,7 +322,7 @@ export default function TournamentManagement() {
                                             setFilterEndDate(date)
                                             setCurrentPage(1)
                                         }}
-                                        placeholder="Chọn ngày kết thúc"
+                                        placeholder={t('tournaments.list.filters.endDatePlaceholder')}
                                         dayPickerProps={{
                                             disabled: false
                                         }}
@@ -330,7 +330,7 @@ export default function TournamentManagement() {
                                 </div>
                                 <div className="lg:w-[220px]">
                                     <label className="text-sm font-medium text-foreground mb-2 block">
-                                        Trạng thái mở
+                                        {t('tournaments.list.filters.openStatus')}
                                     </label>
                                     <Select
                                         value={filterHasOpened}
@@ -340,12 +340,12 @@ export default function TournamentManagement() {
                                         }}
                                     >
                                         <SelectTrigger className="w-full bg-background border-border text-foreground h-11 shadow-sm">
-                                            <SelectValue placeholder="Trạng thái mở" />
+                                            <SelectValue placeholder={t('tournaments.list.filters.openStatusPlaceholder')} />
                                         </SelectTrigger>
                                         <SelectContent className="bg-card border-border">
-                                            <SelectItem value="all">Tất cả</SelectItem>
-                                            <SelectItem value="opened">Đã mở</SelectItem>
-                                            <SelectItem value="notOpened">Chưa mở</SelectItem>
+                                            <SelectItem value="all">{t('tournaments.list.filters.all')}</SelectItem>
+                                            <SelectItem value="opened">{t('tournaments.list.filters.opened')}</SelectItem>
+                                            <SelectItem value="notOpened">{t('tournaments.list.filters.notOpened')}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -357,7 +357,7 @@ export default function TournamentManagement() {
                                             className="w-full border-border text-foreground hover:bg-muted shadow-sm h-11"
                                         >
                                             <X className="w-4 h-4 mr-2" />
-                                            Xóa bộ lọc
+                                            {t('tournaments.list.filters.clearFilters')}
                                         </Button>
                                     ) : (
                                         <div className="h-11" />
@@ -374,7 +374,7 @@ export default function TournamentManagement() {
                         <CardContent className="p-12">
                             <div className="flex flex-col items-center justify-center gap-4">
                                 <Loader2 className="w-12 h-12 animate-spin text-primary" />
-                                <p className="text-muted-foreground">Đang tải dữ liệu...</p>
+                                <p className="text-muted-foreground">{t('tournaments.list.messages.loading')}</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -385,7 +385,7 @@ export default function TournamentManagement() {
                                 <div className="p-3 bg-destructive/10 rounded-full">
                                     <Trophy className="w-8 h-8 text-destructive" />
                                 </div>
-                                <p className="text-destructive font-medium">Có lỗi xảy ra khi tải dữ liệu</p>
+                                <p className="text-destructive font-medium">{t('tournaments.list.messages.error')}</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -396,7 +396,7 @@ export default function TournamentManagement() {
                                 <div className="p-3 bg-muted rounded-full">
                                     <Trophy className="w-8 h-8 text-muted-foreground" />
                                 </div>
-                                <p className="text-muted-foreground font-medium">Không tìm thấy giải đấu nào</p>
+                                <p className="text-muted-foreground font-medium">{t('tournaments.list.messages.noTournaments')}</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -436,7 +436,7 @@ export default function TournamentManagement() {
                                             {tournament.hasOpened && (
                                                 <Badge className="bg-gradient-to-r from-green-500/50 to-emerald-500/50 text-green-800 border-2 border-green-500/70 shadow-md font-semibold flex items-center gap-1.5">
                                                     <CheckCircle2 className="w-3.5 h-3.5" />
-                                                    Đã mở
+                                                    {t('tournaments.list.card.opened')}
                                                 </Badge>
                                             )}
                                         </div>
@@ -446,7 +446,7 @@ export default function TournamentManagement() {
                                             <div className="flex items-center justify-between text-sm">
                                                 <span className="text-muted-foreground flex items-center gap-2 font-medium">
                                                     <Clock className="w-4 h-4" />
-                                                    Thời gian
+                                                    {t('tournaments.list.card.time')}
                                                 </span>
                                                 <span className="text-foreground font-semibold">
                                                     {formatDateOnly(tournament.startDate)} - {formatDateOnly(tournament.endDate)}

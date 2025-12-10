@@ -1,5 +1,6 @@
 import * as React from "react"
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import { ButtonProps, buttonVariants } from "@ui/Button"
 import { cn } from "@utils/CN"
@@ -67,46 +68,55 @@ PaginationLink.displayName = "PaginationLink"
 const PaginationPrevious = ({
   className,
   ...props
-}: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink
-    aria-label="Go to previous page"
-    size="default"
-    className={cn("text-primary hover:text-primary-dark", className)}
-    {...props}
-  >
-    <ChevronLeft className="h-3 w-3 lg:h-4 lg:w-4" />
-  </PaginationLink>
-)
+}: React.ComponentProps<typeof PaginationLink>) => {
+  const { t } = useTranslation()
+  return (
+    <PaginationLink
+      aria-label={t('common.goToPreviousPage')}
+      size="default"
+      className={cn("text-primary hover:text-primary-dark", className)}
+      {...props}
+    >
+      <ChevronLeft className="h-3 w-3 lg:h-4 lg:w-4" />
+    </PaginationLink>
+  )
+}
 PaginationPrevious.displayName = "PaginationPrevious"
 
 const PaginationNext = ({
   className,
   ...props
-}: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink
-    aria-label="Go to next page"
-    size="default"
-    className={cn("text-primary hover:text-primary-dark", className)}
-    {...props}
-  >
-    <ChevronRight className="h-3 w-3 lg:h-4 lg:w-4" />
-  </PaginationLink>
-)
+}: React.ComponentProps<typeof PaginationLink>) => {
+  const { t } = useTranslation()
+  return (
+    <PaginationLink
+      aria-label={t('common.goToNextPage')}
+      size="default"
+      className={cn("text-primary hover:text-primary-dark", className)}
+      {...props}
+    >
+      <ChevronRight className="h-3 w-3 lg:h-4 lg:w-4" />
+    </PaginationLink>
+  )
+}
 PaginationNext.displayName = "PaginationNext"
 
 const PaginationEllipsis = ({
   className,
   ...props
-}: React.ComponentProps<"span">) => (
-  <span
-    aria-hidden
-    className={cn("flex h-8 w-8 lg:h-9 lg:w-9 items-center justify-center text-gray-500", className)}
-    {...props}
-  >
-    <MoreHorizontal className="h-3 w-3 lg:h-4 lg:w-4" />
-    <span className="sr-only">More pages</span>
-  </span>
-)
+}: React.ComponentProps<"span">) => {
+  const { t } = useTranslation()
+  return (
+    <span
+      aria-hidden
+      className={cn("flex h-8 w-8 lg:h-9 lg:w-9 items-center justify-center text-gray-500", className)}
+      {...props}
+    >
+      <MoreHorizontal className="h-3 w-3 lg:h-4 lg:w-4" />
+      <span className="sr-only">{t('common.morePages')}</span>
+    </span>
+  )
+}
 PaginationEllipsis.displayName = "PaginationEllipsis"
 
 // Enhanced Pagination Component with Integrated Logic
@@ -131,6 +141,7 @@ const EnhancedPagination: React.FC<EnhancedPaginationProps> = ({
   className,
   maxVisiblePages = 5
 }) => {
+  const { t } = useTranslation()
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
@@ -239,7 +250,7 @@ const EnhancedPagination: React.FC<EnhancedPaginationProps> = ({
     <div className={`flex flex-col lg:flex-row items-center justify-between gap-4 ${className}`}>
       {showItemCount && (
         <span className="text-sm text-primary whitespace-nowrap order-2 lg:order-1">
-          {startItem}-{endItem} of {totalItems} items
+          {t('common.itemsRange', { start: startItem, end: endItem, total: totalItems })}
         </span>
       )}
       <Pagination className="order-1 lg:order-2">

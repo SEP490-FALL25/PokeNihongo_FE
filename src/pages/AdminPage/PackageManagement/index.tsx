@@ -21,9 +21,9 @@ import {
     ResponsiveContainer,
 } from "recharts"
 
-const monthOptions = Array.from({ length: 12 }, (_, index) => ({
+const monthOptions = (t: any) => Array.from({ length: 12 }, (_, index) => ({
     value: index + 1,
-    label: `Tháng ${index + 1}`,
+    label: `${t('packageManagement.month')} ${index + 1}`,
 }));
 
 const buildYearOptions = (currentYear: number, range = 5) =>
@@ -43,6 +43,7 @@ export default function PackageManagement() {
     const [selectedYear, setSelectedYear] = useState(now.getFullYear());
     const [activeTab, setActiveTab] = useState<string>("overview");
     const yearOptions = useMemo(() => buildYearOptions(now.getFullYear(), 6), [now]);
+    const monthOptionsList = useMemo(() => monthOptions(t), [t]);
 
     const { data: subscriptionStats, isLoading: isSubscriptionLoading } = useGetDashboardSubscriptionPlan();
     const { data: revenueStats, isLoading: isRevenueLoading } = useGetDashboardRevenue(selectedMonth, selectedYear);
@@ -94,9 +95,9 @@ export default function PackageManagement() {
                 getTranslationValue(plan.subscription.nameTranslations, "en") ?? viName
             const durationLabel =
                 plan.type === "LIFETIME"
-                    ? "Trọn đời"
+                    ? t('packageManagement.packages.lifetime')
                     : plan.durationInDays
-                        ? `${plan.durationInDays} ngày`
+                        ? t('packageManagement.packages.days', { count: plan.durationInDays })
                         : "-"
             const features = plan.subscription.features.map((feature) => {
                 const label = feature.feature.nameTranslation
@@ -148,7 +149,7 @@ export default function PackageManagement() {
 
     const stats = useMemo(() => [
         {
-            label: "Tổng gói dịch vụ",
+            label: t('packageManagement.stats.totalPackages'),
             value: subscriptionStats?.totalActivePlans ?? packages.length,
             icon: Package,
             gradient: "from-blue-500/20 via-blue-500/10 to-transparent",
@@ -158,7 +159,7 @@ export default function PackageManagement() {
             isLoading: isSubscriptionLoading,
         },
         {
-            label: "Doanh thu tháng",
+            label: t('packageManagement.stats.monthlyRevenue'),
             value: revenueStats ? `${formatCurrency(revenueStats.totalRevenue.month)} VND` : "—",
             icon: DollarSign,
             gradient: "from-green-500/20 via-green-500/10 to-transparent",
@@ -168,7 +169,7 @@ export default function PackageManagement() {
             isLoading: isRevenueLoading,
         },
         {
-            label: "Tổng đăng ký",
+            label: t('packageManagement.stats.totalSubscriptions'),
             value: revenueStats
                 ? String(revenueStats.plans.reduce((sum, plan) => sum + plan.revenue.month.count, 0))
                 : "—",
@@ -180,7 +181,7 @@ export default function PackageManagement() {
             isLoading: isRevenueLoading,
         },
         {
-            label: "Doanh thu năm",
+            label: t('packageManagement.stats.yearlyRevenue'),
             value: revenueStats ? `${formatCurrency(revenueStats.totalRevenue.year)} VND` : "—",
             icon: TrendingUp,
             gradient: "from-yellow-500/20 via-yellow-500/10 to-transparent",
@@ -189,7 +190,7 @@ export default function PackageManagement() {
             iconColor: "text-yellow-500",
             isLoading: isRevenueLoading,
         },
-    ], [subscriptionStats, packages.length, revenueStats, isSubscriptionLoading, isRevenueLoading])
+    ], [subscriptionStats, packages.length, revenueStats, isSubscriptionLoading, isRevenueLoading, t])
 
     const getColorClasses = (color: string) => {
         const colors: Record<string, { bg: string; text: string; border: string; gradient: string }> = {
@@ -223,7 +224,7 @@ export default function PackageManagement() {
 
     return (
         <>
-            <HeaderAdmin title="Quản lý gói dịch vụ" description="Thống kê và quản lý các gói đăng ký" />
+            <HeaderAdmin title={t('packageManagement.title')} description={t('packageManagement.description')} />
             <div className="mt-24 p-8 space-y-8">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                     <TabsList className="grid w-full max-w-2xl grid-cols-2 bg-muted/50 p-1.5 rounded-xl">
@@ -232,14 +233,14 @@ export default function PackageManagement() {
                             className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-md transition-all"
                         >
                             <BarChart3 className="w-4 h-4" />
-                            Tổng quan
+                            {t('packageManagement.tabs.overview')}
                         </TabsTrigger>
                         <TabsTrigger
                             value="packages"
                             className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-md transition-all"
                         >
                             <Package className="w-4 h-4" />
-                            Danh sách gói
+                            {t('packageManagement.tabs.packages')}
                         </TabsTrigger>
                     </TabsList>
 
@@ -284,9 +285,9 @@ export default function PackageManagement() {
                                     <div>
                                         <CardTitle className="text-lg font-bold flex items-center gap-2">
                                             <DollarSign className="w-5 h-5 text-emerald-500" />
-                                            Doanh thu gói dịch vụ
+                                            {t('packageManagement.revenue.title')}
                                         </CardTitle>
-                                        <p className="text-sm text-muted-foreground mt-1">Tháng {selectedMonth}/{selectedYear}</p>
+                                        <p className="text-sm text-muted-foreground mt-1">{t('packageManagement.month')} {selectedMonth}/{selectedYear}</p>
                                     </div>
                                     <div className="flex flex-wrap gap-3">
                                         <Select
@@ -294,10 +295,10 @@ export default function PackageManagement() {
                                             onValueChange={(value) => setSelectedMonth(Number(value))}
                                         >
                                             <SelectTrigger className="w-[140px] bg-background border-2 border-border h-10">
-                                                <SelectValue placeholder="Tháng" />
+                                                <SelectValue placeholder={t('packageManagement.month')} />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {monthOptions.map((option) => (
+                                                {monthOptionsList.map((option) => (
                                                     <SelectItem key={option.value} value={option.value.toString()}>
                                                         {option.label}
                                                     </SelectItem>
@@ -309,7 +310,7 @@ export default function PackageManagement() {
                                             onValueChange={(value) => setSelectedYear(Number(value))}
                                         >
                                             <SelectTrigger className="w-[140px] bg-background border-2 border-border h-10">
-                                                <SelectValue placeholder="Năm" />
+                                                <SelectValue placeholder={t('packageManagement.year')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {yearOptions.map((option) => (
@@ -333,13 +334,13 @@ export default function PackageManagement() {
                                         {/* Revenue Summary */}
                                         <div className="grid gap-4 md:grid-cols-2">
                                             <div className="p-6 rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border-2 border-emerald-500/20 text-center">
-                                                <p className="text-sm font-semibold text-muted-foreground mb-2">Doanh thu tháng</p>
+                                                <p className="text-sm font-semibold text-muted-foreground mb-2">{t('packageManagement.revenue.monthly')}</p>
                                                 <p className="text-3xl font-bold text-foreground">
                                                     {formatCurrency(revenueStats.totalRevenue.month)} VND
                                                 </p>
                                             </div>
                                             <div className="p-6 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-2 border-blue-500/20 text-center">
-                                                <p className="text-sm font-semibold text-muted-foreground mb-2">Doanh thu năm</p>
+                                                <p className="text-sm font-semibold text-muted-foreground mb-2">{t('packageManagement.revenue.yearly')}</p>
                                                 <p className="text-3xl font-bold text-foreground">
                                                     {formatCurrency(revenueStats.totalRevenue.year)} VND
                                                 </p>
@@ -349,7 +350,7 @@ export default function PackageManagement() {
                                         {/* Revenue Chart */}
                                         {revenueChartData.length > 0 && (
                                             <div className="space-y-4">
-                                                <h3 className="text-lg font-bold text-foreground">Doanh thu theo gói</h3>
+                                                <h3 className="text-lg font-bold text-foreground">{t('packageManagement.revenue.byPackage')}</h3>
                                                 <ResponsiveContainer width="100%" height={300}>
                                                     <BarChart data={revenueChartData}>
                                                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -364,8 +365,8 @@ export default function PackageManagement() {
                                                             formatter={(value: number) => [`${formatCurrency(value)} VND`, ""]}
                                                         />
                                                         <Legend />
-                                                        <Bar dataKey="month" fill="hsl(var(--chart-1))" name="Doanh thu tháng" radius={[8, 8, 0, 0]} />
-                                                        <Bar dataKey="year" fill="hsl(var(--chart-2))" name="Doanh thu năm" radius={[8, 8, 0, 0]} />
+                                                        <Bar dataKey="month" fill="hsl(var(--chart-1))" name={t('packageManagement.revenue.monthly')} radius={[8, 8, 0, 0]} />
+                                                        <Bar dataKey="year" fill="hsl(var(--chart-2))" name={t('packageManagement.revenue.yearly')} radius={[8, 8, 0, 0]} />
                                                     </BarChart>
                                                 </ResponsiveContainer>
                                             </div>
@@ -374,7 +375,7 @@ export default function PackageManagement() {
                                 ) : (
                                     <div className="flex flex-col items-center justify-center py-12 text-center gap-3">
                                         <AlertCircle className="w-10 h-10 text-muted-foreground" />
-                                        <p className="text-muted-foreground font-medium">Chưa có dữ liệu doanh thu</p>
+                                        <p className="text-muted-foreground font-medium">{t('packageManagement.revenue.noData')}</p>
                                     </div>
                                 )}
                             </CardContent>
@@ -387,7 +388,7 @@ export default function PackageManagement() {
                                     <CardHeader className="bg-gradient-to-r from-purple-500/5 to-transparent border-b border-border/50">
                                         <CardTitle className="flex items-center gap-2">
                                             <PieChartIcon className="w-5 h-5 text-purple-500" />
-                                            Phân bố người đăng ký
+                                            {t('packageManagement.subscribers.distribution')}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="pt-6">
@@ -418,7 +419,7 @@ export default function PackageManagement() {
                                     <CardHeader className="bg-gradient-to-r from-blue-500/5 to-transparent border-b border-border/50">
                                         <CardTitle className="flex items-center gap-2">
                                             <Users className="w-5 h-5 text-blue-500" />
-                                            Chi tiết đăng ký
+                                            {t('packageManagement.subscribers.details')}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="pt-6">
@@ -442,11 +443,11 @@ export default function PackageManagement() {
                                                             </div>
                                                             <div className="grid grid-cols-2 gap-3 mt-3">
                                                                 <div>
-                                                                    <p className="text-xs text-muted-foreground">Tổng đăng ký</p>
+                                                                    <p className="text-xs text-muted-foreground">{t('packageManagement.subscribers.totalPurchases')}</p>
                                                                     <p className="text-lg font-bold text-foreground">{plan.stats.totalPurchases.toLocaleString()}</p>
                                                                 </div>
                                                                 <div>
-                                                                    <p className="text-xs text-muted-foreground">Đang hoạt động</p>
+                                                                    <p className="text-xs text-muted-foreground">{t('packageManagement.subscribers.activeUsers')}</p>
                                                                     <p className="text-lg font-bold text-foreground">{plan.stats.activeUsers.toLocaleString()}</p>
                                                                 </div>
                                                             </div>
@@ -514,7 +515,7 @@ export default function PackageManagement() {
                                                     ))}
                                                     {pkg.features.length > 4 && (
                                                         <p className="text-xs text-muted-foreground text-center mt-2">
-                                                            +{pkg.features.length - 4} tính năng khác
+                                                            {t('packageManagement.packages.moreFeatures', { count: pkg.features.length - 4 })}
                                                         </p>
                                                     )}
                                                 </div>
@@ -522,7 +523,7 @@ export default function PackageManagement() {
                                                 <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/50">
                                                     <span className="text-muted-foreground font-medium flex items-center gap-2 text-sm">
                                                         <Users className="w-4 h-4" />
-                                                        Đăng ký
+                                                        {t('packageManagement.packages.subscribers')}
                                                     </span>
                                                     <span className="text-foreground font-bold text-lg">{pkg.subscribers.toLocaleString()}</span>
                                                 </div>
@@ -534,7 +535,7 @@ export default function PackageManagement() {
                         ) : (
                             <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
                                 <Package className="w-10 h-10 text-muted-foreground" />
-                                <p className="text-muted-foreground font-medium">Chưa có gói dịch vụ</p>
+                                <p className="text-muted-foreground font-medium">{t('packageManagement.packages.noPackages')}</p>
                             </div>
                         )}
                     </TabsContent>
