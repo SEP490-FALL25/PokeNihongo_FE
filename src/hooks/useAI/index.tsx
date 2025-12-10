@@ -46,7 +46,7 @@ export const useCreateConfigCustomPrompts = () => {
     const createConfigCustomPromptsMutation = useMutation({
         mutationFn: (data: IUpdateGeminiConfigPromptsRequest) => geminiService.createConfigCustomPrompts(data),
         onSuccess: (data: any) => {
-            queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts'] });
+            queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts'], refetchType: 'all' });
             toast.success(data?.message || 'Tạo config custom prompts thành công');
         },
         onError: (error: any) => {
@@ -66,7 +66,7 @@ export const useUpdateConfigCustomPrompts = () => {
     const updateConfigCustomPromptsMutation = useMutation({
         mutationFn: ({ id, data }: { id: number; data: IUpdateGeminiConfigPromptsRequest }) => geminiService.updateConfigCustomPrompts(id, data),
         onSuccess: (data: any, variables: any) => {
-            queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts'] });
+            queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts'], refetchType: 'all' });
             queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts-by-id', variables.id] });
             toast.success(data?.message || 'Cập nhật config custom prompts thành công');
         },
@@ -87,7 +87,7 @@ export const useDeleteConfigCustomPrompts = () => {
     const deleteConfigCustomPromptsMutation = useMutation({
         mutationFn: (id: number) => geminiService.deleteConfigCustomPrompts(id),
         onSuccess: (data: any, variables: any) => {
-            queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts'] });
+            queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts'], refetchType: 'all' });
             queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts-by-id', variables.id] });
             toast.success(data?.message || 'Xóa config custom prompts thành công');
         },
@@ -144,7 +144,7 @@ export const useCreateAIGeminiConfigModels = () => {
     const createGeminiConfigModelsMutation = useMutation({
         mutationFn: (data: ICreateGeminiConfigModelsRequest) => geminiService.createGeminiConfigModels(data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['gemini-config-models'] });
+            queryClient.invalidateQueries({ queryKey: ['gemini-config-models'], refetchType: 'all' });
             toast.success('Tạo model thành công');
         },
         onError: (error: any) => {
@@ -164,9 +164,9 @@ export const useDeleteAIConfigModel = () => {
     const deleteConfigModelMutation = useMutation({
         mutationFn: (id: number) => geminiService.deleteConfigModel(id),
         onSuccess: (data: any, variables: any) => {
-            queryClient.invalidateQueries({ queryKey: ['gemini-config-models'] });
+            queryClient.invalidateQueries({ queryKey: ['gemini-config-models'], refetchType: 'all' });
             queryClient.invalidateQueries({ queryKey: ['gemini-config-model-by-id', variables.id] });
-            queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts'] });
+            queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts'], refetchType: 'all' });
             toast.success(data?.message || 'Xóa model thành công');
         },
         onError: (error: any) => {
