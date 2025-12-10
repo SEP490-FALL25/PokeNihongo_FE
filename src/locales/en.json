@@ -387,7 +387,11 @@
         "modelId": "Config Model",
         "selectModel": "Select config model",
         "noModels": "No models",
-        "saving": "Saving..."
+        "saving": "Saving...",
+        "allStatuses": "All Statuses",
+        "allModels": "All Models",
+        "allPresets": "All Presets",
+        "name": "Name"
     },
     "aiCustom": {
         "title": "Config AI - Custom AI",
@@ -1383,7 +1387,10 @@
         "rewardTargetEXP": "Experience Points",
         "rewardTargetPOKEMON": "Pokemon",
         "rewardTargetPOKE_COINS": "Poké Coins",
-        "rewardTargetSPARKLES": "Sparkles"
+        "rewardTargetSPARKLES": "Sparkles",
+        "stats": {
+            "totalRewards": "Total Rewards"
+        }
     },
     "users": {
         "title": "User Management",

@@ -367,7 +367,11 @@
         "modelId": "設定モデル",
         "selectModel": "設定モデルを選択",
         "noModels": "モデルなし",
-        "saving": "保存中..."
+        "saving": "保存中...",
+        "allStatuses": "すべてのステータス",
+        "allModels": "すべてのモデル",
+        "allPresets": "すべてのプリセット",
+        "name": "名前"
     },
     "aiCustom": {
         "title": "AI設定 - カスタムAI",
@@ -1361,7 +1365,10 @@
         "rewardTargetEXP": "経験値",
         "rewardTargetPOKEMON": "ポケモン",
         "rewardTargetPOKE_COINS": "ポケコイン",
-        "rewardTargetSPARKLES": "スパークル"
+        "rewardTargetSPARKLES": "スパークル",
+        "stats": {
+            "totalRewards": "総報酬数"
+        }
     },
     "users": {
         "title": "ユーザー管理",

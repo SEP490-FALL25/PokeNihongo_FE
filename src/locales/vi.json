@@ -376,7 +376,11 @@
         "modelId": "Config Model",
         "selectModel": "Chọn config model",
         "noModels": "Không có model",
-        "saving": "Đang lưu..."
+        "saving": "Đang lưu...",
+        "allStatuses": "Tất cả trạng thái",
+        "allModels": "Tất cả model",
+        "allPresets": "Tất cả preset",
+        "name": "Tên"
     },
     "aiCustom": {
         "title": "Config AI - Custom AI",
@@ -1380,7 +1384,10 @@
         "rewardTargetEXP": "Điểm kinh nghiệm",
         "rewardTargetPOKEMON": "Pokemon",
         "rewardTargetPOKE_COINS": "Poke Coins",
-        "rewardTargetSPARKLES": "Sparkles"
+        "rewardTargetSPARKLES": "Sparkles",
+        "stats": {
+            "totalRewards": "Tổng phần thưởng"
+        }
     },
     "users": {
         "title": "Quản lý người dùng",

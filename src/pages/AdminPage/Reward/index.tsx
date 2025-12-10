@@ -136,7 +136,7 @@ const RewardManagement = () => {
                         <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-full -mr-16 -mt-16" />
                         <CardHeader className="pb-3 relative">
                             <div className="flex items-center justify-between">
-                                <CardTitle className="text-sm font-semibold text-foreground/90">Tổng phần thưởng</CardTitle>
+                                <CardTitle className="text-sm font-semibold text-foreground/90">{t('reward.stats.totalRewards')}</CardTitle>
                                 <div className="p-2 bg-purple-500/10 rounded-lg text-purple-500">
                                     <Gift className="w-5 h-5" />
                                 </div>
