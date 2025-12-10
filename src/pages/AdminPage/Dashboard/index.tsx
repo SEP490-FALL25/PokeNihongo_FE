@@ -510,6 +510,7 @@ const AdminDashboard = () => {
                                                         outerRadius={80}
                                                         fill="#8884d8"
                                                         dataKey="count"
+                                                        nameKey="nameJp"
                                                     >
                                                         {starterPokemonChartData.map((_entry, index) => (
                                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
