@@ -201,14 +201,14 @@ export default function PokemonManagement() {
                                 <div className="p-3 bg-destructive/10 rounded-full mb-4">
                                     <Circle className="w-8 h-8 text-destructive" />
                                 </div>
-                                <p className="text-destructive font-medium">Đã có lỗi xảy ra khi tải dữ liệu Pokémon.</p>
+                                <p className="text-destructive font-medium">{t('pokemon.messages.loadingError')}</p>
                             </div>
                         ) : !pokemonData?.results || pokemonData.results.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-12">
                                 <div className="p-3 bg-muted rounded-full mb-4">
                                     <Circle className="w-8 h-8 text-muted-foreground" />
                                 </div>
-                                <p className="text-muted-foreground font-medium">Không tìm thấy Pokémon nào.</p>
+                                <p className="text-muted-foreground font-medium">{t('pokemon.messages.noPokemonFound')}</p>
                             </div>
                         ) : (
                             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -275,11 +275,11 @@ export default function PokemonManagement() {
                                         <CardContent className="flex-1 flex flex-col justify-end relative">
                                             <div className="space-y-3 text-sm pt-4 border-t border-border/50 bg-muted/20 rounded-lg p-4">
                                                 <div className="flex justify-between items-center">
-                                                    <span className="text-muted-foreground font-medium">Độ hiếm:</span>
+                                                    <span className="text-muted-foreground font-medium">{t('pokemon.card.rarity')}</span>
                                                     <Badge variant={getRarityBadgeVariant(pokemon.rarity)} className="shadow-sm font-medium">{pokemon.rarity}</Badge>
                                                 </div>
                                                 <div className="flex justify-between items-center">
-                                                    <span className="text-muted-foreground font-medium">Cấp độ yêu cầu:</span>
+                                                    <span className="text-muted-foreground font-medium">{t('pokemon.card.requiredLevel')}</span>
                                                     <span className="text-foreground font-bold">{pokemon.conditionLevel}</span>
                                                 </div>
                                                 <div className="pt-2 border-t border-border/50">

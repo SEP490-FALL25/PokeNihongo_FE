@@ -1169,7 +1169,15 @@
         "selectOptionalHelp": "If none selected, all random Pokémon will be included.",
         "tapCardToSelect": "Tap card to select. No selection = all.",
         "selectedCount": "{{count}} selected",
-        "noneSelectedMeansAll": "No selection means all will be included"
+        "noneSelectedMeansAll": "No selection means all will be included",
+        "messages": {
+            "loadingError": "An error occurred while loading Pokémon data.",
+            "noPokemonFound": "No Pokémon found."
+        },
+        "card": {
+            "rarity": "Rarity:",
+            "requiredLevel": "Required Level:"
+        }
     },
     "createLesson": {
         "title": "Create New Lesson",

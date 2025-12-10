@@ -1147,7 +1147,15 @@
         "selectOptionalHelp": "選択しない場合、すべてのランダムポケモンが対象になります。",
         "tapCardToSelect": "カードをタップして選択。未選択＝すべて",
         "selectedCount": "{{count}}件を選択",
-        "noneSelectedMeansAll": "未選択はすべてを含むことを意味します"
+        "noneSelectedMeansAll": "未選択はすべてを含むことを意味します",
+        "messages": {
+            "loadingError": "ポケモンデータの読み込み中にエラーが発生しました。",
+            "noPokemonFound": "ポケモンが見つかりません。"
+        },
+        "card": {
+            "rarity": "レア度:",
+            "requiredLevel": "必要レベル:"
+        }
     },
     "createLesson": {
         "title": "新しいレッスンを作成",

@@ -1156,6 +1156,14 @@
         "selectOptional": "Chọn Pokémon (không bắt buộc)",
         "selectOptionalHelp": "Nếu không chọn, sẽ áp dụng tất cả Pokémon ngẫu nhiên.",
         "tapCardToSelect": "Nhấn vào thẻ để chọn. Không chọn = tất cả.",
+        "messages": {
+            "loadingError": "Đã có lỗi xảy ra khi tải dữ liệu Pokémon.",
+            "noPokemonFound": "Không tìm thấy Pokémon nào."
+        },
+        "card": {
+            "rarity": "Độ hiếm:",
+            "requiredLevel": "Cấp độ yêu cầu:"
+        },
         "selectedCount": "Đã chọn {{count}}",
         "noneSelectedMeansAll": "Không chọn nghĩa là sẽ áp dụng tất cả"
     },
