@@ -1797,7 +1797,9 @@
             "title": "スパークル分布",
             "total": "合計",
             "average": "平均",
-            "users": "ユーザー"
+            "users": "ユーザー",
+            "userCount": "ユーザー数",
+            "percentage": "パーセンテージ"
         },
         "starterPokemon": {
             "title": "スターターポケモン",

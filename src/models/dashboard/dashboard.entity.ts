@@ -147,6 +147,11 @@ export const DashboardEngagementStarterPokemonDistributionEntitySchema = z.objec
     starters: z.array(z.object({
         pokemonId: z.number(),
         nameJp: z.string(),
+        nameTranslations: z.object({
+            en: z.string(),
+            ja: z.string(),
+            vi: z.string(),
+        }),
         imageUrl: z.string().url(),
         count: z.number(),
         percent: z.coerce.number(),

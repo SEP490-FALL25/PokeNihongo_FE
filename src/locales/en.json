@@ -1819,7 +1819,9 @@
             "title": "Sparkles Distribution",
             "total": "Total",
             "average": "Average",
-            "users": "users"
+            "users": "users",
+            "userCount": "User Count",
+            "percentage": "Percentage"
         },
         "starterPokemon": {
             "title": "Starter Pokemon",

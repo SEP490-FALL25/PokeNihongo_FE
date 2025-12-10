@@ -1816,10 +1816,12 @@
             "title": "Phân bố Sparkles",
             "total": "Tổng",
             "average": "Trung bình",
-            "users": "người dùng"
+            "users": "người dùng",
+            "userCount": "Số lượng người dùng",
+            "percentage": "Phần trăm"
         },
         "starterPokemon": {
-            "title": "Starter Pokemon",
+            "title": "Pokemon khởi đầu",
             "users": "người dùng"
         },
         "streak": {

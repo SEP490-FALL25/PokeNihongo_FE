@@ -30,9 +30,22 @@ import {
 } from "recharts"
 
 const AdminDashboard = () => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const [period, setPeriod] = useState<string>("month")
     const [activeTab, setActiveTab] = useState<string>("overview")
+
+    // Helper function to get Pokemon name based on current language
+    const getPokemonName = (pokemon: any) => {
+        if (!pokemon) return ''
+        const currentLang = i18n.language
+        if (currentLang === 'ja') {
+            return pokemon.nameJp || pokemon.nameTranslations?.ja || ''
+        } else if (currentLang === 'vi') {
+            return pokemon.nameTranslations?.en || ''
+        } else {
+            return pokemon.nameTranslations?.en || pokemon.nameJp || ''
+        }
+    }
 
     // Fetch data
     const { data: totalUserData, isLoading: isLoadingTotalUser } = useGetDashboardUserGrowthTotalUser()
@@ -56,11 +69,11 @@ const AdminDashboard = () => {
 
     const sparklesChartData = sparklesData
         ? [
-            { name: "0-100", value: sparklesData.distribution["0-100"].count },
-            { name: "101-500", value: sparklesData.distribution["101-500"].count },
-            { name: "501-1000", value: sparklesData.distribution["501-1000"].count },
-            { name: "1001-5000", value: sparklesData.distribution["1001-5000"].count },
-            { name: "5000+", value: sparklesData.distribution["5000+"].count },
+            { name: "0-100", value: sparklesData.distribution["0-100"].count, percent: sparklesData.distribution["0-100"].percent },
+            { name: "101-500", value: sparklesData.distribution["101-500"].count, percent: sparklesData.distribution["101-500"].percent },
+            { name: "501-1000", value: sparklesData.distribution["501-1000"].count, percent: sparklesData.distribution["501-1000"].percent },
+            { name: "1001-5000", value: sparklesData.distribution["1001-5000"].count, percent: sparklesData.distribution["1001-5000"].percent },
+            { name: "5000+", value: sparklesData.distribution["5000+"].count, percent: sparklesData.distribution["5000+"].percent },
         ]
         : []
 
@@ -214,11 +227,12 @@ const AdminDashboard = () => {
                                                     data={jlptChartData}
                                                     cx="50%"
                                                     cy="50%"
-                                                    labelLine={false}
+                                                    labelLine={true}
                                                     label={({ name, percent }: any) => `${name}: ${(percent * 100).toFixed(0)}%`}
                                                     outerRadius={80}
                                                     fill="#8884d8"
                                                     dataKey="value"
+
                                                 >
                                                     {jlptChartData.map((entry, index) => (
                                                         <Cell key={`cell-${index}`} fill={entry.color} />
@@ -254,15 +268,24 @@ const AdminDashboard = () => {
                                     ) : userActivationData ? (
                                         <ResponsiveContainer width="100%" height={250}>
                                             <BarChart data={[
-                                                { name: t('dashboard.activation.pendingTest'), value: userActivationData.pending_test.count },
-                                                { name: t('dashboard.activation.testAgain'), value: userActivationData.test_again.count },
-                                                { name: t('dashboard.activation.pendingChooseJlpt'), value: userActivationData.pending_choose_level_jlpt.count },
-                                                { name: t('dashboard.activation.pendingChoosePokemon'), value: userActivationData.pending_choose_pokemon.count },
+                                                { name: t('dashboard.activation.pendingTest'), value: userActivationData.pending_test.count, percent: userActivationData.pending_test.percent },
+                                                { name: t('dashboard.activation.testAgain'), value: userActivationData.test_again.count, percent: userActivationData.test_again.percent },
+                                                { name: t('dashboard.activation.pendingChooseJlpt'), value: userActivationData.pending_choose_level_jlpt.count, percent: userActivationData.pending_choose_level_jlpt.percent },
+                                                { name: t('dashboard.activation.pendingChoosePokemon'), value: userActivationData.pending_choose_pokemon.count, percent: userActivationData.pending_choose_pokemon.percent },
                                             ]}>
                                                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                                                 <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
                                                 <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                                                <Tooltip />
+                                                <Tooltip
+                                                    formatter={(value: any, _name: any, props: any) => {
+                                                        if (!props?.payload) return value
+                                                        const data = props.payload
+                                                        return [
+                                                            `${value} (${data.percent?.toFixed(1)}%)`,
+                                                            t('dashboard.sparkles.userCount')
+                                                        ]
+                                                    }}
+                                                />
                                                 <Bar dataKey="value" fill="hsl(var(--chart-1))" radius={[8, 8, 0, 0]} />
                                             </BarChart>
                                         </ResponsiveContainer>
@@ -471,7 +494,16 @@ const AdminDashboard = () => {
                                                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                                                     <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
                                                     <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                                                    <Tooltip />
+                                                    <Tooltip
+                                                        formatter={(value: any, _name: any, props: any) => {
+                                                            if (!props?.payload) return value
+                                                            const data = props.payload
+                                                            return [
+                                                                `${value} (${data.percent?.toFixed(1)}%)`,
+                                                                t('dashboard.sparkles.userCount')
+                                                            ]
+                                                        }}
+                                                    />
                                                     <Bar dataKey="value" fill="hsl(var(--chart-2))" radius={[8, 8, 0, 0]} />
                                                 </BarChart>
                                             </ResponsiveContainer>
@@ -512,19 +544,47 @@ const AdminDashboard = () => {
                                                         data={starterPokemonChartData}
                                                         cx="50%"
                                                         cy="50%"
-                                                        labelLine={false}
-                                                        label={({ nameJp, percent }: any) => `${nameJp}: ${(percent * 100).toFixed(0)}%`}
+                                                        labelLine={true}
+                                                        label={(props: any) => {
+                                                            // Only show label if percent > 0
+                                                            if (!props || props.percent <= 0) return ''
+                                                            // Find pokemon from chart data using index
+                                                            const pokemon = starterPokemonChartData[props.index]
+                                                            if (!pokemon) return ''
+                                                            const pokemonName = getPokemonName(pokemon)
+                                                            // Use percent directly from pokemon data (already in percentage format 0-100)
+                                                            return `${pokemonName}: ${pokemon.percent.toFixed(0)}%`
+                                                        }}
                                                         outerRadius={80}
                                                         fill="#8884d8"
                                                         dataKey="count"
-                                                        nameKey="nameJp"
                                                     >
                                                         {starterPokemonChartData.map((_entry, index) => (
                                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                         ))}
                                                     </Pie>
-                                                    <Tooltip />
-                                                    <Legend />
+                                                    <Tooltip
+                                                        content={({ active, payload }: any) => {
+                                                            if (!active || !payload || !payload[0]) return null
+                                                            const data = payload[0].payload
+                                                            const pokemon = starterPokemonChartData.find((p: any) => p.pokemonId === data.pokemonId)
+                                                            if (!pokemon) return null
+                                                            const pokemonName = getPokemonName(pokemon)
+                                                            return (
+                                                                <div className="rounded-lg border bg-white p-2 shadow-sm">
+                                                                    <p className="text-sm font-medium">{pokemonName}: {payload[0].value}</p>
+                                                                </div>
+                                                            )
+                                                        }}
+                                                    />
+                                                    <Legend
+                                                        formatter={(value: any, entry: any) => {
+                                                            if (!entry?.payload?.pokemonId) return value
+                                                            const pokemon = starterPokemonChartData.find((p: any) => p.pokemonId === entry.payload.pokemonId)
+                                                            if (!pokemon) return value
+                                                            return getPokemonName(pokemon)
+                                                        }}
+                                                    />
                                                 </PieChart>
                                             </ResponsiveContainer>
                                         ) : (
