@@ -103,7 +103,7 @@ const AIServiceManagement: React.FC = () => {
                                                         <div className="flex items-center gap-3">
                                                             <Badge
                                                                 variant="outline"
-                                                                className="bg-primary/10 text-primary border-primary/30"
+                                                                className="bg-primary/80 text-primary border-primary/80"
                                                             >
                                                                 {t("aiService.columns.id")}: {config.id}
                                                             </Badge>
@@ -113,7 +113,7 @@ const AIServiceManagement: React.FC = () => {
                                                                 {getStatusLabel(config.isActive)}
                                                             </Badge>
                                                             {config.isDefault && (
-                                                                <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/30">
+                                                                <Badge variant="outline" className="bg-blue-500/80 text-blue-600 border-blue-500/80">
                                                                     {t("aiService.isDefault")}
                                                                 </Badge>
                                                             )}
