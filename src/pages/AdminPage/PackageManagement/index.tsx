@@ -37,7 +37,7 @@ const formatCurrency = (value: number) => value.toLocaleString("vi-VN");
 const COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))"];
 
 export default function PackageManagement() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const now = new Date();
     const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState(now.getFullYear());
@@ -72,9 +72,10 @@ export default function PackageManagement() {
     const subscriptionPlanMap = useMemo(() => {
         if (!subscriptionStats) return {}
         const map: Record<number, { name: string; color: string }> = {}
+        const currentLang = (i18n.language || 'vi') as "vi" | "en" | "ja"
         subscriptionStats.plans.forEach((plan) => {
             const name =
-                getTranslationValue(plan.subscription.nameTranslations, "vi") ??
+                getTranslationValue(plan.subscription.nameTranslations, currentLang) ??
                 plan.subscription.nameTranslation ??
                 plan.subscription.nameKey
             map[plan.planId] = {
@@ -83,16 +84,21 @@ export default function PackageManagement() {
             }
         })
         return map
-    }, [subscriptionStats])
+    }, [subscriptionStats, i18n.language])
 
     const remotePackages = useMemo(() => {
         if (!subscriptionStats) return null
+        const currentLang = (i18n.language || 'vi') as "vi" | "en" | "ja"
         return subscriptionStats.plans.map((plan) => {
             const viName =
                 getTranslationValue(plan.subscription.nameTranslations, "vi") ??
                 plan.subscription.nameTranslation
             const enName =
                 getTranslationValue(plan.subscription.nameTranslations, "en") ?? viName
+            const currentName =
+                getTranslationValue(plan.subscription.nameTranslations, currentLang) ??
+                plan.subscription.nameTranslation ??
+                plan.subscription.nameKey
             const durationLabel =
                 plan.type === "LIFETIME"
                     ? t('packageManagement.packages.lifetime')
@@ -105,7 +111,7 @@ export default function PackageManagement() {
             })
             return {
                 id: plan.planId,
-                name: viName,
+                name: currentName,
                 nameEn: enName,
                 price: plan.price,
                 duration: durationLabel,
@@ -116,7 +122,7 @@ export default function PackageManagement() {
                 color: mapTagToColor(plan.subscription.tagName, plan.type),
             }
         })
-    }, [subscriptionStats])
+    }, [subscriptionStats, i18n.language, t])
 
     const packages = remotePackages ?? []
 
@@ -193,27 +199,31 @@ export default function PackageManagement() {
     ], [subscriptionStats, packages.length, revenueStats, isSubscriptionLoading, isRevenueLoading, t])
 
     const getColorClasses = (color: string) => {
-        const colors: Record<string, { bg: string; text: string; border: string; gradient: string }> = {
+        const colors: Record<string, { bg: string; hoverBg: string; text: string; border: string; gradient: string }> = {
             blue: {
-                bg: "bg-blue-500/10",
+                bg: "bg-blue-500/80",
+                hoverBg: "hover:bg-blue-500/50",
                 text: "text-blue-600",
                 border: "border-blue-500/40",
                 gradient: "from-blue-500/20 to-cyan-500/20"
             },
             purple: {
-                bg: "bg-purple-500/10",
+                bg: "bg-purple-500/80",
+                hoverBg: "hover:bg-purple-500/50",
                 text: "text-purple-600",
                 border: "border-purple-500/40",
                 gradient: "from-purple-500/20 to-pink-500/20"
             },
             yellow: {
-                bg: "bg-yellow-500/10",
+                bg: "bg-yellow-500/80",
+                hoverBg: "hover:bg-yellow-500/50",
                 text: "text-yellow-600",
                 border: "border-yellow-500/40",
                 gradient: "from-yellow-500/20 to-amber-500/20"
             },
             red: {
-                bg: "bg-red-500/10",
+                bg: "bg-red-500/80",
+                hoverBg: "hover:bg-red-500/50",
                 text: "text-red-600",
                 border: "border-red-500/40",
                 gradient: "from-red-500/20 to-rose-500/20"
@@ -437,7 +447,7 @@ export default function PackageManagement() {
                                                                 <p className="font-semibold text-foreground">
                                                                     {planInfo?.name || `Plan ${plan.planId}`}
                                                                 </p>
-                                                                <Badge className={`${colorClasses.bg} ${colorClasses.text}`}>
+                                                                <Badge className={`${colorClasses.bg} ${colorClasses.hoverBg} ${colorClasses.text} transition-colors`}>
                                                                     {plan.subscription.tagName}
                                                                 </Badge>
                                                             </div>
@@ -486,7 +496,7 @@ export default function PackageManagement() {
 
                                             <CardHeader className="text-center pb-4 relative">
                                                 <div className="flex flex-col items-center gap-3 mb-4">
-                                                    <div className={`p-3 rounded-xl ${colorClasses.bg} ${colorClasses.text} border-2 ${colorClasses.border} shadow-lg group-hover:scale-110 transition-transform`}>
+                                                    <div className={`p-3 rounded-xl ${colorClasses.bg} ${colorClasses.hoverBg} ${colorClasses.text} border-2 ${colorClasses.border} shadow-lg group-hover:scale-110 transition-all cursor-pointer`}>
                                                         <Package className="w-8 h-8" />
                                                     </div>
                                                     <div>
@@ -507,7 +517,7 @@ export default function PackageManagement() {
                                                 <div className="space-y-2 mb-4 p-4 bg-card/50 rounded-lg border border-border/50">
                                                     {pkg.features.slice(0, 4).map((feature) => (
                                                         <div key={feature} className="flex items-start gap-2">
-                                                            <div className={`p-1 rounded-full ${colorClasses.bg} ${colorClasses.text} mt-0.5 flex-shrink-0`}>
+                                                            <div className={`p-1 rounded-full ${colorClasses.bg} ${colorClasses.hoverBg} ${colorClasses.text} mt-0.5 flex-shrink-0 transition-colors cursor-pointer`}>
                                                                 <Check className="w-3 h-3" />
                                                             </div>
                                                             <span className="text-foreground text-sm leading-relaxed">{feature}</span>
