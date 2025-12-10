@@ -166,6 +166,7 @@ export const useDeleteAIConfigModel = () => {
         onSuccess: (data: any, variables: any) => {
             queryClient.invalidateQueries({ queryKey: ['gemini-config-models'] });
             queryClient.invalidateQueries({ queryKey: ['gemini-config-model-by-id', variables.id] });
+            queryClient.invalidateQueries({ queryKey: ['gemini-config-prompts'] });
             toast.success(data?.message || 'Xóa model thành công');
         },
         onError: (error: any) => {
