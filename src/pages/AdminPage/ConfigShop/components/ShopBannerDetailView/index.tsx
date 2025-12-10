@@ -9,11 +9,11 @@ import { useNavigate } from "react-router-dom";
 import AddRandomPokemonDialog from "../AddRandomPokemonDialog";
 import { useState } from "react";
 import { IShopBannerSchema } from "@models/shop/entity";
-import { useDeleteShopItem } from "@hooks/useShop";
 import { RarityBadge } from "@atoms/BadgeRarity";
 import AddHandmadePokemonDialog from "../AddHandmadePokemonDialog";
 import EditPriceDialog from "../EditPriceDialog";
 import EditShopBannerDialog from "../EditShopBannerDialog";
+import DeleteConfirmShopItem from "@organisms/DeleteConfirmShopItem";
 
 export default function ShopBannerDetailView({ bannerDetail }: { bannerDetail: IShopBannerSchema }) {
 
@@ -135,9 +135,10 @@ export default function ShopBannerDetailView({ bannerDetail }: { bannerDetail: I
     /**
      * Handle Delete Shop Item
      */
-    const { mutate: deleteShopItem } = useDeleteShopItem();
+    const [itemIdToDelete, setItemIdToDelete] = useState<number | null>(null);
+
     const handleDeleteShopItem = (id: number) => {
-        deleteShopItem(id);
+        setItemIdToDelete(id);
     };
     //------------------------End------------------------//
 
@@ -392,6 +393,12 @@ export default function ShopBannerDetailView({ bannerDetail }: { bannerDetail: I
                 isOpen={isEditBannerDialogOpen}
                 onClose={() => setIsEditBannerDialogOpen(false)}
                 bannerData={bannerDetail}
+            />
+
+            {/* Delete Confirmation Dialog */}
+            <DeleteConfirmShopItem
+                itemIdToDelete={itemIdToDelete}
+                setItemIdToDelete={setItemIdToDelete}
             />
         </div>
     );

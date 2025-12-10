@@ -4,6 +4,7 @@
         "cancel": "キャンセル",
         "edit": "編集",
         "delete": "削除",
+        "deleting": "削除中...",
         "add": "追加",
         "create": "作成",
         "update": "更新",
@@ -574,6 +575,12 @@
         "updatePriceError": "価格の更新に失敗しました",
         "deletePokemonSuccess": "ポケモンが正常に削除されました！",
         "deletePokemonError": "ポケモンの削除に失敗しました",
+        "deleteDialog": {
+            "title": "削除の確認",
+            "message": "このポケモンをショップから削除してもよろしいですか？この操作は元に戻せません。",
+            "deleteButton": "削除",
+            "deleting": "削除中..."
+        },
         "editPrice": "価格を編集",
         "editPriceDescription": "ショップのこのポケモンの価格を更新",
         "enterPrice": "価格を入力",

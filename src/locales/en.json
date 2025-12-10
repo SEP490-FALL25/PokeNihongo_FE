@@ -4,6 +4,7 @@
         "cancel": "Cancel",
         "edit": "Edit",
         "delete": "Delete",
+        "deleting": "Deleting...",
         "add": "Add",
         "create": "Create",
         "update": "Update",
@@ -594,6 +595,12 @@
         "updatePriceError": "Failed to update price",
         "deletePokemonSuccess": "Pokemon deleted successfully!",
         "deletePokemonError": "Failed to delete Pokemon",
+        "deleteDialog": {
+            "title": "Confirm Delete",
+            "message": "Are you sure you want to delete this Pokemon from the shop? This action cannot be undone.",
+            "deleteButton": "Delete",
+            "deleting": "Deleting..."
+        },
         "editPrice": "Edit Price",
         "editPriceDescription": "Update the price for this Pokemon in the shop",
         "enterPrice": "Enter price",

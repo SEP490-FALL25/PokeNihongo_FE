@@ -4,6 +4,7 @@
         "cancel": "Hủy",
         "edit": "Chỉnh sửa",
         "delete": "Xóa",
+        "deleting": "Đang xóa...",
         "add": "Thêm",
         "create": "Tạo",
         "update": "Cập nhật",
@@ -583,6 +584,12 @@
         "updatePriceError": "Cập nhật giá thất bại",
         "deletePokemonSuccess": "Xóa Pokemon thành công!",
         "deletePokemonError": "Xóa Pokemon thất bại",
+        "deleteDialog": {
+            "title": "Xác nhận xóa",
+            "message": "Bạn có chắc chắn muốn xóa Pokemon này khỏi shop? Hành động này không thể hoàn tác.",
+            "deleteButton": "Xóa",
+            "deleting": "Đang xóa..."
+        },
         "editPrice": "Chỉnh sửa giá",
         "editPriceDescription": "Cập nhật giá cho Pokemon này trong shop",
         "enterPrice": "Nhập giá",
