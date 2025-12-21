@@ -77,6 +77,13 @@ const testSetService = {
     const response = await axiosPrivate.post('/testset/upsert-with-question-banks', body);
     return response.data;
   },
+  // Delete test set by ID
+  deleteTestSet: async (
+    id: number
+  ): Promise<{ message: string } & Record<string, unknown>> => {
+    const response = await axiosPrivate.delete(`/testset/${id}`);
+    return response.data;
+  },
 };
 
 export default testSetService;

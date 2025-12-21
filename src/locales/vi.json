@@ -1735,7 +1735,14 @@
         "updateSuccess": "Cập nhật bộ đề thành công",
         "createNoId": "Không nhận được ID từ server sau khi tạo",
         "unknownError": "Đã xảy ra lỗi không mong muốn",
-        "testTypeLabel": "Loại"
+        "testTypeLabel": "Loại",
+        "deleteSuccess": "Đã xóa bộ đề thành công",
+        "deleteDialog": {
+            "title": "Xác nhận xóa bộ đề",
+            "message": "Bạn có chắc chắn muốn xóa bộ đề này? Hành động này không thể hoàn tác.",
+            "deleteButton": "Xóa",
+            "deleting": "Đang xóa..."
+        }
     },
     "packageManagement": {
         "title": "Quản lý gói dịch vụ",

@@ -358,3 +358,27 @@ export const useUpsertTestSetWithQuestionBanks = () => {
 
   return upsertMutation;
 };
+
+/**
+ * Hook for deleting a test set
+ * @returns mutation object with deleteTestSet function
+ */
+export const useDeleteTestSet = () => {
+  const queryClient = useQueryClient();
+
+  const deleteTestSetMutation = useMutation({
+    mutationFn: (id: number) => testSetService.deleteTestSet(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["testset-list"] });
+      queryClient.invalidateQueries({ queryKey: ["testset-linked-question-banks"] });
+    },
+    onError: (error: unknown) => {
+      console.error("Error deleting test set:", error);
+      toast.error(
+        getErrorMessage(error, "Có lỗi xảy ra khi xóa test set")
+      );
+    },
+  });
+
+  return deleteTestSetMutation;
+};

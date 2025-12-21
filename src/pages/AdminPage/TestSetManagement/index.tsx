@@ -4,12 +4,23 @@ import { Input } from "@ui/Input";
 import { Textarea } from "@ui/Textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@ui/Dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@ui/AlertDialog";
+import {
   useTestSet,
   useCreateTestSet,
   useUpdateTestSet,
   useLinkQuestionBanksToTestSet,
   useGetLinkedQuestionBanksByTestSet,
   useDeleteLinkedQuestionBanksFromTestSet,
+  useDeleteTestSet,
 } from "@hooks/useTestSet";
 import { TestSetCreateRequest } from "@models/testSet/request";
 import {
@@ -21,7 +32,7 @@ import {
 } from "@ui/Select";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card";
 import { Skeleton } from "@ui/Skeleton";
-import { FileText, Plus, Mic, X } from "lucide-react";
+import { FileText, Plus, Mic, X, Loader2 } from "lucide-react";
 import HeaderAdmin from "@organisms/Header/Admin";
 import PaginationControls from "@ui/PaginationControls";
 import { Checkbox } from "@ui/Checkbox";
@@ -72,12 +83,14 @@ const TestSetManagement: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isAddQuestionsOpen, setIsAddQuestionsOpen] = useState(false);
   const [selectedLinkedIds, setSelectedLinkedIds] = useState<number[]>([]);
+  const [testSetIdToDelete, setTestSetIdToDelete] = useState<number | null>(null);
   
   // Test set service hooks
   const createTestSetMutation = useCreateTestSet();
   const updateTestSetMutation = useUpdateTestSet();
   const linkQuestionBanksMutation = useLinkQuestionBanksToTestSet();
   const deleteLinkedQuestionBanksMutation = useDeleteLinkedQuestionBanksFromTestSet();
+  const deleteTestSetMutation = useDeleteTestSet();
   const {
     data: linkedQuestionsData,
     isLoading: loadingLinked,
@@ -412,6 +425,23 @@ const TestSetManagement: React.FC = () => {
     );
   };
 
+  const handleDeleteTestSet = (id: number) => {
+    setTestSetIdToDelete(id);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (testSetIdToDelete === null) return;
+
+    try {
+      await deleteTestSetMutation.mutateAsync(testSetIdToDelete);
+      toast.success(t("testSetManagement.deleteSuccess"));
+      setTestSetIdToDelete(null);
+    } catch (error) {
+      console.error("Error deleting test set:", error);
+      // Error already handled by hook
+    }
+  };
+
   return (
     <>
       <HeaderAdmin
@@ -503,6 +533,7 @@ const TestSetManagement: React.FC = () => {
                           openEdit(t.id);
                         }
                       }}
+                      onDelete={handleDeleteTestSet}
                     />
                   ))}
                 </div>
@@ -950,6 +981,42 @@ const TestSetManagement: React.FC = () => {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog
+          open={testSetIdToDelete !== null}
+          onOpenChange={(open) => !open && setTestSetIdToDelete(null)}
+        >
+          <AlertDialogContent className="bg-white border-border">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-foreground">
+                {t("testSetManagement.deleteDialog.title")}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-muted-foreground">
+                {t("testSetManagement.deleteDialog.message")}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="border-border text-foreground hover:bg-muted cursor-pointer">
+                {t("common.cancel")}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteConfirm}
+                disabled={deleteTestSetMutation.isPending}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90 cursor-pointer"
+              >
+                {deleteTestSetMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    {t("testSetManagement.deleteDialog.deleting")}
+                  </>
+                ) : (
+                  t("testSetManagement.deleteDialog.deleteButton")
+                )}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </>
   );

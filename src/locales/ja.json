@@ -1716,7 +1716,14 @@
         "updateSuccess": "テストセットを更新しました",
         "createNoId": "作成後にサーバーからIDを受け取れませんでした",
         "unknownError": "予期しないエラーが発生しました",
-        "testTypeLabel": "種類"
+        "testTypeLabel": "種類",
+        "deleteSuccess": "テストセットを削除しました",
+        "deleteDialog": {
+            "title": "テストセットの削除を確認",
+            "message": "このテストセットを削除してもよろしいですか？この操作は元に戻せません。",
+            "deleteButton": "削除",
+            "deleting": "削除中..."
+        }
     },
     "packageManagement": {
         "title": "パッケージ管理",

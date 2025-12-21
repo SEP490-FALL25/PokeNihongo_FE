@@ -59,7 +59,6 @@ const FilterSection: React.FC<FilterSectionProps> = ({
           </SelectTrigger>
           <SelectContent className="bg-card border-border">
             <SelectItem value="ALL">{t("testManagement.allLevels")}</SelectItem>
-            <SelectItem value="0">{t("testManagement.allLevels")}</SelectItem>
             <SelectItem value="1">{t("testManagement.levels.N1")}</SelectItem>
             <SelectItem value="2">{t("testManagement.levels.N2")}</SelectItem>
             <SelectItem value="3">{t("testManagement.levels.N3")}</SelectItem>

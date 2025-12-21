@@ -1,7 +1,8 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card";
 import { Badge } from "@ui/Badge";
-import { FileText, Tag } from "lucide-react";
+import { Button } from "@ui/Button";
+import { FileText, Tag, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface TestSetCardProps {
@@ -16,12 +17,14 @@ interface TestSetCardProps {
   };
   extractText: (field: unknown, lang?: string) => string;
   onClick: () => void;
+  onDelete?: (id: number) => void;
 }
 
 const TestSetCard: React.FC<TestSetCardProps> = ({
   testSet,
   extractText,
   onClick,
+  onDelete,
 }) => {
   const { t } = useTranslation();
   const statusLabel =
@@ -29,6 +32,14 @@ const TestSetCard: React.FC<TestSetCardProps> = ({
   const testTypeLabel =
     t(`testManagement.testSetTypes.${testSet.testType}` as const) ||
     testSet.testType;
+  
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onDelete) {
+      onDelete(testSet.id);
+    }
+  };
+
   return (
     <Card
       className="group relative overflow-hidden bg-gradient-to-br from-card via-card to-card/95 border-border hover:border-primary/50 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer"
@@ -74,6 +85,17 @@ const TestSetCard: React.FC<TestSetCardProps> = ({
               </Badge>
             </div>
           </div>
+          {onDelete && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={handleDelete}
+              aria-label={t("common.delete")}
+            >
+              <Trash2 className="h-4 w-4 text-red-500" />
+            </Button>
+          )}
         </div>
       </CardHeader>
       <CardContent className="relative">
