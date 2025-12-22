@@ -43,6 +43,12 @@ const dashboardService = {
     getContentPerformanceCompleteRate: async () => {
         return await axiosPrivate.get('/dashboard/content-performance/completion-rate');
     },
+    getLeaderboardSeasonStats: async () => {
+        return await axiosPrivate.get(`/dashboard/leaderboard-season/overview`);
+    },
+    getLeaderboardSeasonStatsBySeasonId: async (seasonId: number, period: string) => {
+        return await axiosPrivate.get(`/dashboard/leaderboard-season/${seasonId}?period=${period}`);
+    },
 }
 
 export default dashboardService;

@@ -3,13 +3,14 @@ import { useGetBattleLeaderBoardSeasonDetail } from "@hooks/useBattle"
 import { Badge } from "@ui/Badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card"
 import { Button } from "@ui/Button"
-import { Award, Calendar, CheckCircle2, Clock, Gift, Languages, Loader2, RefreshCcw, Trophy, XCircle } from "lucide-react"
+import { Award, Calendar, CheckCircle2, Clock, Gift, Languages, Loader2, RefreshCcw, Trophy, XCircle, BarChart3 } from "lucide-react"
 import { useParams } from "react-router-dom"
 import { formatDateOnly, formatDateTime } from "@utils/date"
 import { BATTLE_STATUS_CONFIG, getStatusBadgeColor, getStatusText } from "@atoms/BadgeStatusColor"
 import HeaderAdmin from "@organisms/Header/Admin"
 import { useTranslation } from "react-i18next"
 import DialogUpdateRewardSeason from "../DialogUpdateRewardSeason"
+import DialogPeriodStats from "../DialogPeriodStats"
 
 type SeasonRankRewardEntry = {
     id: number
@@ -95,6 +96,7 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
     }
 
     const [isRewardDialogOpen, setIsRewardDialogOpen] = useState(false)
+    const [isPeriodStatsDialogOpen, setIsPeriodStatsDialogOpen] = useState(false)
 
     const rewardOverviewLabels = {
         title: t('tournaments.detail.rewardOverview.title'),
@@ -564,6 +566,34 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
                 </Card>
             </div>
 
+            {/* Period Stats Button */}
+            <Card className="border border-indigo-300/50 bg-gradient-to-br from-indigo-500/10 via-background to-background shadow-lg shadow-indigo-200/30">
+                <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-primary/10 rounded-lg">
+                                <BarChart3 className="w-5 h-5 text-primary" />
+                            </div>
+                            <div>
+                                <CardTitle className="text-lg font-bold text-foreground">
+                                    {t('tournaments.detail.periodStats.title')}
+                                </CardTitle>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                    {t('tournaments.detail.periodStats.description')}
+                                </p>
+                            </div>
+                        </div>
+                        <Button
+                            onClick={() => setIsPeriodStatsDialogOpen(true)}
+                            className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-lg"
+                        >
+                            <BarChart3 className="w-4 h-4 mr-2" />
+                            {t('tournaments.detail.periodStats.viewButton')}
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+
             <Card className="border border-blue-300/40 bg-gradient-to-br from-blue-500/10 via-background to-background shadow-lg shadow-blue-300/20">
                 <CardHeader className="pb-3">
                     <div className="flex items-center gap-3">
@@ -746,12 +776,21 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
         />
     )
 
+    const periodStatsDialog = (
+        <DialogPeriodStats
+            open={isPeriodStatsDialogOpen}
+            onOpenChange={setIsPeriodStatsDialogOpen}
+            seasonId={resolvedId}
+        />
+    )
+
     if (isStandalonePage) {
         return (
             <>
                 <HeaderAdmin title={t('tournaments.title')} description={t('tournaments.description')} />
                 {content}
                 {rewardDialog}
+                {periodStatsDialog}
             </>
         )
     }
@@ -760,6 +799,7 @@ export default function LeaderboardDetail({ leaderboardSeasonId }: LeaderboardDe
         <>
             {content}
             {rewardDialog}
+            {periodStatsDialog}
         </>
     )
 }

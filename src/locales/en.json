@@ -209,6 +209,34 @@
             },
             "labels": {
                 "seasonCode": "Season code: {{code}}"
+            },
+            "periodStats": {
+                "title": "Period Statistics",
+                "description": "View detailed statistics by day, week, or month",
+                "viewButton": "View Statistics",
+                "selectPeriod": "Select Period",
+                "noData": "No statistics data available for this period.",
+                "periods": {
+                    "day": "By Day",
+                    "week": "By Week",
+                    "month": "By Month"
+                },
+                "overall": {
+                    "totalParticipants": "Total Participants",
+                    "totalMatches": "Total Matches",
+                    "totalMatchesSuccess": "Successful Matches",
+                    "successRate": "Success Rate"
+                },
+                "table": {
+                    "period": "Period",
+                    "participants": "Participants",
+                    "newParticipants": "New Participants",
+                    "activeParticipants": "Active Participants",
+                    "matches": "Matches",
+                    "winRate": "Win Rate",
+                    "wins": "Wins",
+                    "losses": "Losses"
+                }
             }
         },
         "delete": {
@@ -225,7 +253,7 @@
                 "totalTournaments": "Total Tournaments",
                 "activeTournaments": "Active",
                 "totalParticipants": "Total Participants",
-                "monthlyRewards": "Monthly Rewards"
+                "growthRate": "Growth Rate"
             },
             "filters": {
                 "search": "Search",

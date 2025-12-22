@@ -4,10 +4,11 @@ import { Badge } from "@ui/Badge"
 import { Button } from "@ui/Button"
 import { Input } from "@ui/Input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select"
-import { Trophy, Calendar, Users, Award, Search, Edit, Trash2, Loader2, Clock, CheckCircle2, X, Plus } from "lucide-react"
+import { Trophy, Calendar, Users, Search, Edit, Trash2, Loader2, Clock, CheckCircle2, X, Plus, TrendingUp } from "lucide-react"
 import HeaderAdmin from "@organisms/Header/Admin"
 import { useTranslation } from "react-i18next"
 import { useBattleListLeaderBoardSeason } from "@hooks/useBattle"
+import { useGetDashboardLeaderboardSeasonStats } from "@hooks/useDashboard"
 import PaginationControls from "@ui/PaginationControls"
 import { BATTLE } from "@constants/battle"
 import CustomDatePicker from "@ui/DatePicker"
@@ -15,8 +16,9 @@ import CreateSeason from "./components/CreateSeason"
 import DialogDeleteSeason from "./components/DialogDeleteSeason"
 import { ROUTES } from "@constants/route"
 import { useNavigate } from "react-router-dom"
-import { formatDateOnly } from "@utils/date"
+
 import { BATTLE_STATUS_CONFIG, getStatusBadgeColor, getStatusText, StatusStyleConfig } from "@atoms/BadgeStatusColor"
+import { formatDate } from "@utils/date"
 
 export default function TournamentManagement() {
     const { t } = useTranslation()
@@ -86,16 +88,18 @@ export default function TournamentManagement() {
     // Fetch tournaments data
     const { data: tournaments, pagination, isLoading, error } = useBattleListLeaderBoardSeason(queryParams)
 
+    // Fetch leaderboard season stats overview
+    const { data: seasonStats } = useGetDashboardLeaderboardSeasonStats()
+
     // Ensure tournaments is always an array
     const tournamentsList = Array.isArray(tournaments) ? tournaments : []
 
     // Stats calculations
     const stats = useMemo(() => {
-        const totalTournaments = pagination?.totalItem || 0
-        const activeTournaments = tournamentsList.filter((t: any) => t.status === BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE).length
-
-        const totalParticipants = 0
-        const monthlyRewards = 0
+        const totalTournaments = seasonStats?.totalSeasons || pagination?.totalItem || 0
+        const activeTournaments = seasonStats?.activeSeasons || tournamentsList.filter((t: any) => t.status === BATTLE.BATTLE_LIST_LEADER_BOARD_SEASON_STATUS.ACTIVE).length
+        const totalParticipants = seasonStats?.currentParticipants || 0
+        const participationChangeRate = seasonStats?.participationChangeRate || 0
 
         return [
             {
@@ -126,16 +130,20 @@ export default function TournamentManagement() {
                 borderColor: "border-green-500/20"
             },
             {
-                label: t('tournaments.list.stats.monthlyRewards'),
-                value: monthlyRewards.toString() || "0",
-                icon: Award,
+                label: t('tournaments.list.stats.growthRate'),
+                value: participationChangeRate > 0
+                    ? `+${participationChangeRate}%`
+                    : participationChangeRate < 0
+                        ? `${participationChangeRate}%`
+                        : "0%",
+                icon: TrendingUp,
                 gradient: "from-purple-500/20 to-pink-500/20",
                 iconBg: "bg-purple-500/10",
                 iconColor: "text-purple-500",
                 borderColor: "border-purple-500/20"
             },
         ]
-    }, [tournamentsList, pagination, t])
+    }, [tournamentsList, pagination, seasonStats, t])
 
     // Handle clear filters
     const handleClearFilters = () => {
@@ -449,7 +457,7 @@ export default function TournamentManagement() {
                                                     {t('tournaments.list.card.time')}
                                                 </span>
                                                 <span className="text-foreground font-semibold">
-                                                    {formatDateOnly(tournament.startDate)} - {formatDateOnly(tournament.endDate)}
+                                                    {formatDate(tournament.startDate)} - {formatDate(tournament.endDate)}
                                                 </span>
                                             </div>
                                             <div className="h-px bg-border/50" />

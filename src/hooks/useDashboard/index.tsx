@@ -247,3 +247,41 @@ export const useGetDashboardContentPerformanceCompleteRate = () => {
     return { data: getDashboardContentPerformanceCompleteRateQuery.data, isLoading: getDashboardContentPerformanceCompleteRateQuery.isLoading, error: getDashboardContentPerformanceCompleteRateQuery.error };
 }
 //------------------End------------------//
+
+
+/**
+ * Handle Get Dashboard Leaderboard Season Stats Overview
+ * @returns 
+ */
+export const useGetDashboardLeaderboardSeasonStats = () => {
+    const currentLanguage = useSelector(selectCurrentLanguage);
+    return useQuery({
+        queryKey: ['dashboard-leaderboard-season-stats', currentLanguage],
+        queryFn: async () => {
+            const response = await dashboardService.getLeaderboardSeasonStats();
+            return response.data?.data;
+        },
+    });
+}
+//------------------End------------------//
+
+
+/**
+ * Handle Get Dashboard Leaderboard Season Stats By Season Id
+ * @param seasonId - The season ID
+ * @param period - The period (day, week, month)
+ * @returns 
+ */
+export const useGetDashboardLeaderboardSeasonStatsBySeasonId = (seasonId: number | undefined, period: string) => {
+    const currentLanguage = useSelector(selectCurrentLanguage);
+    return useQuery({
+        queryKey: ['dashboard-leaderboard-season-stats-by-season-id', seasonId, period, currentLanguage],
+        queryFn: async () => {
+            if (!seasonId) return null;
+            const response = await dashboardService.getLeaderboardSeasonStatsBySeasonId(seasonId, period);
+            return response.data?.data;
+        },
+        enabled: !!seasonId,
+    });
+}
+//------------------End------------------//

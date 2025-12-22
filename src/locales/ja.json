@@ -189,6 +189,34 @@
             },
             "labels": {
                 "seasonCode": "シーズンコード: {{code}}"
+            },
+            "periodStats": {
+                "title": "期間別統計",
+                "description": "日、週、または月別の詳細統計を表示",
+                "viewButton": "統計を表示",
+                "selectPeriod": "期間を選択",
+                "noData": "この期間の統計データがありません。",
+                "periods": {
+                    "day": "日別",
+                    "week": "週別",
+                    "month": "月別"
+                },
+                "overall": {
+                    "totalParticipants": "総参加者数",
+                    "totalMatches": "総試合数",
+                    "totalMatchesSuccess": "成功した試合数",
+                    "successRate": "成功率"
+                },
+                "table": {
+                    "period": "期間",
+                    "participants": "参加者",
+                    "newParticipants": "新規参加者",
+                    "activeParticipants": "アクティブ参加者",
+                    "matches": "試合数",
+                    "winRate": "勝率",
+                    "wins": "勝利",
+                    "losses": "敗北"
+                }
             }
         },
         "delete": {
@@ -205,7 +233,7 @@
                 "totalTournaments": "総トーナメント数",
                 "activeTournaments": "開催中",
                 "totalParticipants": "総参加者数",
-                "monthlyRewards": "今月の報酬"
+                "growthRate": "成長率"
             },
             "filters": {
                 "search": "検索",

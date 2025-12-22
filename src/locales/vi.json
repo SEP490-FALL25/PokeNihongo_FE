@@ -198,6 +198,34 @@
             },
             "labels": {
                 "seasonCode": "Mã mùa: {{code}}"
+            },
+            "periodStats": {
+                "title": "Thống kê theo kỳ",
+                "description": "Xem chi tiết thống kê theo ngày, tuần hoặc tháng",
+                "viewButton": "Xem thống kê",
+                "selectPeriod": "Chọn kỳ",
+                "noData": "Chưa có dữ liệu thống kê cho kỳ này.",
+                "periods": {
+                    "day": "Theo ngày",
+                    "week": "Theo tuần",
+                    "month": "Theo tháng"
+                },
+                "overall": {
+                    "totalParticipants": "Tổng người tham gia",
+                    "totalMatches": "Tổng trận đấu",
+                    "totalMatchesSuccess": "Trận đấu thành công",
+                    "successRate": "Tỷ lệ thành công"
+                },
+                "table": {
+                    "period": "Kỳ",
+                    "participants": "Người tham gia",
+                    "newParticipants": "Người mới",
+                    "activeParticipants": "Người hoạt động",
+                    "matches": "Trận đấu",
+                    "winRate": "Tỷ lệ thắng",
+                    "wins": "Thắng",
+                    "losses": "Thua"
+                }
             }
         },
         "delete": {
@@ -214,7 +242,7 @@
                 "totalTournaments": "Tổng giải đấu",
                 "activeTournaments": "Đang diễn ra",
                 "totalParticipants": "Tổng người tham gia",
-                "monthlyRewards": "Giải thưởng tháng này"
+                "growthRate": "Tỷ lệ tăng trưởng"
             },
             "filters": {
                 "search": "Tìm kiếm",
