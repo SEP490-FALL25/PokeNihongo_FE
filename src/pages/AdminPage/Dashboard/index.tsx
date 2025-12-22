@@ -124,7 +124,7 @@ const AdminDashboard = () => {
         },
         {
             title: t('dashboard.stats.notActivated'),
-            value: userActivationData?.summary?.total?.toLocaleString() || "0",
+            value: userActivationData?.pending_test?.count?.toLocaleString() || "0",
             icon: UserX,
             gradient: "from-orange-500/20 via-orange-500/10 to-transparent",
             borderColor: "border-orange-500/20",

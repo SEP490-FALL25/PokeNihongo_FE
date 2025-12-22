@@ -1795,7 +1795,7 @@
             "totalUsers": "Total Users",
             "activeUsers": "Active Users",
             "newUsers": "New Users",
-            "notActivated": "Not Activated"
+            "notActivated": "Level Not Selected"
         },
         "jlpt": {
             "title": "JLPT Level Distribution",

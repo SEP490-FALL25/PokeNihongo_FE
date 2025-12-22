@@ -1792,7 +1792,7 @@
             "totalUsers": "Tổng người dùng",
             "activeUsers": "Người dùng hoạt động",
             "newUsers": "Người dùng mới",
-            "notActivated": "Chưa kích hoạt"
+            "notActivated": "Chưa chọn trình độ"
         },
         "jlpt": {
             "title": "Phân bố cấp độ JLPT",

@@ -1773,7 +1773,7 @@
             "totalUsers": "総ユーザー数",
             "activeUsers": "アクティブユーザー",
             "newUsers": "新規ユーザー",
-            "notActivated": "未アクティベート"
+            "notActivated": "レベル未選択"
         },
         "jlpt": {
             "title": "JLPTレベル分布",
