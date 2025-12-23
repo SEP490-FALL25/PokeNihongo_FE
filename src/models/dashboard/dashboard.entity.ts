@@ -197,3 +197,63 @@ export const DashboardContentPerformanceCompleteRateEntitySchema = z.object({
 
 export type IDashboardContentPerformanceCompleteRateEntity = z.infer<typeof DashboardContentPerformanceCompleteRateEntitySchema>;
 //------------------End------------------//
+
+
+/**
+ * Dashboard Gacha Stats Overview Entity Schema
+ */
+export const DashboardGachaStatsOverviewEntitySchema = z.object({
+    summary: z.object({
+        totalBanners: z.number(),
+        totalActive: z.number(),
+        totalExpired: z.number(),
+        totalPreview: z.number(),
+        totalRolls: z.number(),
+        totalFiveStar: z.number(),
+        fiveStarRate: z.coerce.number(),
+        starDistribution: z.array(z.object({
+            star: z.string(),
+            count: z.number(),
+            percentage: z.coerce.number(),
+        })),
+    }),
+});
+
+export type IDashboardGachaStatsOverviewEntity = z.infer<typeof DashboardGachaStatsOverviewEntitySchema>;
+//------------------End------------------//
+
+
+/**
+ * Dashboard Gacha Stats Detail Entity Schema
+ */
+export const DashboardGachaStatsDetailEntitySchema = z.object({
+    id: z.number(),
+    nameKey: z.string(),
+    nameTranslation: z.string(),
+    nameTranslations: z.array(z.object({
+        key: z.string(),
+        value: z.string(),
+    })),
+    status: z.string(),
+    startDate: z.string(),
+    endDate: z.string(),
+    hardPity5Star: z.number(),
+    costRoll: z.number(),
+    totalPurchases: z.number(),
+    totalRolls: z.number(),
+    starDistribution: z.array(z.object({
+        star: z.string(),
+        count: z.number(),
+        percentage: z.coerce.number(),
+    })),
+    items: z.array(z.object({
+        pokemonId: z.number(),
+        pokemonName: z.string(),
+        rarity: z.string(),
+        starType: z.string(),
+        rate: z.coerce.number(),
+    })),
+});
+
+export type IDashboardGachaStatsDetailEntity = z.infer<typeof DashboardGachaStatsDetailEntitySchema>;
+//------------------End------------------//

@@ -4,8 +4,10 @@ import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { selectCurrentLanguage } from "@redux/features/language/selector";
 import gachaService from "@services/gacha";
+import dashboardService from "@services/dashboard";
 import { IGachaBannerEntity } from "@models/gacha/entity";
 import { ICreateGachaItemListRequest, ICreateGachaRequest } from "@models/gacha/request";
+import { IDashboardGachaStatsOverviewEntity, IDashboardGachaStatsDetailEntity } from "@models/dashboard/dashboard.entity";
 
 /**
  * Handle Gacha Banner List
@@ -186,4 +188,40 @@ export const useUpdateGachaItemList = () => {
     });
 };
 //------------------------End------------------------//
+
+//------------------------------------------------Dashboard------------------------------------------------//
+/**
+ * Handle Get Dashboard Gacha Stats Overview
+ * @returns 
+ */
+export const useDashboardGachaStatsOverview = () => {
+    return useQuery<{ data: IDashboardGachaStatsOverviewEntity }>({
+        queryKey: ["dashboardGachaStatsOverview"],
+        queryFn: async () => {
+            const response = await dashboardService.getStatsGacha();
+            return response.data;
+        },
+    });
+};
+//------------------------End------------------------//
+
+
+/**
+ * Handle Get Dashboard Gacha Stats Detail
+ * @param gachaBannerId 
+ * @returns 
+ */
+export const useDashboardGachaStatsDetail = (gachaBannerId: number) => {
+    return useQuery<{ data: IDashboardGachaStatsDetailEntity }>({
+        queryKey: ["dashboardGachaStatsDetail", gachaBannerId],
+        queryFn: async () => {
+            if (!gachaBannerId) throw new Error("Gacha banner ID is required");
+            const response = await dashboardService.getGachaStatsGachaDetail(gachaBannerId);
+            return response.data;
+        },
+        enabled: !!gachaBannerId,
+    });
+};
+//------------------------End------------------------//
+
 //------------------------------------------------End------------------------------------------------//

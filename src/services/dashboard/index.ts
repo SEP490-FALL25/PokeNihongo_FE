@@ -49,6 +49,12 @@ const dashboardService = {
     getLeaderboardSeasonStatsBySeasonId: async (seasonId: number, period: string) => {
         return await axiosPrivate.get(`/dashboard/leaderboard-season/${seasonId}?period=${period}`);
     },
+    getStatsGacha: async () => {
+        return await axiosPrivate.get('/dashboard/gacha-stats/overview');
+    },
+    getGachaStatsGachaDetail: async (gachaBannerId: number) => {
+        return await axiosPrivate.get(`/dashboard/gacha-stats/${gachaBannerId}`);
+    },
 }
 
 export default dashboardService;

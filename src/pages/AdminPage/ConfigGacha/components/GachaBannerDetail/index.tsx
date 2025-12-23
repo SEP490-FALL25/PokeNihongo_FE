@@ -1,4 +1,4 @@
-import { useGachaBannerById } from "@hooks/useGacha";
+import { useGachaBannerById, useDashboardGachaStatsDetail } from "@hooks/useGacha";
 import { Card, CardContent, CardHeader } from "@ui/Card";
 import { Skeleton } from "@ui/Skeleton";
 import { useParams } from "react-router-dom";
@@ -10,7 +10,10 @@ import GachaDetailView from "../GachaDetailView";
 export default function GachaBannerDetail() {
     const { t } = useTranslation();
     const { bannerId } = useParams<{ bannerId: string }>();
-    const { data: bannerDetail, isLoading } = useGachaBannerById(Number(bannerId));
+    const { data: bannerDetail, isLoading: isBannerLoading } = useGachaBannerById(Number(bannerId));
+    const { data: statsDetail, isLoading: isStatsLoading } = useDashboardGachaStatsDetail(Number(bannerId));
+
+    const isLoading = isBannerLoading || isStatsLoading;
 
     return (
         <>
@@ -31,7 +34,10 @@ export default function GachaBannerDetail() {
                     </Card>
                 </div>
             ) : (
-                <GachaDetailView bannerDetail={bannerDetail?.data || {} as IGachaBannerEntity} />
+                <GachaDetailView
+                    bannerDetail={bannerDetail?.data || {} as IGachaBannerEntity}
+                    statsDetail={statsDetail?.data}
+                />
             )}
         </>
     );

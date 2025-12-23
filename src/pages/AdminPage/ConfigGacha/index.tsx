@@ -6,8 +6,8 @@ import { Skeleton } from "@ui/Skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/Select";
 import HeaderAdmin from "@organisms/Header/Admin";
 import PaginationControls from "@ui/PaginationControls";
-import { Plus, X, Coins, Star, Gift, Clock } from "lucide-react";
-import { useGachaBannerList } from "@hooks/useGacha";
+import { Plus, X, Coins, Star, Gift, Clock, Activity, Eye } from "lucide-react";
+import { useGachaBannerList, useDashboardGachaStatsOverview } from "@hooks/useGacha";
 import { useTranslation } from "react-i18next";
 import CustomDatePicker from "@ui/DatePicker";
 import { GACHA } from "@constants/gacha";
@@ -25,6 +25,12 @@ export default function ConfigGacha() {
 
 
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState<boolean>(false);
+
+    /**
+     * Handle Dashboard Stats
+     */
+    const { data: overviewStats } = useDashboardGachaStatsOverview();
+    //------------------------End------------------------//
 
     /***
      * Handle Gacha Banner List
@@ -97,6 +103,69 @@ export default function ConfigGacha() {
             <HeaderAdmin title={t('configGacha.title')} description={t('configGacha.description')} />
 
             <div className="p-8 mt-24 space-y-8">
+                {/* Overview Stats */}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    <Card className="bg-card border-border">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">
+                                {t('configGacha.totalBanners')}
+                            </CardTitle>
+                            <Gift className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{overviewStats?.data?.summary?.totalBanners || 0}</div>
+                            <p className="text-xs text-muted-foreground">
+                                {overviewStats?.data?.summary?.totalActive || 0} {t('common.active')}
+                            </p>
+                        </CardContent>
+                    </Card>
+                    <Card className="bg-card border-border">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">
+                                {t('configGacha.totalRolls')}
+                            </CardTitle>
+                            <Activity className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{overviewStats?.data?.summary?.totalRolls || 0}</div>
+                        </CardContent>
+                    </Card>
+                    <Card className="bg-card border-border">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">
+                                {t('configGacha.fiveStarRate')}
+                            </CardTitle>
+                            <Star className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{overviewStats?.data?.summary?.fiveStarRate || 0}%</div>
+                            <p className="text-xs text-muted-foreground">
+                                {overviewStats?.data?.summary?.totalFiveStar || 0} {t('configGacha.totalFiveStar')}
+                            </p>
+                        </CardContent>
+                    </Card>
+                    <Card className="bg-card border-border">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">
+                                {t('configGacha.statusOverview')}
+                            </CardTitle>
+                            <Eye className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-sm space-y-1">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">{t('configGacha.preview')}:</span>
+                                    <span className="font-medium">{overviewStats?.data?.summary?.totalPreview || 0}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">{t('configGacha.expired')}:</span>
+                                    <span className="font-medium">{overviewStats?.data?.summary?.totalExpired || 0}</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
                 <Card className="bg-gradient-to-br from-card via-card to-card/95 border-border shadow-md">
                     <CardHeader className="pb-4">
                         <div className="flex items-center justify-between mb-4">

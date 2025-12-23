@@ -3,9 +3,10 @@ import { Badge } from "@ui/Badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/Card";
 import { Button } from "@ui/Button";
 import { Separator } from "@ui/Separator";
-import { ArrowLeft, Settings, Calendar, TrendingUp, Zap, Coins, Star, Sparkles, X, Undo, Redo, Save } from "lucide-react";
+import { ArrowLeft, Settings, Calendar, TrendingUp, Zap, Coins, Star, Sparkles, X, Undo, Redo, Save, Activity, Percent } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { IGachaBannerEntity } from "@models/gacha/entity";
+import { IDashboardGachaStatsDetailEntity } from "@models/dashboard/dashboard.entity";
 import { RarityBadge } from "@atoms/BadgeRarity";
 import { useEffect, useState } from "react";
 import EditGachaDialog from "../EditGachaDialog";
@@ -14,8 +15,9 @@ import { useDeleteGachaItem, useUpdateGachaItemList } from "@hooks/useGacha";
 import getHeaderColor from "@atoms/HeaderColorRarity";
 import getCardColor from "@atoms/CardColorRarity";
 import { RarityToStarTypeMap } from "@constants/gacha";
+import GachaPerformanceStatsModal from "../GachaPerformanceStatsModal";
 
-export default function GachaDetailView({ bannerDetail }: { bannerDetail: IGachaBannerEntity }) {
+export default function GachaDetailView({ bannerDetail, statsDetail }: { bannerDetail: IGachaBannerEntity; statsDetail?: IDashboardGachaStatsDetailEntity }) {
 
     /**
      * Define Variables
@@ -32,6 +34,7 @@ export default function GachaDetailView({ bannerDetail }: { bannerDetail: IGacha
     const [dragOverRarity, setDragOverRarity] = useState<string | null>(null)
     const [history, setHistory] = useState<Record<string, any[]>[]>([])
     const [historyIndex, setHistoryIndex] = useState<number>(-1)
+    const [isStatsModalOpen, setIsStatsModalOpen] = useState<boolean>(false)
 
 
     /**
@@ -241,6 +244,39 @@ export default function GachaDetailView({ bannerDetail }: { bannerDetail: IGacha
                         {/* Separator */}
                         <Separator />
 
+                        {/* Performance Stats section (open in modal) */}
+                        {statsDetail && (
+                            <div className="rounded-lg border border-blue-200 bg-blue-50/60 px-4 py-3 mb-4 flex items-center justify-between">
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-1.5 rounded-md bg-blue-100">
+                                            <Activity className="h-4 w-4 text-blue-600" />
+                                        </div>
+                                        <h3 className="text-sm font-semibold text-foreground tracking-wide uppercase">
+                                            {t('configGacha.performanceStats')}
+                                        </h3>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        {t('configGacha.totalRolls')}:{" "}
+                                        <span className="font-semibold text-foreground">
+                                            {statsDetail.totalRolls.toLocaleString()}
+                                        </span>
+                                    </p>
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="gap-2 border-blue-400 text-blue-600 hover:bg-blue-50 bg-background/80"
+                                    onClick={() => setIsStatsModalOpen(true)}
+                                >
+                                    <Percent className="h-4 w-4 text-blue-600" />
+                                    <span className="text-xs font-semibold">
+                                        {t('common.view')} {t('configGacha.starDistribution')}
+                                    </span>
+                                </Button>
+                            </div>
+                        )}
+
                         {/* Gacha Stats section */}
                         <div>
                             <div className="flex items-center gap-2 mb-4">
@@ -250,20 +286,20 @@ export default function GachaDetailView({ bannerDetail }: { bannerDetail: IGacha
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                                 <div className="p-4 rounded-lg border border-green-200 bg-green-50/60">
                                     <div className="flex items-center justify-between">
-                                        <p className="text-xs font-semibold text-green-800 uppercase tracking-wide">{t('configGacha.amount5Star')}</p>
+                                        <p className="text-xs font-semibold text-green-800 uppercase tracking-wide">{t('configGacha.amount1Star')}</p>
                                         <Star className="h-4 w-4 text-green-700" />
                                     </div>
                                     <p className="mt-2 text-base font-bold text-green-900">
-                                        {bannerDetail?.amount5StarCurrent}/{bannerDetail?.amount5Star}
+                                        {bannerDetail?.amount1StarCurrent}/{bannerDetail?.amount1Star}
                                     </p>
                                 </div>
                                 <div className="p-4 rounded-lg border border-emerald-200 bg-emerald-50/60">
                                     <div className="flex items-center justify-between">
-                                        <p className="text-xs font-semibold text-emerald-800 uppercase tracking-wide">{t('configGacha.amount4Star')}</p>
+                                        <p className="text-xs font-semibold text-emerald-800 uppercase tracking-wide">{t('configGacha.amount2Star')}</p>
                                         <Star className="h-4 w-4 text-emerald-700" />
                                     </div>
                                     <p className="mt-2 text-base font-bold text-emerald-900">
-                                        {bannerDetail?.amount4StarCurrent}/{bannerDetail?.amount4Star}
+                                        {bannerDetail?.amount2StarCurrent}/{bannerDetail?.amount2Star}
                                     </p>
                                 </div>
                                 <div className="p-4 rounded-lg border border-blue-200 bg-blue-50/60">
@@ -277,20 +313,20 @@ export default function GachaDetailView({ bannerDetail }: { bannerDetail: IGacha
                                 </div>
                                 <div className="p-4 rounded-lg border border-purple-200 bg-purple-50/60">
                                     <div className="flex items-center justify-between">
-                                        <p className="text-xs font-semibold text-purple-800 uppercase tracking-wide">{t('configGacha.amount2Star')}</p>
+                                        <p className="text-xs font-semibold text-purple-800 uppercase tracking-wide">{t('configGacha.amount4Star')}</p>
                                         <Star className="h-4 w-4 text-purple-700" />
                                     </div>
                                     <p className="mt-2 text-base font-bold text-purple-900">
-                                        {bannerDetail?.amount2StarCurrent}/{bannerDetail?.amount2Star}
+                                        {bannerDetail?.amount4StarCurrent}/{bannerDetail?.amount4Star}
                                     </p>
                                 </div>
                                 <div className="p-4 rounded-lg border border-amber-200 bg-amber-50/60">
                                     <div className="flex items-center justify-between">
-                                        <p className="text-xs font-semibold text-amber-800 uppercase tracking-wide">{t('configGacha.amount1Star')}</p>
+                                        <p className="text-xs font-semibold text-amber-800 uppercase tracking-wide">{t('configGacha.amount5Star')}</p>
                                         <Star className="h-4 w-4 text-amber-700" />
                                     </div>
                                     <p className="mt-2 text-base font-bold text-amber-900">
-                                        {bannerDetail?.amount1StarCurrent}/{bannerDetail?.amount1Star}
+                                        {bannerDetail?.amount5StarCurrent}/{bannerDetail?.amount5Star}
                                     </p>
                                 </div>
                             </div>
@@ -446,6 +482,14 @@ export default function GachaDetailView({ bannerDetail }: { bannerDetail: IGacha
             </Card>
             <EditGachaDialog isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} bannerData={bannerDetail} />
             <AddGachaPokemonSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} gachaBannerId={bannerDetail.id} />
+
+            {statsDetail && (
+                <GachaPerformanceStatsModal
+                    open={isStatsModalOpen}
+                    onOpenChange={setIsStatsModalOpen}
+                    statsDetail={statsDetail}
+                />
+            )}
         </div>
     );
 }
