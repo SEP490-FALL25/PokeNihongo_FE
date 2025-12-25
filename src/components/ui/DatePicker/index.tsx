@@ -144,9 +144,12 @@ export default function CustomDatePicker({
 
     // Default values for other props
     const defaultCaptionLayout = 'dropdown' as const;
+    const currentYear = today ? today.getFullYear() : new Date().getFullYear();
     const defaultDayPickerProps = {
         captionLayout: defaultCaptionLayout,
-        startMonth: new Date(2024, 6),
+        startMonth: new Date(currentYear, 0), // Tháng 1 của năm hiện tại
+        fromYear: currentYear, // Năm bắt đầu (năm hiện tại)
+        toYear: currentYear + 10, 
         classNames: {
             selected: 'selected',
             chevron: '',

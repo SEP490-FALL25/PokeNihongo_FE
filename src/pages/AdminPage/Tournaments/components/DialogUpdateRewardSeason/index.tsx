@@ -16,6 +16,7 @@ import DialogReward from "../DialogReward";
 // Sử dụng -1 để đại diện cho order null (rewards chung) trong state
 // Chuyển đổi sang null khi gửi API
 const COMMON_ORDER_KEY = -1;
+const DEFAULT_RANKS = ["N5", "N4", "N3"]; // Luôn hiển thị các rank này
 
 type PendingSelections = Record<string, Record<number, number[]>>;
 
@@ -77,22 +78,36 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
 
     const baselineSelections = useMemo<PendingSelections>(() => {
         const result: PendingSelections = {};
-        rankGroups.forEach(([rankName, entries]) => {
-            result[rankName] = {};
-            // Khởi tạo order mặc định cho rewards chung (sử dụng COMMON_ORDER_KEY = -1)
-            result[rankName][COMMON_ORDER_KEY] = [];
 
-            entries.forEach((entry) => {
-                const rewardIds = Array.isArray(entry.rewards) ? entry.rewards.map((reward) => reward.id) : [];
-
-                // Xử lý order null từ API (chuyển thành COMMON_ORDER_KEY)
-                if (entry.order === null) {
-                    result[rankName][COMMON_ORDER_KEY] = rewardIds;
-                } else {
-                    result[rankName][entry.order] = rewardIds;
-                }
-            });
+        // Luôn khởi tạo cho N5, N4, N3
+        DEFAULT_RANKS.forEach((rankName) => {
+            result[rankName] = {
+                [COMMON_ORDER_KEY]: [],
+            };
         });
+
+        // Merge data từ BE nếu có
+        if (rankGroups.length > 0) {
+            rankGroups.forEach(([rankName, entries]) => {
+                // Nếu rank chưa có trong result, khởi tạo
+                if (!result[rankName]) {
+                    result[rankName] = {
+                        [COMMON_ORDER_KEY]: [],
+                    };
+                }
+
+                entries.forEach((entry) => {
+                    const rewardIds = Array.isArray(entry.rewards) ? entry.rewards.map((reward) => reward.id) : [];
+
+                    // Xử lý order null từ API (chuyển thành COMMON_ORDER_KEY)
+                    if (entry.order === null) {
+                        result[rankName][COMMON_ORDER_KEY] = rewardIds;
+                    } else {
+                        result[rankName][entry.order] = rewardIds;
+                    }
+                });
+            });
+        }
         return result;
     }, [rankGroups]);
 
@@ -108,11 +123,12 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
     useEffect(() => {
         if (open) {
             setPendingSelections(baselineSelections);
-            setActiveRank(rankGroups[0]?.[0] ?? "");
+            // Luôn set activeRank là N5 (rank đầu tiên trong DEFAULT_RANKS)
+            setActiveRank(DEFAULT_RANKS[0] ?? "");
             setNewOrderInputs({});
             setRewardSelectDialog(null);
         }
-    }, [open, baselineSelections, rankGroups]);
+    }, [open, baselineSelections]);
 
     const handleAddNewOrder = useCallback((rankName: string, orderStr: string) => {
         const order = Number.parseInt(orderStr, 10);
@@ -165,10 +181,10 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
 
     const handleReset = useCallback(() => {
         setPendingSelections(baselineSelections);
-        setActiveRank(rankGroups[0]?.[0] ?? "");
+        setActiveRank(DEFAULT_RANKS[0] ?? "");
         setNewOrderInputs({});
         setRewardSelectDialog(null);
-    }, [baselineSelections, rankGroups]);
+    }, [baselineSelections]);
 
     const handleOpenRewardSelect = useCallback((rankName: string, order: number) => {
         setRewardSelectDialog({ open: true, rankName, order });
@@ -247,7 +263,28 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
         }
     }, [pendingSelections, seasonId, updateSeasonRankRewardMutation, onOpenChange]);
 
-    const activeRankValue = activeRank || (rankGroups[0]?.[0] ?? "");
+    // Tạo danh sách rank để hiển thị (luôn bao gồm N5, N4, N3)
+    const displayRanks = useMemo(() => {
+        const ranksFromBE = rankGroups.length > 0
+            ? rankGroups.map(([rankName]) => rankName)
+            : [];
+
+        // Merge DEFAULT_RANKS với ranks từ BE, đảm bảo không trùng lặp
+        const allRanks = new Set<string>([...DEFAULT_RANKS, ...ranksFromBE]);
+        return Array.from(allRanks).sort((a, b) => {
+            // Sắp xếp theo thứ tự: N5, N4, N3, sau đó các rank khác
+            const defaultIndexA = DEFAULT_RANKS.indexOf(a);
+            const defaultIndexB = DEFAULT_RANKS.indexOf(b);
+            if (defaultIndexA !== -1 && defaultIndexB !== -1) {
+                return defaultIndexA - defaultIndexB;
+            }
+            if (defaultIndexA !== -1) return -1;
+            if (defaultIndexB !== -1) return 1;
+            return a.localeCompare(b);
+        });
+    }, [rankGroups]);
+
+    const activeRankValue = activeRank || (displayRanks[0] ?? "");
 
     return (
         <Dialog open={open} onOpenChange={handleDialogChange}>
@@ -256,287 +293,199 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
                     <DialogTitle>{dialogLabels.title}</DialogTitle>
                     <DialogDescription>{dialogLabels.description}</DialogDescription>
                 </DialogHeader>
-                {rankGroups.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">{messages.noRewards}</p>
-                ) : (
-                    <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
-                        <div className="flex flex-wrap items-center justify-end gap-3 flex-shrink-0 mb-4">
-                            <Button
-                                variant="outline"
-                                onClick={handleReset}
-                                disabled={isSavingRewards}
-                            >
-                                {dialogLabels.reset}
-                            </Button>
-                        </div>
-                        <Tabs
-                            value={activeRankValue}
-                            onValueChange={setActiveRank}
-                            className="flex flex-col flex-1 min-h-0 overflow-hidden"
+                <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
+                    <div className="flex flex-wrap items-center justify-end gap-3 flex-shrink-0 mb-4">
+                        <Button
+                            variant="outline"
+                            onClick={handleReset}
+                            disabled={isSavingRewards}
                         >
-                            <div className="flex-shrink-0 mb-4">
-                                <ScrollArea className="max-w-full">
-                                    <TabsList className="flex w-full flex-nowrap gap-2 bg-muted/40 p-2">
-                                        {rankGroups.map(([rankName]) => (
-                                            <TabsTrigger key={rankName} value={rankName} className="min-w-[120px]">
-                                                {rankName}
-                                            </TabsTrigger>
-                                        ))}
-                                    </TabsList>
-                                    <ScrollBar orientation="horizontal" />
-                                </ScrollArea>
-                            </div>
-                            {rankGroups.map(([rankName, entries]) => {
-                                // Tạo Set các existing orders (bao gồm cả null được chuyển thành COMMON_ORDER_KEY)
-                                const existingOrders = new Set(
-                                    entries
-                                        .map(e => e.order === null ? COMMON_ORDER_KEY : e.order)
-                                        .filter((order): order is number => order !== null)
-                                );
-                                const newOrderInput = newOrderInputs[rankName] ?? "";
-                                const currentSelections = pendingSelections[rankName] ?? {};
+                            {dialogLabels.reset}
+                        </Button>
+                    </div>
+                    <Tabs
+                        value={activeRankValue}
+                        onValueChange={setActiveRank}
+                        className="flex flex-col flex-1 min-h-0 overflow-hidden"
+                    >
+                        <div className="flex-shrink-0 mb-4">
+                            <ScrollArea className="max-w-full">
+                                <TabsList className="flex w-full flex-nowrap gap-2 bg-muted/40 p-2">
+                                    {displayRanks.map((rankName) => (
+                                        <TabsTrigger key={rankName} value={rankName} className="min-w-[120px]">
+                                            {rankName}
+                                        </TabsTrigger>
+                                    ))}
+                                </TabsList>
+                                <ScrollBar orientation="horizontal" />
+                            </ScrollArea>
+                        </div>
+                        {displayRanks.map((rankName) => {
+                            // Tìm entries từ rankGroups nếu có
+                            const rankGroupEntry = rankGroups.find(([rName]) => rName === rankName);
+                            const entries = rankGroupEntry ? rankGroupEntry[1] : [];
+                            // Tạo Set các existing orders (bao gồm cả null được chuyển thành COMMON_ORDER_KEY)
+                            const existingOrders = new Set(
+                                entries
+                                    .map(e => e.order === null ? COMMON_ORDER_KEY : e.order)
+                                    .filter((order): order is number => order !== null)
+                            );
+                            const newOrderInput = newOrderInputs[rankName] ?? "";
+                            const currentSelections = pendingSelections[rankName] ?? {};
 
-                                // Lấy order COMMON_ORDER_KEY (rewards chung)
-                                const commonRewards = currentSelections[COMMON_ORDER_KEY] ?? [];
+                            // Lấy order COMMON_ORDER_KEY (rewards chung)
+                            const commonRewards = currentSelections[COMMON_ORDER_KEY] ?? [];
 
-                                // Kiểm tra xem rank hiện tại đã có bất kỳ order nào chưa
-                                const occupiedOrders = new Set<number>();
-                                Object.keys(currentSelections).forEach((orderStr) => {
-                                    const order = Number(orderStr);
-                                    if (!Number.isNaN(order) && order !== COMMON_ORDER_KEY) {
-                                        occupiedOrders.add(order);
-                                    }
-                                });
-                                const hasAnyOrder = occupiedOrders.size > 0;
-                                let suggestedOrder = 1;
-                                while (occupiedOrders.has(suggestedOrder)) {
-                                    suggestedOrder += 1;
+                            // Kiểm tra xem rank hiện tại đã có bất kỳ order nào chưa
+                            const occupiedOrders = new Set<number>();
+                            Object.keys(currentSelections).forEach((orderStr) => {
+                                const order = Number(orderStr);
+                                if (!Number.isNaN(order) && order !== COMMON_ORDER_KEY) {
+                                    occupiedOrders.add(order);
                                 }
+                            });
+                            const hasAnyOrder = occupiedOrders.size > 0;
+                            let suggestedOrder = 1;
+                            while (occupiedOrders.has(suggestedOrder)) {
+                                suggestedOrder += 1;
+                            }
 
-                                // Lấy các order mới (không có trong existingOrders và không phải COMMON_ORDER_KEY)
-                                const newOrderSelections: Array<{ order: number; rewards: number[] }> = [];
+                            // Lấy các order mới (không có trong existingOrders và không phải COMMON_ORDER_KEY)
+                            const newOrderSelections: Array<{ order: number; rewards: number[] }> = [];
 
-                                // Duyệt qua tất cả keys
-                                Object.keys(currentSelections).forEach((orderStr) => {
-                                    const order = Number(orderStr);
-                                    if (!Number.isNaN(order) && order !== COMMON_ORDER_KEY && !existingOrders.has(order)) {
-                                        const rewards = currentSelections[order];
-                                        if (Array.isArray(rewards)) {
-                                            newOrderSelections.push({
-                                                order,
-                                                rewards: rewards as number[],
-                                            });
-                                        }
+                            // Duyệt qua tất cả keys
+                            Object.keys(currentSelections).forEach((orderStr) => {
+                                const order = Number(orderStr);
+                                if (!Number.isNaN(order) && order !== COMMON_ORDER_KEY && !existingOrders.has(order)) {
+                                    const rewards = currentSelections[order];
+                                    if (Array.isArray(rewards)) {
+                                        newOrderSelections.push({
+                                            order,
+                                            rewards: rewards as number[],
+                                        });
                                     }
-                                });
+                                }
+                            });
 
-                                newOrderSelections.sort((a, b) => a.order - b.order);
+                            newOrderSelections.sort((a, b) => a.order - b.order);
 
-                                const commonRewardsList = commonRewards
-                                    .map((id: number) => rewardOptionsMap.get(id))
-                                    .filter((reward): reward is IRewardEntityType => reward !== undefined);
+                            const commonRewardsList = commonRewards
+                                .map((id: number) => rewardOptionsMap.get(id))
+                                .filter((reward): reward is IRewardEntityType => reward !== undefined);
 
-                                return (
-                                    <TabsContent key={rankName} value={rankName} className="mt-0 flex-1 min-h-0 flex flex-col overflow-hidden">
-                                        <ScrollArea className="flex-1">
-                                            <div className="space-y-3 py-2 pr-2">
-                                                {/* Rewards chung (order null) */}
-                                                <Card className="border border-purple-200/50 bg-purple-50/50 shadow-sm">
-                                                    <CardHeader className="space-y-3 pb-3">
-                                                        <div className="flex items-center justify-between">
-                                                            <div className="flex items-center gap-2">
-                                                                <Badge className="bg-gradient-to-r from-purple-500/50 to-pink-500/50 text-purple-900 border-2 border-purple-500/70 font-bold shadow-md flex items-center gap-1.5 px-3 py-1">
-                                                                    <Award className="w-4 h-4" />
-                                                                    {t('tournaments.detail.rewards.dialog.commonRewards', { defaultValue: 'Phần thưởng chung cho tất cả' })}
-                                                                </Badge>
-                                                            </div>
-                                                            <Button
-                                                                size="sm"
-                                                                variant="outline"
-                                                                onClick={() => handleOpenRewardSelect(rankName, COMMON_ORDER_KEY)}
-                                                                disabled={isSavingRewards || isRewardListLoading}
-                                                                className="h-8"
-                                                            >
-                                                                <Edit2 className="w-3 h-3 mr-1.5" />
-                                                                {t('tournaments.detail.rewards.dialog.selectRewards', { defaultValue: 'Chọn rewards' })}
-                                                            </Button>
-                                                        </div>
-                                                    </CardHeader>
-                                                    <CardContent className="pt-0">
-                                                        {commonRewards.length === 0 ? (
-                                                            <p className="text-sm text-muted-foreground py-2">
-                                                                {t('tournaments.detail.rewards.dialog.noCommonRewards', { defaultValue: 'Chưa có rewards chung cho rank này.' })}
-                                                            </p>
-                                                        ) : (
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {commonRewardsList.map((reward: IRewardEntityType) => (
-                                                                    <Badge
-                                                                        key={reward.id}
-                                                                        variant="secondary"
-                                                                        className="bg-purple-500/25 text-purple-800 border-purple-500/50 pr-1 cursor-pointer hover:bg-purple-500/35 transition-colors font-medium shadow-sm"
-                                                                        onClick={() => handleRemoveReward(rankName, COMMON_ORDER_KEY, reward.id)}
-                                                                    >
-                                                                        {reward.nameTranslation || reward.nameKey || `#${reward.id}`}
-                                                                        <X className="w-3 h-3 ml-1.5" />
-                                                                    </Badge>
-                                                                ))}
-                                                            </div>
-                                                        )}
-                                                    </CardContent>
-                                                </Card>
-
-                                                {/* Add New Order Section */}
-                                                <Card className="border border-blue-200/50 bg-blue-50/50 shadow-sm">
-                                                    <CardHeader className="space-y-3 pb-3">
+                            return (
+                                <TabsContent key={rankName} value={rankName} className="mt-0 flex-1 min-h-0 flex flex-col overflow-hidden">
+                                    <ScrollArea className="flex-1">
+                                        <div className="space-y-3 py-2 pr-2">
+                                            {/* Rewards chung (order null) */}
+                                            <Card className="border border-purple-200/50 bg-purple-50/50 shadow-sm">
+                                                <CardHeader className="space-y-3 pb-3">
+                                                    <div className="flex items-center justify-between">
                                                         <div className="flex items-center gap-2">
-                                                            <Plus className="w-4 h-4 text-primary" />
-                                                            <span className="text-sm font-semibold text-foreground">
-                                                                {t('tournaments.detail.rewards.dialog.addNewOrder', { defaultValue: 'Thêm vị trí mới' })}
-                                                            </span>
+                                                            <Badge className="bg-gradient-to-r from-purple-500/50 to-pink-500/50 text-purple-900 border-2 border-purple-500/70 font-bold shadow-md flex items-center gap-1.5 px-3 py-1">
+                                                                <Award className="w-4 h-4" />
+                                                                {t('tournaments.detail.rewards.dialog.commonRewards', { defaultValue: 'Phần thưởng chung cho tất cả' })}
+                                                            </Badge>
                                                         </div>
-                                                        <div className="flex gap-2">
-                                                            <Input
-                                                                type="number"
-                                                                min="1"
-                                                                placeholder={t('tournaments.detail.rewards.dialog.orderPlaceholder', { defaultValue: 'Nhập vị trí (order)' })}
-                                                                value={newOrderInput}
-                                                                onChange={(e) => setNewOrderInputs(prev => ({ ...prev, [rankName]: e.target.value }))}
-                                                                className="flex-1 bg-background border-border"
-                                                                disabled={isSavingRewards}
-                                                            />
-                                                            <Button
-                                                                size="sm"
-                                                                onClick={() => handleAddNewOrder(rankName, newOrderInput)}
-                                                                disabled={isSavingRewards || !newOrderInput || Number.isNaN(Number.parseInt(newOrderInput, 10))}
-                                                            >
-                                                                <Plus className="w-4 h-4 mr-1" />
-                                                                {t('common.add', { defaultValue: 'Thêm' })}
-                                                            </Button>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            onClick={() => handleOpenRewardSelect(rankName, COMMON_ORDER_KEY)}
+                                                            disabled={isSavingRewards || isRewardListLoading}
+                                                            className="h-8"
+                                                        >
+                                                            <Edit2 className="w-3 h-3 mr-1.5" />
+                                                            {t('tournaments.detail.rewards.dialog.selectRewards', { defaultValue: 'Chọn rewards' })}
+                                                        </Button>
+                                                    </div>
+                                                </CardHeader>
+                                                <CardContent className="pt-0">
+                                                    {commonRewards.length === 0 ? (
+                                                        <p className="text-sm text-muted-foreground py-2">
+                                                            {t('tournaments.detail.rewards.dialog.noCommonRewards', { defaultValue: 'Chưa có rewards chung cho rank này.' })}
+                                                        </p>
+                                                    ) : (
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {commonRewardsList.map((reward: IRewardEntityType) => (
+                                                                <Badge
+                                                                    key={reward.id}
+                                                                    variant="secondary"
+                                                                    className="bg-purple-500/25 text-purple-800 border-purple-500/50 pr-1 cursor-pointer hover:bg-purple-500/35 transition-colors font-medium shadow-sm"
+                                                                    onClick={() => handleRemoveReward(rankName, COMMON_ORDER_KEY, reward.id)}
+                                                                >
+                                                                    {reward.nameTranslation || reward.nameKey || `#${reward.id}`}
+                                                                    <X className="w-3 h-3 ml-1.5" />
+                                                                </Badge>
+                                                            ))}
                                                         </div>
-                                                    </CardHeader>
-                                                    {newOrderSelections.length > 0 && (
-                                                        <CardContent className="space-y-3 pt-0">
-                                                            {newOrderSelections.map(({ order, rewards }) => {
-                                                                const selectedRewardIds = rewards;
-                                                                const selectedRewards = selectedRewardIds
-                                                                    .map(id => rewardOptionsMap.get(id))
-                                                                    .filter((reward): reward is IRewardEntityType => reward !== undefined);
-                                                                return (
-                                                                    <div key={order} className="p-4 rounded-lg border border-blue-200/40 bg-background/70 space-y-3">
-                                                                        <div className="flex items-center justify-between">
-                                                                            <Badge className="bg-blue-500/40 text-blue-900 border-blue-500/60 font-semibold shadow-sm">
-                                                                                {t('tournaments.detail.rewards.range.single', { rank: order })}
-                                                                            </Badge>
-                                                                            <div className="flex items-center gap-2">
-                                                                                <Button
-                                                                                    size="sm"
-                                                                                    variant="outline"
-                                                                                    onClick={() => handleOpenRewardSelect(rankName, order)}
-                                                                                    disabled={isSavingRewards || isRewardListLoading}
-                                                                                    className="h-8"
-                                                                                >
-                                                                                    <Edit2 className="w-3 h-3 mr-1.5" />
-                                                                                    {t('tournaments.detail.rewards.dialog.selectRewards', { defaultValue: 'Chọn rewards' })}
-                                                                                </Button>
-                                                                                <Button
-                                                                                    size="sm"
-                                                                                    variant="outline"
-                                                                                    onClick={() => handleRemoveOrder(rankName, order)}
-                                                                                    disabled={isSavingRewards}
-                                                                                    className="h-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                                                                >
-                                                                                    <Trash2 className="w-3 h-3" />
-                                                                                </Button>
-                                                                            </div>
-                                                                        </div>
-                                                                        {selectedRewardIds.length === 0 ? (
-                                                                            <p className="text-sm text-muted-foreground py-2">
-                                                                                {messages.noRewardRange}
-                                                                            </p>
-                                                                        ) : (
-                                                                            <div className="flex flex-wrap gap-2">
-                                                                                {selectedRewards.map((reward: IRewardEntityType) => (
-                                                                                    <Badge
-                                                                                        key={reward.id}
-                                                                                        variant="secondary"
-                                                                                        className="bg-blue-500/25 text-blue-800 border-blue-500/50 pr-1 cursor-pointer hover:bg-blue-500/35 transition-colors font-medium shadow-sm"
-                                                                                        onClick={() => handleRemoveReward(rankName, order, reward.id)}
-                                                                                    >
-                                                                                        {reward.nameTranslation || reward.nameKey || `#${reward.id}`}
-                                                                                        <X className="w-3 h-3 ml-1.5" />
-                                                                                    </Badge>
-                                                                                ))}
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                );
-                                                            })}
-                                                        </CardContent>
                                                     )}
-                                                </Card>
-                                                {!hasAnyOrder && (
-                                                    <Card className="border border-dashed border-muted-foreground/40 bg-muted/10 shadow-none">
-                                                        <CardHeader className="space-y-2">
-                                                            <DialogTitle className="text-base font-semibold">
-                                                                {t('tournaments.detail.rewards.dialog.emptyStateTitle', { defaultValue: 'Chưa có phần thưởng nào cho rank này' })}
-                                                            </DialogTitle>
-                                                            <DialogDescription className="text-sm text-muted-foreground">
-                                                                {t('tournaments.detail.rewards.dialog.emptyStateDescription', { defaultValue: 'Tạo order đầu tiên để bắt đầu cấu hình phần thưởng.' })}
-                                                            </DialogDescription>
-                                                        </CardHeader>
-                                                        <CardContent className="pt-0">
-                                                            <Button
-                                                                onClick={() => {
-                                                                    handleAddNewOrder(rankName, String(suggestedOrder));
-                                                                    handleOpenRewardSelect(rankName, suggestedOrder);
-                                                                }}
-                                                                disabled={isSavingRewards || isRewardListLoading}
-                                                            >
-                                                                <Plus className="w-4 h-4 mr-2" />
-                                                                {t('tournaments.detail.rewards.dialog.emptyStateAction', { defaultValue: 'Thêm phần thưởng đầu tiên' })}
-                                                            </Button>
-                                                        </CardContent>
-                                                    </Card>
-                                                )}
-                                                {(() => {
-                                                    // Lọc các entries có order !== null và sắp xếp theo order
-                                                    const validEntries = entries
-                                                        .filter((entry) => entry.order !== null)
-                                                        .sort((a, b) => (a.order as number) - (b.order as number));
+                                                </CardContent>
+                                            </Card>
 
-                                                    return validEntries.map((entry, index) => {
-                                                        const nextEntry = validEntries[index + 1];
-                                                        const order = entry.order as number;
-                                                        const nextOrder = nextEntry?.order as number | undefined;
-                                                        const rangeLabel = formatRangeLabel(order, nextOrder);
-                                                        const selectedRewardIds = pendingSelections[rankName]?.[order] ?? [];
-                                                        const selectedRewards = selectedRewardIds
-                                                            .map((id: number) => rewardOptionsMap.get(id))
-                                                            .filter((reward): reward is IRewardEntityType => reward !== undefined);
-
-                                                        return (
-                                                            <Card
-                                                                key={entry.id}
-                                                                className="border border-amber-200/50 bg-background/90 shadow-sm"
-                                                            >
-                                                                <CardHeader className="space-y-3 pb-3">
-                                                                    <div className="flex flex-wrap items-center justify-between gap-3">
-                                                                        <Badge className="bg-primary/35 text-primary border-primary/60 font-semibold uppercase tracking-wide shadow-sm">
-                                                                            {rangeLabel}
+                                            {/* Add New Order Section */}
+                                            <Card className="border border-blue-200/50 bg-blue-50/50 shadow-sm">
+                                                <CardHeader className="space-y-3 pb-3">
+                                                    <div className="flex items-center gap-2">
+                                                        <Plus className="w-4 h-4 text-primary" />
+                                                        <span className="text-sm font-semibold text-foreground">
+                                                            {t('tournaments.detail.rewards.dialog.addNewOrder', { defaultValue: 'Thêm vị trí mới' })}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <Input
+                                                            type="number"
+                                                            min="1"
+                                                            placeholder={t('tournaments.detail.rewards.dialog.orderPlaceholder', { defaultValue: 'Nhập vị trí (order)' })}
+                                                            value={newOrderInput}
+                                                            onChange={(e) => setNewOrderInputs(prev => ({ ...prev, [rankName]: e.target.value }))}
+                                                            className="flex-1 bg-background border-border"
+                                                            disabled={isSavingRewards}
+                                                        />
+                                                        <Button
+                                                            size="sm"
+                                                            onClick={() => handleAddNewOrder(rankName, newOrderInput)}
+                                                            disabled={isSavingRewards || !newOrderInput || Number.isNaN(Number.parseInt(newOrderInput, 10))}
+                                                        >
+                                                            <Plus className="w-4 h-4 mr-1" />
+                                                            {t('common.add', { defaultValue: 'Thêm' })}
+                                                        </Button>
+                                                    </div>
+                                                </CardHeader>
+                                                {newOrderSelections.length > 0 && (
+                                                    <CardContent className="space-y-3 pt-0">
+                                                        {newOrderSelections.map(({ order, rewards }) => {
+                                                            const selectedRewardIds = rewards;
+                                                            const selectedRewards = selectedRewardIds
+                                                                .map(id => rewardOptionsMap.get(id))
+                                                                .filter((reward): reward is IRewardEntityType => reward !== undefined);
+                                                            return (
+                                                                <div key={order} className="p-4 rounded-lg border border-blue-200/40 bg-background/70 space-y-3">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <Badge className="bg-blue-500/40 text-blue-900 border-blue-500/60 font-semibold shadow-sm">
+                                                                            {t('tournaments.detail.rewards.range.single', { rank: order })}
                                                                         </Badge>
-                                                                        <Button
-                                                                            size="sm"
-                                                                            variant="outline"
-                                                                            onClick={() => handleOpenRewardSelect(rankName, order)}
-                                                                            disabled={isSavingRewards || isRewardListLoading}
-                                                                            className="h-8"
-                                                                        >
-                                                                            <Edit2 className="w-3 h-3 mr-1.5" />
-                                                                            {t('tournaments.detail.rewards.dialog.selectRewards', { defaultValue: 'Chọn rewards' })}
-                                                                        </Button>
+                                                                        <div className="flex items-center gap-2">
+                                                                            <Button
+                                                                                size="sm"
+                                                                                variant="outline"
+                                                                                onClick={() => handleOpenRewardSelect(rankName, order)}
+                                                                                disabled={isSavingRewards || isRewardListLoading}
+                                                                                className="h-8"
+                                                                            >
+                                                                                <Edit2 className="w-3 h-3 mr-1.5" />
+                                                                                {t('tournaments.detail.rewards.dialog.selectRewards', { defaultValue: 'Chọn rewards' })}
+                                                                            </Button>
+                                                                            <Button
+                                                                                size="sm"
+                                                                                variant="outline"
+                                                                                onClick={() => handleRemoveOrder(rankName, order)}
+                                                                                disabled={isSavingRewards}
+                                                                                className="h-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                                            >
+                                                                                <Trash2 className="w-3 h-3" />
+                                                                            </Button>
+                                                                        </div>
                                                                     </div>
-                                                                </CardHeader>
-                                                                <CardContent className="pt-0">
                                                                     {selectedRewardIds.length === 0 ? (
                                                                         <p className="text-sm text-muted-foreground py-2">
                                                                             {messages.noRewardRange}
@@ -547,7 +496,7 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
                                                                                 <Badge
                                                                                     key={reward.id}
                                                                                     variant="secondary"
-                                                                                    className="bg-primary/25 text-primary border-primary/50 pr-1 cursor-pointer hover:bg-primary/35 transition-colors font-medium shadow-sm"
+                                                                                    className="bg-blue-500/25 text-blue-800 border-blue-500/50 pr-1 cursor-pointer hover:bg-blue-500/35 transition-colors font-medium shadow-sm"
                                                                                     onClick={() => handleRemoveReward(rankName, order, reward.id)}
                                                                                 >
                                                                                     {reward.nameTranslation || reward.nameKey || `#${reward.id}`}
@@ -556,20 +505,107 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
                                                                             ))}
                                                                         </div>
                                                                     )}
-                                                                </CardContent>
-                                                            </Card>
-                                                        );
-                                                    })
-                                                })()}
-                                            </div>
-                                            <ScrollBar orientation="vertical" />
-                                        </ScrollArea>
-                                    </TabsContent>
-                                );
-                            })}
-                        </Tabs>
-                    </div>
-                )}
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </CardContent>
+                                                )}
+                                            </Card>
+                                            {!hasAnyOrder && (
+                                                <Card className="border border-dashed border-muted-foreground/40 bg-muted/10 shadow-none">
+                                                    <CardHeader className="space-y-2">
+                                                        <DialogTitle className="text-base font-semibold">
+                                                            {t('tournaments.detail.rewards.dialog.emptyStateTitle', { defaultValue: 'Chưa có phần thưởng nào cho rank này' })}
+                                                        </DialogTitle>
+                                                        <DialogDescription className="text-sm text-muted-foreground">
+                                                            {t('tournaments.detail.rewards.dialog.emptyStateDescription', { defaultValue: 'Tạo order đầu tiên để bắt đầu cấu hình phần thưởng.' })}
+                                                        </DialogDescription>
+                                                    </CardHeader>
+                                                    <CardContent className="pt-0">
+                                                        <Button
+                                                            onClick={() => {
+                                                                handleAddNewOrder(rankName, String(suggestedOrder));
+                                                                handleOpenRewardSelect(rankName, suggestedOrder);
+                                                            }}
+                                                            disabled={isSavingRewards || isRewardListLoading}
+                                                        >
+                                                            <Plus className="w-4 h-4 mr-2" />
+                                                            {t('tournaments.detail.rewards.dialog.emptyStateAction', { defaultValue: 'Thêm phần thưởng đầu tiên' })}
+                                                        </Button>
+                                                    </CardContent>
+                                                </Card>
+                                            )}
+                                            {(() => {
+                                                // Lọc các entries có order !== null và sắp xếp theo order
+                                                const validEntries = entries
+                                                    .filter((entry) => entry.order !== null)
+                                                    .sort((a, b) => (a.order as number) - (b.order as number));
+
+                                                return validEntries.map((entry, index) => {
+                                                    const nextEntry = validEntries[index + 1];
+                                                    const order = entry.order as number;
+                                                    const nextOrder = nextEntry?.order as number | undefined;
+                                                    const rangeLabel = formatRangeLabel(order, nextOrder);
+                                                    const selectedRewardIds = pendingSelections[rankName]?.[order] ?? [];
+                                                    const selectedRewards = selectedRewardIds
+                                                        .map((id: number) => rewardOptionsMap.get(id))
+                                                        .filter((reward): reward is IRewardEntityType => reward !== undefined);
+
+                                                    return (
+                                                        <Card
+                                                            key={entry.id}
+                                                            className="border border-amber-200/50 bg-background/90 shadow-sm"
+                                                        >
+                                                            <CardHeader className="space-y-3 pb-3">
+                                                                <div className="flex flex-wrap items-center justify-between gap-3">
+                                                                    <Badge className="bg-primary/35 text-primary border-primary/60 font-semibold uppercase tracking-wide shadow-sm">
+                                                                        {rangeLabel}
+                                                                    </Badge>
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="outline"
+                                                                        onClick={() => handleOpenRewardSelect(rankName, order)}
+                                                                        disabled={isSavingRewards || isRewardListLoading}
+                                                                        className="h-8"
+                                                                    >
+                                                                        <Edit2 className="w-3 h-3 mr-1.5" />
+                                                                        {t('tournaments.detail.rewards.dialog.selectRewards', { defaultValue: 'Chọn rewards' })}
+                                                                    </Button>
+                                                                </div>
+                                                            </CardHeader>
+                                                            <CardContent className="pt-0">
+                                                                {selectedRewardIds.length === 0 ? (
+                                                                    <p className="text-sm text-muted-foreground py-2">
+                                                                        {messages.noRewardRange}
+                                                                    </p>
+                                                                ) : (
+                                                                    <div className="flex flex-wrap gap-2">
+                                                                        {selectedRewards.map((reward: IRewardEntityType) => (
+                                                                            <Badge
+                                                                                key={reward.id}
+                                                                                variant="secondary"
+                                                                                className="bg-primary/25 text-primary border-primary/50 pr-1 cursor-pointer hover:bg-primary/35 transition-colors font-medium shadow-sm"
+                                                                                onClick={() => handleRemoveReward(rankName, order, reward.id)}
+                                                                            >
+                                                                                {reward.nameTranslation || reward.nameKey || `#${reward.id}`}
+                                                                                <X className="w-3 h-3 ml-1.5" />
+                                                                            </Badge>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
+                                                            </CardContent>
+                                                        </Card>
+                                                    );
+                                                })
+                                            })()}
+                                        </div>
+                                        <ScrollBar orientation="vertical" />
+                                    </ScrollArea>
+                                </TabsContent>
+                            );
+                        })}
+                    </Tabs>
+                </div>
                 <DialogFooter className="flex items-center justify-end gap-2 flex-shrink-0 pt-4 border-t">
                     <Button
                         variant="outline"
@@ -580,7 +616,7 @@ const DialogUpdateRewardSeason = ({ open, onOpenChange, seasonId, rankGroups }: 
                     </Button>
                     <Button
                         onClick={handleSaveRewards}
-                        disabled={isSavingRewards || rankGroups.length === 0}
+                        disabled={isSavingRewards}
                     >
                         {isSavingRewards && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         {dialogLabels.save}

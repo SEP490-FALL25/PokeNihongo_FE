@@ -62,8 +62,8 @@ const DialogReward = ({
 
     return (
         <Dialog open={open} onOpenChange={(open) => !open && handleClose()}>
-            <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col overflow-hidden bg-white">
-                <DialogHeader>
+            <DialogContent className="max-w-3xl h-[80vh] flex flex-col overflow-hidden bg-white">
+                <DialogHeader className="flex-shrink-0">
                     <DialogTitle>
                         {order === null
                             ? t('tournaments.detail.rewards.dialog.selectCommonRewardsTitle', {
@@ -88,14 +88,16 @@ const DialogReward = ({
                         }
                     </DialogDescription>
                 </DialogHeader>
-                <div className="flex flex-col flex-1 min-h-0 space-y-4">
-                    <Input
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        placeholder={searchPlaceholder || t('tournaments.detail.rewards.dialog.searchPlaceholder', { defaultValue: 'Tìm kiếm rewards...' })}
-                        className="bg-background border-border"
-                        disabled={isRewardListLoading}
-                    />
+                <div className="flex flex-col flex-1 min-h-0 space-y-4 overflow-hidden">
+                    <div className="flex-shrink-0">
+                        <Input
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder={searchPlaceholder || t('tournaments.detail.rewards.dialog.searchPlaceholder', { defaultValue: 'Tìm kiếm rewards...' })}
+                            className="bg-background border-border"
+                            disabled={isRewardListLoading}
+                        />
+                    </div>
                     <ScrollArea className="flex-1 min-h-0">
                         {isRewardListLoading ? (
                             <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
@@ -154,7 +156,7 @@ const DialogReward = ({
                         <ScrollBar orientation="vertical" />
                     </ScrollArea>
                 </div>
-                <DialogFooter>
+                <DialogFooter className="flex-shrink-0">
                     <Button
                         onClick={handleClose}
                         disabled={isSavingRewards}

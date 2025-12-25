@@ -464,11 +464,15 @@ export default function TournamentManagement() {
                                         </div>
 
                                         {/* Action Buttons */}
-                                        <div className="flex gap-2 pt-2">
+                                        <div className="flex gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
                                             <Button
                                                 variant="outline"
                                                 size="icon"
                                                 className="border-border text-foreground hover:bg-primary/10 hover:border-primary/50 hover:text-primary transition-all shadow-sm"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    router(`${ROUTES.ADMIN.TOURNAMENT_MANAGEMENT}/${tournament.id}`);
+                                                }}
                                             >
                                                 <Edit className="w-4 h-4" />
                                             </Button>
@@ -476,7 +480,10 @@ export default function TournamentManagement() {
                                                 variant="outline"
                                                 size="icon"
                                                 className="border-border text-destructive hover:bg-destructive/10 hover:border-destructive hover:text-destructive transition-all shadow-sm"
-                                                onClick={() => setDeleteCandidate({ id: tournament.id, name: tournament.nameTranslation || tournament.nameKey })}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setDeleteCandidate({ id: tournament.id, name: tournament.nameTranslation || tournament.nameKey });
+                                                }}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
